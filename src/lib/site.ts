@@ -1,22 +1,21 @@
+import { SECTION, SECTIONS } from './taxonomy';
+
 export const SITE = {
   name: 'Stackvenn',
   url: 'https://stackvenn.in',
   tagline: 'Where AI engineering, software and work overlap.',
   description:
-    'Field notes where AI, engineering and work overlap, from an engineer who ships agentic AI in production. Guides, essays and notes by Srihari Venkatesan.',
+    'Reporting and analysis where AI, engineering and work overlap, from an engineer who ships agentic AI in production. By Srihari Venkatesan.',
   locale: 'en',
+  timeZone: 'Asia/Kolkata',
   repo: 'https://github.com/MayaDispeler/stackvenn',
   author: {
     name: 'Srihari Venkatesan',
+    slug: 'srihari-venkatesan',
     url: 'https://iamsrihari.com',
     role: 'AI engineer who ships agentic systems in production',
   },
 } as const;
 
-export const NAV = [
-  { href: '/guides', label: 'Guides' },
-  { href: '/essays', label: 'Essays' },
-  { href: '/notes', label: 'Notes' },
-  { href: '/topics', label: 'Topics' },
-  { href: '/about', label: 'About' },
-] as const;
+/** Main navigation is the six sections, like a newspaper. Formats never appear in the nav. */
+export const NAV = SECTIONS.map((s) => ({ href: `/${s}`, label: SECTION[s].label }));

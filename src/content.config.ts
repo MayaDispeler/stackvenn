@@ -2,51 +2,36 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
-
-export const TYPES = ['guide', 'essay', 'note', 'glossary', 'tool'] as const;
-export const PILLARS = [
-  'agentic',
-  'retrieval',
-  'evals',
-  'cost',
-  'shipping',
-  'careers',
-  'work',
-  'life',
-  'society',
-] as const;
-
-/** Folder under src/content/ that each type must live in, which also fixes its URL prefix. */
-export const TYPE_DIR: Record<(typeof TYPES)[number], string> = {
-  guide: 'guides',
-  essay: 'essays',
-  note: 'notes',
-  glossary: 'glossary',
-  tool: 'tools',
-};
+import { COLUMN_SLUGS, FORMATS, SECTIONS } from './lib/taxonomy';
 
 const source = z.object({ title: z.string().min(1), url: z.url() });
 
 const posts = defineCollection({
-  loader: glob({
-    pattern: '{essays,notes,guides,glossary,tools}/**/*.{md,mdx}',
-    base: './src/content',
-  }),
+  loader: glob({ pattern: '{stories,terms,tools}/**/*.{md,mdx}', base: './src/content' }),
   schema: ({ image }) =>
     z
       .object({
-        title: z.string().min(1),
-        dek: z
+        headline: z.string().min(1),
+        /** One-paragraph standfirst under the headline; doubles as the meta description. */
+        standfirst: z
           .string()
-          .min(120, 'dek must be 120–160 characters (it is the meta description)')
-          .max(160, 'dek must be 120–160 characters (it is the meta description)'),
-        type: z.enum(TYPES),
-        pillar: z.enum(PILLARS),
+          .min(120, 'standfirst must be 120–160 characters (it is the meta description)')
+          .max(160, 'standfirst must be 120–160 characters (it is the meta description)'),
+        format: z.enum(FORMATS),
+        section: z.enum(SECTIONS),
+        /** Optional kicker override; defaults to the format label or the column name. */
+        kicker: z.string().optional(),
+        column: z.enum(COLUMN_SLUGS).optional(),
         overlap: z.tuple([z.string().min(1), z.string().min(1)]),
+        /** Ordered path (Explained) or reading series, e.g. "start-here". */
         series: z.string().optional(),
         order: z.number().int().positive().optional(),
         level: z.enum(['beginner', 'intermediate', 'advanced']).optional(),
         tested_with: z.array(z.string()).optional(),
+        /** "Explained in 60 seconds": 3–5 one-line takeaways, Explained only. */
+        summary: z.array(z.string().min(1)).min(3).max(5).optional(),
+        /** Place line for the dateline, e.g. "Chennai". */
+        dateline: z.string().optional(),
         published: z.coerce.date(),
         updated: z.coerce.date().optional(),
         status: z.enum(['draft', 'review', 'approved']),
@@ -68,6 +53,7 @@ const posts = defineCollection({
         sources: z.array(source).default([]),
         cover: image().optional(),
         cover_alt: z.string().optional(),
+        cover_credit: z.string().optional(),
         distribute: z
           .object({
             devto: z.boolean().default(false),
@@ -88,22 +74,19 @@ const posts = defineCollection({
         faq: z.array(z.object({ q: z.string(), a: z.string() })).optional(),
       })
       .superRefine((d, ctx) => {
-        if (d.type !== 'guide' && d.level) {
-          ctx.addIssue({ code: 'custom', path: ['level'], message: 'level is for guides only' });
+        const issue = (path: string, message: string) =>
+          ctx.addIssue({ code: 'custom', path: [path], message });
+        if (d.format === 'column' && !d.column) issue('column', 'a column piece needs `column`');
+        if (d.format !== 'column' && d.column) issue('column', '`column` is for format: column');
+        if (d.format !== 'explained' && (d.level || d.summary)) {
+          issue('format', '`level` and `summary` are for format: explained');
         }
-        if (d.type === 'guide' && !d.level) {
-          ctx.addIssue({ code: 'custom', path: ['level'], message: 'guides need a level' });
+        if (d.format === 'explained' && !d.level) issue('level', 'Explained pieces need a level');
+        if (d.format === 'explained' && !d.summary) {
+          issue('summary', 'Explained pieces need an "Explained in 60 seconds" summary');
         }
-        if (d.updated && d.updated < d.published) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['updated'],
-            message: 'updated is before published',
-          });
-        }
-        if (d.cover && !d.cover_alt) {
-          ctx.addIssue({ code: 'custom', path: ['cover_alt'], message: 'a cover needs alt text' });
-        }
+        if (d.updated && d.updated < d.published) issue('updated', 'updated is before published');
+        if (d.cover && !d.cover_alt) issue('cover_alt', 'a cover needs alt text');
       }),
 });
 

@@ -2,6 +2,26 @@
 
 Newest first. Each entry: what was decided, why, and who decided.
 
+## 2026-10-29: Editorial model, a publication rather than a blog (Srihari)
+
+**The bar** is Medium, The Hindu, The Economic Times and Deccan Chronicle. "Essays", "Guides" and "Notes" are removed from the UI, URLs and docs.
+
+**Sections are the navigation:** AI · Engineering · Careers · Work · Life · Society. Pillar mapping: agentic/retrieval/evals/cost → AI or Engineering (per story); shipping → Work; careers/work/life/society unchanged.
+
+**Formats are kickers, never nav:** Explained (old guides, docs layout), Analysis, Opinion, Column (first: "2 AM"), Brief (old notes), Terms (old glossary), Tools.
+
+**URLs, permanent from today:** `/<section>/<slug>` for every story, `/explained` hub, `/columns/2-am`, `/terms/<slug>`, `/tools/<slug>`, `/author/srihari-venkatesan`, section pagination at `/<section>/page/<n>`. Slugs are unique site-wide; `page`, `index`, `rss` and `feed` are reserved. All 19 new article URLs are in MIGRATION §1.
+
+**Schema:** `title` → `headline`, `dek` → `standfirst`, `type` → `format`, `pillar` → `section`, `series: 2-am` → `column: 2-am`. Added `kicker` (override), `summary` ("Explained in 60 seconds", required for Explained), `dateline`, `cover_credit`. Stories live in `src/content/stories/`, terms in `terms/`, tools in `tools/`.
+
+**Structured data:** Explained → TechArticle; Analysis → AnalysisNewsArticle; Opinion and Column → OpinionNewsArticle; Brief → BlogPosting. The Person entity moved to `/author/srihari-venkatesan#person`.
+
+**iamsrihari.com 301s (Claude, from checking that repo):** no article ever had a page there (the current site links out or opens 2 AM pieces in an in-page reader; an old `/blog/<slug>` route held one internal draft). So the "301 map" is defensive: `/writing/<slug>` and `/blog/<slug>` for the 19 slugs → their new URLs.
+
+**Formats for migrated stories are proposals** (MIGRATION §1: the three 2 AM pieces are Column; "9.2% If You Stay" and "Why AI is Not Free" are Analysis; the rest Opinion). Each migration PR confirms them.
+
+**Lead story has no card surface** (supersedes DESIGN_SYSTEM's "Featured card"): "no cards-in-grids look; rules and type do the work."
+
 ## 2026-10-29: Merge policy, living docs, Node pin (Srihari)
 
 **Merge policy.** Claude may merge code, design and infra PRs once CI is fully green and, for UI PRs, the Impeccable audit is clean. Content PRs (new or migrated articles) wait for Srihari. His own saves in the `/admin` writing desk count as approval; Claude's drafts still go through PRs. Recorded in CLAUDE.md.

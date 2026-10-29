@@ -15,6 +15,7 @@ for (const page of PAGES) {
         await p.setViewportSize({ width, height: 900 });
         const res = await p.goto(page.path);
         if (page.name !== '404') expect(res?.status()).toBe(200);
+        await p.waitForLoadState('load');
         await p.evaluate(() => document.fonts.ready);
 
         await expect(p.locator('html')).toHaveAttribute('data-theme', theme);

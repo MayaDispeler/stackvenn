@@ -34,29 +34,29 @@ Content-Signal: search=yes, ai-input=yes, ai-train=yes
 Sitemap: https://stackvenn.in/sitemap-index.xml
 ```
 - [ ] Check the current Content Signals syntax on Cloudflare's docs before shipping, and match Training to the Cloudflare decision above.
-- [ ] `sitemap-index.xml` with `<lastmod>` taken from `updated` or `published`. Exclude drafts, tag pages with fewer than 3 posts, and the search page.
-- [ ] `/llms.txt`: site summary, then sections (Guides, Essays, Glossary, Tools), each line `- [Title](url.md): dek`. `/llms-full.txt`: the full markdown of all guides and glossary terms. This is a community proposal; Google doesn't use it, but it is cheap and some AI tools read it.
-- [ ] Each post's `.md` twin is linked with `<link rel="alternate" type="text/markdown" href="….md">`.
+- [ ] `sitemap-index.xml` with `<lastmod>` taken from `updated` or `published`. Exclude drafts, `/admin`, section fronts with no stories, and the search page.
+- [ ] `/llms.txt`: site summary, then sections (one per site section, plus Explained, Terms, Tools), each line `- [Headline](url.md): standfirst`. `/llms-full.txt`: the full markdown of all Explained pieces and Terms. This is a community proposal; Google doesn't use it, but it is cheap and some AI tools read it.
+- [ ] Each story's `.md` twin is linked with `<link rel="alternate" type="text/markdown" href="….md">`.
 - [ ] Full-content RSS (`/rss.xml`) and JSON Feed (`/feed.json`), with autodiscovery `<link>` tags on every page.
 
 ## 4. On-page SEO (enforced by a build-time check script)
 
-- [ ] `<title>`: post title + " · Stackvenn"; aim for ≤ 60 characters total.
-- [ ] Meta description = `dek` (120–160 chars). Fail the build if it is missing or duplicated.
+- [ ] `<title>`: headline + " · Stackvenn"; aim for ≤ 60 characters total.
+- [ ] Meta description = `standfirst` (120–160 chars). Fail the build if it is missing or duplicated.
 - [ ] One H1; logical H2/H3; the first 100 words state what the reader will get, and include the main term naturally.
 - [ ] Self-referencing canonical on every page (migrated posts keep their canonical rules from the PRD).
 - [ ] Open Graph and Twitter cards with a generated 1200×630 OG image (title, overlap chip, Venn mark, on `--bg`).
 - [ ] Descriptive slugs (3–6 words, lowercase, hyphens), never dates in URLs.
 - [ ] Images: AVIF or WebP via astro:assets, explicit width and height, descriptive alt, lazy below the fold, LCP image prioritised.
-- [ ] Internal links: each new post links to its pillar hub plus at least 2 related posts, and gets at least 2 links from older posts (the publish workflow adds those as a PR). Breadcrumbs on every post.
-- [ ] Show "Updated <date>" and keep a short changelog at the end of guides. Only bump `updated` for real content changes.
+- [ ] Internal links: each new story links to its section front plus at least 2 related stories, and gets at least 2 links from older stories (the publish workflow adds those as a PR). Breadcrumbs on every story (Stackvenn › Section › Headline).
+- [ ] Show "Updated <date>" and keep a short changelog at the end of Explained pieces. Only bump `updated` for real content changes.
 - [ ] Performance budget enforced in CI (Lighthouse CI): JS ≤ 50KB gzipped on content pages, LCP < 2.5s, CLS < 0.1.
 
 ## 5. Structured data (JSON-LD, validated in CI)
 
-- [ ] Sitewide: `WebSite` (name, url), `Organization` (Stackvenn, logo), `Person` (Srihari: name, url → /about, `sameAs` → iamsrihari.com, LinkedIn, GitHub, Medium, Amazon author page).
-- [ ] Guides: `TechArticle`. Essays and notes: `BlogPosting`. Each includes headline, description, datePublished, dateModified, author (Person @id), publisher, image, `about` (pillar) and `isPartOf` (series).
-- [ ] `BreadcrumbList` on all posts; `DefinedTerm` on glossary pages; `Book` on the book page; `SoftwareApplication` or `WebApplication` on tools.
+- [ ] Sitewide: `WebSite` (name, url), `Organization` (Stackvenn, logo), `Person` (Srihari: name, url → /author/srihari-venkatesan, `sameAs` → iamsrihari.com, LinkedIn, GitHub, Medium, Amazon author page).
+- [ ] Explained: `TechArticle`. Analysis: `AnalysisNewsArticle`. Opinion and Column: `OpinionNewsArticle`. Brief: `BlogPosting`. Each includes headline, description, datePublished, dateModified, author (Person @id), publisher, image, `articleSection` (section) and `isPartOf` (column or path).
+- [ ] `BreadcrumbList` on all stories; `DefinedTerm` on Terms pages; `Book` on the book page; `SoftwareApplication` or `WebApplication` on tools.
 - [ ] Don't rely on FAQ or HowTo rich results (Google limited them). FAQ blocks are still welcome as plain content for readers and AI answers.
 
 ## 6. Search engines: connect and automate
@@ -78,17 +78,17 @@ AI answers cite pages that are crawlable, clear, specific and trustworthy.
 - [ ] Original value AI can't make up: real numbers from Srihari's projects, code, architecture diagrams, failure post-mortems, benchmarks with method notes.
 - [ ] Cite sources inline and in a "Sources" list. Show author credentials on every post.
 - [ ] Keep naming consistent ("Stackvenn", "Srihari Venkatesan") everywhere, including socials and GitHub, so assistants connect the entity.
-- [ ] "Copy Markdown" and "Open in ChatGPT/Claude/Perplexity" buttons on guides spread the page into AI conversations.
+- [ ] "Copy Markdown" and "Open in ChatGPT/Claude/Perplexity" buttons on Explained pages spread the page into AI conversations.
 - [ ] Measure: PostHog channel breakdown for referrers chatgpt.com, chat.openai.com, perplexity.ai, claude.ai, gemini.google.com, copilot.microsoft.com, plus `utm_source=chatgpt.com`. Report monthly.
 
 ## 8. Off-site reach (earned, not spammed)
 
 Claude prepares assets and drafts. Anything posted in communities is a human's decision.
-- [ ] **GitHub:** the READMEs of Orqestra, Savepoint and other repos link to the matching deep-dive guide. This is the strongest legitimate backlink source available. Claude opens PRs on Srihari's own repos.
+- [ ] **GitHub:** the READMEs of Orqestra, Savepoint and other repos link to the matching Explained piece. This is the strongest legitimate backlink source available. Claude opens PRs on Srihari's own repos.
 - [ ] **Syndication with canonical:** dev.to and Hashnode (see MARKETING_AUTOMATION.md).
 - [ ] **Old copies on LinkedIn and Medium stay up** (Srihari's choice). To help search engines treat stackvenn.in as the main version: migrated posts are revised and expanded (not word-for-word), carry their own canonical, and get internal links. [H, optional] On Medium, set each story's canonical link to the stackvenn.in URL (story settings → Advanced → "This story was originally published elsewhere"). LinkedIn has no canonical setting, so nothing is needed there.
 - [ ] **daily.dev:** submit stackvenn.in as a source (one-time, **[H]** if a form login is needed). Dev blogs get large reach there.
-- [ ] **Awesome lists:** at most 3 highly relevant ones (for example awesome-mcp, awesome-llm-evals), via a PR adding the tool or guide. Only when it meets the list's contribution rules.
+- [ ] **Awesome lists:** at most 3 highly relevant ones (for example awesome-mcp, awesome-llm-evals), via a PR adding the tool or Explained piece. Only when it meets the list's contribution rules.
 - [ ] **Communities** (manual, Srihari decides): Hacker News "Show HN" for tools and the /experiment page; relevant subreddits that follow their self-promotion rules; LinkedIn groups. Claude writes a tailored draft into the issue; it never posts.
 - [ ] **Podcasts and newsletters:** monthly, Claude lists 5 relevant AI-engineering newsletters or podcasts that accept submissions and drafts a pitch per item in an issue labelled `human`.
 - [ ] **Unlinked mentions:** monthly search for "Stackvenn" or "Srihari Venkatesan" mentions without links; draft polite outreach in an issue.
@@ -97,4 +97,4 @@ Claude prepares assets and drafts. Anything posted in communities is a human's d
 
 - [ ] Monthly: refresh posts ranking in positions 8–20 for any query with at least 100 impressions (improve intro, add a section, update data, add internal links) via a PR.
 - [ ] Quarterly: prune or merge posts with no impressions after 6 months (301 into the stronger post).
-- [ ] Re-test guides when a tool in `tested_with` ships a major version; update or add a "Version note" callout.
+- [ ] Re-test Explained pieces when a tool in `tested_with` ships a major version; update or add a "Version note" callout.

@@ -1,9 +1,10 @@
 ---
-// Essays and field notes (DESIGN §3): one 680px column.
+// Story page: Analysis, Opinion, Column and Brief (DESIGN §3). One 680px column.
 import Shell from './Shell.astro';
 import OverlapChip from '../components/OverlapChip.astro';
 import { SITE } from '../lib/site';
-import { formatDate, readingTime, urlOf, type Post } from '../lib/posts';
+import { COLUMNS, SECTION } from '../lib/taxonomy';
+import { formatDate, kickerOf, readingTime, urlOf, type Post } from '../lib/posts';
 
 interface Props {
   post: Post;
@@ -11,10 +12,13 @@ interface Props {
 const { post } = Astro.props;
 const d = post.data;
 const url = urlOf(post);
+const abs = new URL(url, SITE.url).href;
 const minutes = readingTime(post.body);
-const isNote = d.type === 'note';
-const is2am = d.series === '2-am';
-const typeLabel = isNote ? 'Note' : 'Essay';
+const section = SECTION[d.section];
+const column = d.column ? COLUMNS[d.column] : undefined;
+const kicker = kickerOf(post);
+const kickerHref = column ? `/columns/${d.column}` : undefined;
+const isBrief = d.format === 'brief';
 const firstPublished = d.first_published
   ? `First published on ${d.first_published.platform}, ${d.first_published.date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' })}. Revised for Stackvenn.`
   : undefined;
@@ -22,22 +26,28 @@ const firstPublished = d.first_published
 const jsonLd = [
   {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: d.title,
-    description: d.dek,
-    url: new URL(url, SITE.url).href,
+    '@type':
+      d.format === 'analysis'
+        ? 'AnalysisNewsArticle'
+        : d.format === 'opinion' || d.format === 'column'
+          ? 'OpinionNewsArticle'
+          : 'BlogPosting',
+    headline: d.headline,
+    description: d.standfirst,
+    url: abs,
+    mainEntityOfPage: abs,
     datePublished: d.published.toISOString(),
     dateModified: (d.updated ?? d.published).toISOString(),
     inLanguage: SITE.locale,
-    author: { '@id': `${SITE.url}/about#person` },
+    articleSection: section.label,
+    author: { '@id': `${SITE.url}/author/srihari-venkatesan#person` },
     publisher: { '@id': `${SITE.url}/#org` },
-    about: d.pillar,
-    ...(d.series
+    ...(column
       ? {
           isPartOf: {
             '@type': 'CreativeWorkSeries',
-            name: d.series,
-            url: `${SITE.url}/series/${d.series}`,
+            name: column.name,
+            url: `${SITE.url}/columns/${d.column}`,
           },
         }
       : {}),
@@ -47,21 +57,16 @@ const jsonLd = [
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE.name, item: SITE.url },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: isNote ? 'Notes' : 'Essays',
-        item: `${SITE.url}/${isNote ? 'notes' : 'essays'}`,
-      },
-      { '@type': 'ListItem', position: 3, name: d.title, item: new URL(url, SITE.url).href },
+      { '@type': 'ListItem', position: 2, name: section.label, item: `${SITE.url}/${d.section}` },
+      { '@type': 'ListItem', position: 3, name: d.headline, item: abs },
     ],
   },
 ];
 ---
 
 <Shell
-  title={d.title}
-  description={d.dek}
+  title={d.headline}
+  description={d.standfirst}
   path={url}
   ogType="article"
   markdownTwin={`${url}.md`}
@@ -74,39 +79,42 @@ const jsonLd = [
     <span data-progress></span>
   </div>
 
-  <article class:list={['container', 'essay', { note: isNote }]}>
+  <article class:list={['container', 'story', { brief: isBrief }]}>
     <header class="head">
-      <nav class="crumbs meta" aria-label="Breadcrumb">
-        <a href={isNote ? '/notes' : '/essays'}>{isNote ? 'Notes' : 'Essays'}</a>
-        <span aria-hidden="true">/</span>
-        <a href={`/topics/${d.pillar}`}>{d.pillar}</a>
-      </nav>
-      <p class="kicker">
-        {is2am ? (
-          <a class="column" href="/series/2-am">
-            2 AM
+      <p class="kicker-row">
+        <a class="section" href={`/${d.section}`}>
+          {section.label}
+        </a>
+        <span class="rule" aria-hidden="true"></span>
+        {kickerHref ? (
+          <a class="kicker" href={kickerHref}>
+            {kicker}
           </a>
-        ) : null}
-        <OverlapChip overlap={d.overlap} />
-        <span class="meta">· {typeLabel}</span>
-      </p>
-      <h1>{d.title}</h1>
-      <p class="dek">{d.dek}</p>
-      <p class="byline meta">
-        <a href="/about">{SITE.author.name}</a>
-        <span aria-hidden="true">·</span>
-        <time datetime={d.published.toISOString()}>{formatDate(d.published)}</time>
-        {d.updated && (
-          <>
-            <span aria-hidden="true">·</span>
-            <span>
-              Updated <time datetime={d.updated.toISOString()}>{formatDate(d.updated)}</time>
-            </span>
-          </>
+        ) : (
+          <span class="kicker">{kicker}</span>
         )}
-        <span aria-hidden="true">·</span>
-        <span>{minutes} min read</span>
       </p>
+      <h1>{d.headline}</h1>
+      <p class="standfirst">{d.standfirst}</p>
+      <div class="byline">
+        <OverlapChip overlap={d.overlap} />
+        <p class="meta">
+          By <a href="/author/srihari-venkatesan">{SITE.author.name}</a>
+          <span aria-hidden="true">·</span>
+          {d.dateline && <span class="dateline">{d.dateline},</span>}
+          <time datetime={d.published.toISOString()}>{formatDate(d.published)}</time>
+          {d.updated && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span>
+                Updated <time datetime={d.updated.toISOString()}>{formatDate(d.updated)}</time>
+              </span>
+            </>
+          )}
+          <span aria-hidden="true">·</span>
+          <span>{minutes} min read</span>
+        </p>
+      </div>
     </header>
 
     <div class="prose body">
@@ -134,7 +142,7 @@ const jsonLd = [
 
 <script>
   const bar = document.querySelector<HTMLElement>('[data-progress]');
-  const body = document.querySelector<HTMLElement>('.essay .body');
+  const body = document.querySelector<HTMLElement>('.story .body');
   if (bar && body && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const update = () => {
       const r = body.getBoundingClientRect();
@@ -149,7 +157,7 @@ const jsonLd = [
 </script>
 
 <style>
-  /* Pinned to the viewport top (not under the header), so it stays put when the mobile header hides. */
+  /* Pinned to the viewport top, so it stays put when the mobile header hides. */
   .progress {
     position: fixed;
     inset: 0 0 auto;
@@ -169,40 +177,40 @@ const jsonLd = [
       display: none;
     }
   }
-  .essay {
-    max-width: calc(var(--w-essay) + var(--gutter) + var(--gutter-r));
+  .story {
+    max-width: calc(var(--w-story) + var(--gutter) + var(--gutter-r));
     padding-block-start: var(--s-7);
   }
-  .crumbs {
+  .kicker-row {
     display: flex;
-    gap: var(--s-2);
-    margin-block-end: var(--s-5);
-  }
-  .crumbs a {
-    color: var(--text-muted);
-    text-decoration: none;
-    text-transform: capitalize;
-  }
-  .crumbs a:hover {
-    color: var(--text);
-    text-decoration: underline;
-  }
-  .kicker {
-    display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: var(--s-2);
+    gap: var(--s-3);
     margin-block-end: var(--s-4);
-  }
-  .column {
-    font-family: var(--font-mono);
     font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    font-weight: 600;
     letter-spacing: var(--ls-eyebrow);
     text-transform: uppercase;
+  }
+  .section {
     color: var(--text);
     text-decoration: none;
-    padding-inline-end: var(--s-2);
-    border-inline-end: var(--bw) solid var(--border);
+  }
+  .section:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  .rule {
+    width: var(--s-5);
+    height: var(--bw);
+    background: var(--border-strong);
+  }
+  .kicker {
+    color: var(--accent-text);
+    text-decoration: none;
+  }
+  a.kicker:hover {
+    text-decoration: underline;
   }
   h1 {
     font-family: var(--font-read);
@@ -212,28 +220,32 @@ const jsonLd = [
     font-variation-settings: 'opsz' 72;
     letter-spacing: -0.01em;
   }
-  .note h1 {
+  .brief h1 {
     font-size: var(--fs-h1);
     line-height: var(--lh-h1);
   }
-  .dek {
+  .standfirst {
     margin-block-start: var(--s-4);
     font-family: var(--font-read);
     font-style: italic;
-    font-size: var(--fs-dek);
-    line-height: var(--lh-dek);
+    font-size: var(--fs-standfirst);
+    line-height: var(--lh-standfirst);
     color: var(--text-muted);
   }
-  .note .dek {
+  .brief .standfirst {
     font-style: normal;
   }
   .byline {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
     gap: var(--s-2);
     margin-block: var(--s-5) var(--s-7);
     padding-block-end: var(--s-5);
     border-block-end: var(--bw) solid var(--border);
+  }
+  .byline .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
   }
   .byline a {
     color: var(--text-soft);

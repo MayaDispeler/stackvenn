@@ -7,11 +7,11 @@ export default defineConfig({
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
-  use: { baseURL: 'http://localhost:4321', ...devices['Desktop Chrome'] },
+  use: { baseURL: 'http://localhost:4322', ...devices['Desktop Chrome'] },
   webServer: {
-    command: 'npx astro preview --port 4321',
-    url: 'http://localhost:4321',
-    reuseExistingServer: !process.env.CI,
+    command: 'npx astro preview --port 4322',
+    url: 'http://localhost:4322',
+    reuseExistingServer: false,
     timeout: 60_000,
   },
 });

@@ -1,0 +1,47 @@
+---
+// Hub for the Explained format (step-by-step pieces in the docs layout), grouped by section.
+import List from '../layouts/List.astro';
+import StoryList from '../components/StoryList.astro';
+import { getStories } from '../lib/posts';
+import { SECTION, SECTIONS } from '../lib/taxonomy';
+
+const explained = await getStories((p) => p.data.format === 'explained');
+const groups = SECTIONS.map((s) => ({
+  section: s,
+  posts: explained.filter((p) => p.data.section === s),
+})).filter((g) => g.posts.length);
+---
+
+<List
+  title="Explained"
+  heading="Explained"
+  lede="Step-by-step pieces you can follow and apply, with the tool and model versions they were written against."
+  description="Explained on Stackvenn: step-by-step pieces on AI and engineering that you can follow and apply to your own projects, from setup to the finished result."
+  path="/explained"
+>
+  {groups.length ? (
+    groups.map((g) => (
+      <section class="group" aria-labelledby={`g-${g.section}`}>
+        <h2 id={`g-${g.section}`}>{SECTION[g.section].label}</h2>
+        <StoryList posts={g.posts} showSection={false} headingLevel="h3" />
+      </section>
+    ))
+  ) : (
+    <p class="meta">The first Explained pieces are being written.</p>
+  )}
+</List>
+
+<style>
+  .group + .group {
+    margin-block-start: var(--s-8);
+  }
+  .group h2 {
+    font-size: var(--fs-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding-block-end: var(--s-3);
+    margin-block-end: var(--s-5);
+    border-block-end: var(--bw) solid var(--text);
+  }
+</style>
