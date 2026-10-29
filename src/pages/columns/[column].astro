@@ -1,0 +1,24 @@
+---
+import List from '../../layouts/List.astro';
+import StoryList from '../../components/StoryList.astro';
+import { getStories } from '../../lib/posts';
+import { COLUMNS, COLUMN_SLUGS, type ColumnSlug } from '../../lib/taxonomy';
+
+export function getStaticPaths() {
+  return COLUMN_SLUGS.map((column) => ({ params: { column } }));
+}
+
+const slug = Astro.params.column as ColumnSlug;
+const column = COLUMNS[slug];
+const posts = await getStories((p) => p.data.column === slug);
+---
+
+<List
+  title={`${column.name}, a column`}
+  heading={column.name}
+  lede={column.description}
+  description={`${column.name}: ${column.description} A column by Srihari Venkatesan on Stackvenn.`}
+  path={`/columns/${slug}`}
+>
+  <StoryList posts={posts} />
+</List>

@@ -236,7 +236,7 @@ a:hover {
   }
 }
 
-/* ---------- Prose (essays, notes) ---------- */
+/* ---------- Prose (stories) ---------- */
 .prose {
   font-family: var(--font-read);
   font-size: var(--fs-body);

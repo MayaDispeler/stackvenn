@@ -1,11 +1,11 @@
 ---
-// Guides and glossary terms (DESIGN §4): docs layout.
+// Explained format (DESIGN §4): docs layout.
 // ≥1200px: sidebar | content | TOC. 960–1199: sidebar | content, TOC as a bar. <960: sidebar in a disclosure.
-// The sidebar is sticky but never scrolls on its own: only the active pillar is expanded.
+// The sidebar is sticky but never scrolls on its own: only the active section is expanded.
 import type { MarkdownHeading } from 'astro';
 import Shell from './Shell.astro';
 import { SITE } from '../lib/site';
-import { PILLAR_LABEL } from '../lib/pillars';
+import { SECTION, type Section } from '../lib/taxonomy';
 import { formatDate, getPosts, readingTime, urlOf, type Post } from '../lib/posts';
 
 interface Props {
@@ -15,28 +15,30 @@ interface Props {
 const { post, headings } = Astro.props;
 const d = post.data;
 const url = urlOf(post);
+const abs = new URL(url, SITE.url).href;
 const minutes = readingTime(post.body);
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
-const guides = await getPosts((p) => p.data.type === 'guide');
-const byPillar = new Map<string, Post[]>();
-for (const g of guides) byPillar.set(g.data.pillar, [...(byPillar.get(g.data.pillar) ?? []), g]);
+const explained = await getPosts((p) => p.data.format === 'explained');
+const bySection = new Map<Section, Post[]>();
+for (const g of explained)
+  bySection.set(g.data.section, [...(bySection.get(g.data.section) ?? []), g]);
 
 const levelLabel = d.level ? d.level[0]!.toUpperCase() + d.level.slice(1) : undefined;
 const jsonLd = [
   {
     '@context': 'https://schema.org',
-    '@type': d.type === 'glossary' ? 'DefinedTerm' : 'TechArticle',
-    headline: d.title,
-    name: d.title,
-    description: d.dek,
-    url: new URL(url, SITE.url).href,
+    '@type': 'TechArticle',
+    headline: d.headline,
+    description: d.standfirst,
+    url: abs,
+    mainEntityOfPage: abs,
     datePublished: d.published.toISOString(),
     dateModified: (d.updated ?? d.published).toISOString(),
     inLanguage: SITE.locale,
-    author: { '@id': `${SITE.url}/about#person` },
+    articleSection: SECTION[d.section].label,
+    author: { '@id': `${SITE.url}/author/srihari-venkatesan#person` },
     publisher: { '@id': `${SITE.url}/#org` },
-    about: d.pillar,
     ...(d.level ? { proficiencyLevel: levelLabel } : {}),
   },
   {
@@ -44,22 +46,16 @@ const jsonLd = [
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: SITE.name, item: SITE.url },
-      { '@type': 'ListItem', position: 2, name: 'Guides', item: `${SITE.url}/guides` },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: PILLAR_LABEL[d.pillar],
-        item: `${SITE.url}/topics/${d.pillar}`,
-      },
-      { '@type': 'ListItem', position: 4, name: d.title, item: new URL(url, SITE.url).href },
+      { '@type': 'ListItem', position: 2, name: 'Explained', item: `${SITE.url}/explained` },
+      { '@type': 'ListItem', position: 3, name: d.headline, item: abs },
     ],
   },
 ];
 ---
 
 <Shell
-  title={d.title}
-  description={d.dek}
+  title={d.headline}
+  description={d.standfirst}
   path={url}
   ogType="article"
   markdownTwin={`${url}.md`}
@@ -70,16 +66,16 @@ const jsonLd = [
 >
   <div class="container docs">
     <details class="sidebar" open data-sidebar>
-      <summary class="btn btn-secondary btn-sm">All guides</summary>
-      <nav aria-label="Guides">
-        {[...byPillar].map(([pillar, items]) => (
-          <details class="group" open={pillar === d.pillar}>
-            <summary>{PILLAR_LABEL[pillar as keyof typeof PILLAR_LABEL]}</summary>
+      <summary class="btn btn-secondary btn-sm">All Explained</summary>
+      <nav aria-label="Explained">
+        {[...bySection].map(([section, items]) => (
+          <details class="group" open={section === d.section}>
+            <summary>{SECTION[section].label}</summary>
             <ul>
               {items.map((g) => (
                 <li>
                   <a href={urlOf(g)} aria-current={g.id === post.id ? 'page' : undefined}>
-                    {g.data.title}
+                    {g.data.headline}
                   </a>
                 </li>
               ))}
@@ -91,9 +87,12 @@ const jsonLd = [
 
     <article class="content">
       <header>
-        <p class="eyebrow">{PILLAR_LABEL[d.pillar]}</p>
-        <h1>{d.title}</h1>
-        <p class="dek">{d.dek}</p>
+        <p class="eyebrow">
+          <a href="/explained">Explained</a> <span aria-hidden="true">·</span>{' '}
+          <a href={`/${d.section}`}>{SECTION[d.section].label}</a>
+        </p>
+        <h1>{d.headline}</h1>
+        <p class="standfirst">{d.standfirst}</p>
         <dl class="meta-row">
           {levelLabel && (
             <div>
@@ -123,6 +122,17 @@ const jsonLd = [
         <slot name="actions" />
       </header>
 
+      {d.summary && (
+        <aside class="sixty" aria-labelledby="sixty-h">
+          <h2 id="sixty-h">Explained in 60 seconds</h2>
+          <ul>
+            {d.summary.map((line) => (
+              <li>{line}</li>
+            ))}
+          </ul>
+        </aside>
+      )}
+
       {toc.length > 1 && (
         <details class="toc-bar">
           <summary>On this page</summary>
@@ -136,7 +146,7 @@ const jsonLd = [
         </details>
       )}
 
-      <div class="prose guide-body">
+      <div class="prose explained-body">
         <slot />
       </div>
 
@@ -198,7 +208,7 @@ const jsonLd = [
   }
   .content {
     min-width: 0;
-    max-width: var(--w-guide);
+    max-width: var(--w-explained);
   }
 
   /* Sidebar */
@@ -248,10 +258,10 @@ const jsonLd = [
     font-weight: 700;
     letter-spacing: var(--ls-h1);
   }
-  .dek {
+  .standfirst {
     margin-block-start: var(--s-3);
-    font-size: var(--fs-dek);
-    line-height: var(--lh-dek);
+    font-size: var(--fs-standfirst);
+    line-height: var(--lh-standfirst);
     color: var(--text-muted);
   }
   .meta-row {
@@ -285,13 +295,13 @@ const jsonLd = [
   }
 
   /* Guide prose uses the UI face for headings */
-  .guide-body {
+  .explained-body {
     font-family: var(--font-ui);
     font-size: 1.0625rem;
     max-width: none;
   }
-  .guide-body :global(h2),
-  .guide-body :global(h3) {
+  .explained-body :global(h2),
+  .explained-body :global(h3) {
     font-family: var(--font-ui);
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -342,6 +352,39 @@ const jsonLd = [
     color: var(--accent-text);
     border-inline-start-color: var(--accent);
   }
+  .eyebrow a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .eyebrow a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+  .sixty {
+    margin-block: var(--s-2) var(--s-7);
+    padding: var(--s-5);
+    background: var(--surface);
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-md);
+  }
+  .sixty h2 {
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-block-end: var(--s-3);
+  }
+  .sixty ul {
+    display: grid;
+    gap: var(--s-2);
+    padding-inline-start: 1.1em;
+    color: var(--text);
+  }
+  .sixty li::marker {
+    color: var(--accent);
+  }
   .foot {
     display: flex;
     flex-wrap: wrap;
@@ -369,7 +412,7 @@ const jsonLd = [
   }
   @media (min-width: 1200px) {
     .docs {
-      grid-template-columns: var(--w-sidebar) minmax(0, var(--w-guide)) var(--w-toc);
+      grid-template-columns: var(--w-sidebar) minmax(0, var(--w-explained)) var(--w-toc);
       justify-content: space-between;
       gap: var(--s-6);
     }

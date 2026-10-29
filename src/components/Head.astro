@@ -6,7 +6,7 @@ import ThemeScript from './ThemeScript.astro';
 export interface SeoProps {
   title: string;
   description: string;
-  /** Path of the page, e.g. /essays/foo. Canonical is always self on stackvenn.in. */
+  /** Path of the page, e.g. /careers/some-story. Canonical is always self on stackvenn.in. */
   path?: string | undefined;
   ogImage?: string | undefined;
   ogType?: 'website' | 'article' | undefined;
@@ -58,8 +58,9 @@ const og = new URL(p.ogImage ?? '/og/default.png', SITE.url).href;
 <meta name="twitter:description" content={p.description} />
 <meta name="twitter:image" content={og} />
 
-<Font cssVariable="--font-schibsted" preload />
-<Font cssVariable="--font-newsreader" preload />
+<!-- Preload only the Latin faces the first viewport needs: UI 600 (nav, kicker) and body 400. -->
+<Font cssVariable="--font-schibsted" preload={[{ weight: '600', style: 'normal' }]} />
+<Font cssVariable="--font-newsreader" preload={[{ weight: '500', style: 'normal' }]} />
 <Font cssVariable="--font-jetbrains" />
 
 {p.jsonLd?.map((d) => (

@@ -1,20 +1,19 @@
 ---
-// Phase 1 home: masthead + plain feed. The full Medium-like home (tabs, featured, rail) lands in Phase 2.
+// Interim front page: masthead + latest list. The newspaper front page (DESIGN §2) replaces it in the next PR.
 import List from '../layouts/List.astro';
 import OverlapChip from '../components/OverlapChip.astro';
 import Venn from '../components/Venn.astro';
 import { SITE } from '../lib/site';
-import { formatDate, getPosts, readingTime, urlOf } from '../lib/posts';
+import { formatDate, getStories, kickerOf, readingTime, urlOf } from '../lib/posts';
 
-const posts = await getPosts();
-const TYPE_LABEL = { essay: 'Essay', note: 'Note', guide: 'Guide', glossary: 'Term', tool: 'Tool' };
+const posts = await getStories();
 ---
 
 <List title={SITE.name} description={SITE.description} heading="Latest" path="/" hideHeading>
   <section class="masthead container" slot="masthead" aria-labelledby="promise">
     <Venn size={64} class="mark" />
     <h1 id="promise">Field notes where AI, engineering and work overlap.</h1>
-    <p class="dek">From an engineer who ships agentic AI in production.</p>
+    <p class="standfirst">From an engineer who ships agentic AI in production.</p>
   </section>
 
   {posts.length === 0 ? (
@@ -25,11 +24,11 @@ const TYPE_LABEL = { essay: 'Essay', note: 'Note', guide: 'Guide', glossary: 'Te
         <li>
           <OverlapChip overlap={p.data.overlap} />
           <h2>
-            <a href={urlOf(p)}>{p.data.title}</a>
+            <a href={urlOf(p)}>{p.data.headline}</a>
           </h2>
-          <p class="item-dek">{p.data.dek}</p>
+          <p class="item-standfirst">{p.data.standfirst}</p>
           <p class="meta">
-            {formatDate(p.data.published)} · {readingTime(p.body)} min · {TYPE_LABEL[p.data.type]}
+            {formatDate(p.data.published)} · {readingTime(p.body)} min · {kickerOf(p)}
           </p>
         </li>
       ))}
@@ -54,12 +53,12 @@ const TYPE_LABEL = { essay: 'Essay', note: 'Note', guide: 'Guide', glossary: 'Te
     font-variation-settings: 'opsz' 72;
     letter-spacing: -0.015em;
   }
-  .dek {
+  .standfirst {
     margin-block-start: var(--s-4);
     font-family: var(--font-read);
     font-style: italic;
-    font-size: var(--fs-dek);
-    line-height: var(--lh-dek);
+    font-size: var(--fs-standfirst);
+    line-height: var(--lh-standfirst);
     color: var(--text-muted);
   }
   .feed-list {
@@ -87,7 +86,7 @@ const TYPE_LABEL = { essay: 'Essay', note: 'Note', guide: 'Guide', glossary: 'Te
     text-decoration: underline;
     text-decoration-color: var(--accent);
   }
-  .item-dek {
+  .item-standfirst {
     color: var(--text-muted);
     display: -webkit-box;
     -webkit-line-clamp: 2;

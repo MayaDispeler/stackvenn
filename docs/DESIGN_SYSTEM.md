@@ -12,10 +12,10 @@ Implement every value here as tokens in `src/styles/tokens.css`. Components neve
 
 - Two overlapping circles of equal size, overlapping by 40% of the diameter.
 - Left circle: 1.5px stroke in `--text`. Right circle: 1.5px stroke in `--accent`. The lens where they overlap: solid `--accent`.
-- Use it as: the logo (with "Stackvenn" set in Schibsted Grotesk 600), the favicon (lens only), the topic-overlap chip, section dividers on the home page (small, 16px) and the loading state of search.
+- Use it as: the logo (with "Stackvenn" set in Schibsted Grotesk 600), the favicon (lens only), the topic-overlap chip, section-band dividers on the front page (small, 16px) and the loading state of search.
 - Never animate it in a loop. Never fill both circles.
 
-**Overlap chip** (the signature component): a mini Venn (14px) plus the label `AI × Work`. Every post shows its two stacks this way.
+**Overlap chip** (the signature component): a mini Venn (14px) plus the label `AI × Work`. Every story shows its two stacks this way, in the byline block.
 
 ---
 
@@ -31,6 +31,7 @@ Dark is the default theme. Light is available through the toggle and "System".
   --raised:        #1B1917;  /* menus, modal, hover rows */
   --border:        #2C2824;  /* hairlines */
   --border-strong: #3D3832;  /* inputs, focusable outlines */
+  --border-control:#6D655A;  /* input and control outlines, 3.45:1 (added 2026-10-29, WCAG 1.4.11) */
   --text:          #E6D5BD;  /* headings, primary copy      13.8:1 on bg */
   --text-soft:     #BDB09C;  /* article body                 9.3:1 on bg */
   --text-muted:    #948A7B;  /* meta, captions, placeholders 5.8:1 on bg */
@@ -53,6 +54,7 @@ Dark is the default theme. Light is available through the toggle and "System".
   --raised:        #EFE7D8;
   --border:        #DDD2BF;
   --border-strong: #C7B9A2;
+  --border-control:#8C8273;  /* 3.39:1 */
   --text:          #101010;  /* 17.0:1 */
   --text-soft:     #3A3631;  /* 10.7:1 */
   --text-muted:    #6B6358;  /* 5.3:1 on bg, 4.8:1 on raised */
@@ -76,7 +78,7 @@ Dark is the default theme. Light is available through the toggle and "System".
 - Dark mode uses borders, not shadows, for separation. Light mode may use one soft shadow (`0 1px 2px rgb(16 16 16 / .06)`) on raised menus only.
 - Images are never filtered or tinted. Cover thumbnails get a 1px `--border` frame so bright covers sit calmly on the dark page.
 - Status colours are semantic only (callouts, form states). They never act as brand accents.
-- Verify every pair in CI with a contrast script. Fail the build below: body text 7:1, meta 4.5:1, UI borders on inputs 3:1 (use `--border-strong`).
+- Verify every pair in CI with a contrast script. Fail the build below: body text 7:1, meta 4.5:1, UI borders on inputs 3:1 (use `--border-control`; `--border-strong` is only 1.7:1).
 
 ---
 
@@ -86,8 +88,8 @@ All three faces are on Google Fonts under the OFL licence. Self-host them throug
 
 | Role | Family | Use |
 |---|---|---|
-| UI + headings (guides) | **Schibsted Grotesk** (400, 500, 600, 700) | Nav, buttons, chips, guide headings, labels. A newspaper-born grotesk, editorial without being cute. |
-| Reading + display (essays) | **Newsreader** (variable, opsz 6–72, 400, 500, italic) | Article body text, essay titles (display optical size), pull quotes. Designed for on-screen reading. |
+| UI + headings (Explained) | **Schibsted Grotesk** (400, 500, 600, 700) | Nav, buttons, chips, kickers, Explained headings, labels. A newspaper-born grotesk, editorial without being cute. |
+| Reading + display (stories) | **Newsreader** (variable, opsz 6–72, 400, 500, italic) | Story body text, headlines (display optical size), standfirsts, pull quotes. Designed for on-screen reading. |
 | Mono | **JetBrains Mono** (400, 500) | Code, file names, keyboard hints, the "Tested with" row, data. |
 
 Fallbacks: `"Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif`; `"Newsreader", Georgia, "Times New Roman", serif`; `"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace`.
@@ -96,13 +98,13 @@ Fallbacks: `"Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-seri
 
 | Token | Size | Line height | Usage |
 |---|---|---|---|
-| `--fs-display` | clamp(2.5rem, 5vw, 3.75rem) | 1.05 | Essay title (Newsreader opsz 72, 500), home masthead |
-| `--fs-h1` | clamp(2rem, 3.6vw, 2.75rem) | 1.1 | Guide H1 (Schibsted 700, letter-spacing −0.02em) |
+| `--fs-display` | clamp(2.5rem, 5vw, 3.75rem) | 1.05 | Story headline (Newsreader opsz 72, 500), lead-story headline |
+| `--fs-h1` | clamp(2rem, 3.6vw, 2.75rem) | 1.1 | Explained H1 (Schibsted 700, letter-spacing −0.02em), Brief headline |
 | `--fs-h2` | 1.625rem | 1.25 | Section heading |
 | `--fs-h3` | 1.25rem | 1.35 | Sub-section |
-| `--fs-dek` | 1.25rem | 1.5 | Dek / subtitle (Newsreader italic for essays; Schibsted 400 `--text-muted` for guides) |
+| `--fs-standfirst` | 1.25rem | 1.5 | Standfirst (Newsreader italic for stories; Schibsted 400 `--text-muted` for Explained) |
 | `--fs-body` | 1.1875rem (19px) | 1.7 | Article body (Newsreader, `--text-soft`) |
-| `--fs-ui` | 0.9375rem (15px) | 1.5 | UI text, feed deks |
+| `--fs-ui` | 0.9375rem (15px) | 1.5 | UI text, list standfirsts |
 | `--fs-meta` | 0.8125rem (13px) | 1.4 | Meta rows, captions, chips |
 | `--fs-eyebrow` | 0.75rem | 1.2 | Uppercase, letter-spacing 0.12em, Schibsted 600 |
 | `--fs-code` | 0.875rem | 1.6 | Code blocks |
@@ -115,9 +117,9 @@ Rules: prose measure 62–72 characters; `text-wrap: balance` on headings and `p
 
 - Spacing scale (4px base): `--s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px`.
 - Paragraph spacing 1.1em; space above H2 is `--s-8` and below is `--s-4`.
-- Containers: page max 1280px. Essay column 680px. Guide content 740px. Guide sidebar 264px. TOC 224px. Home feed 728px plus a 320px rail.
+- Containers: page max 1280px. Story column 680px (`--w-story`). Explained content 740px (`--w-explained`). Explained sidebar 264px. TOC 224px. List column 728px plus a 320px rail.
 - Side gutter: `max(16px, env(safe-area-inset-left))` (and the right equivalent); 24px from 768px up.
-- Breakpoints: 640 / 960 / 1200. Below 960, the guide sidebar becomes a drawer and the TOC becomes a collapsible "On this page" bar under the title.
+- Breakpoints: 640 / 960 / 1200. Below 960, the Explained sidebar becomes a disclosure and the TOC becomes a collapsible "On this page" bar under the title.
 - Radius: `--r-sm: 6px` (chips, code, inputs), `--r-md: 10px` (cards, callouts, modal), `--r-full` (pills, buttons, avatar). Never mix radii within one component.
 - Borders: 1px `--border` everywhere. A selected or active state adds a 2px left bar in `--accent` (sidebar and TOC only).
 
@@ -142,23 +144,29 @@ Lucide icons, 1.5px stroke, 16 or 20px, `currentColor`. No emoji in UI chrome. N
 Each component needs these states: default, hover, focus-visible (2px `--focus` ring, 2px offset), active, disabled, and loading where relevant.
 
 **Buttons** (height 40px, padding 0 16px, `--r-full`, Schibsted 600 15px)
-- Primary: `--text` fill, `--bg` label (13.8:1). Use it for the one main action per view: Subscribe, Read the guide.
+- Primary: `--text` fill, `--bg` label (13.8:1). Use it for the one main action per view: Subscribe, Read the story.
 - Accent: `--accent` fill, `--on-accent` label. Reserved for the newsletter submit only.
 - Secondary: `--surface` fill, 1px `--border-strong`, `--text` label.
 - Ghost: transparent, `--text-soft` label; hover fills `--raised`.
 - Icon button: 36px square, ghost style.
 
-**Links:** `--accent-text` with an underline. In nav and feed titles, links are `--text` with no underline; the hover underline is in `--accent`.
+**Links:** `--accent-text` with an underline. In nav and headline links, links are `--text` with no underline; the hover underline is in `--accent`.
 
 **Chips:** height 26px, `--surface`, 1px `--border`, `--fs-meta`, `--text-soft`. Selected filter: `--text` fill with `--bg` label. Overlap chip: Venn glyph + `AI × Work`.
 
-**Meta badge row** (guides): small bordered pill groups, each a label + value, separated by a 1px divider, for example `Level | Intermediate`, `Updated | 12 Oct 2026`, `Tested with | Claude Opus 5.5`.
+**Meta badge row** (Explained): small bordered pill groups, each a label + value, separated by a 1px divider, for example `Level | Intermediate`, `Updated | 12 Oct 2026`, `Tested with | Claude Opus 5.5`.
 
-**Action buttons** (guides): "Copy Markdown" (copy icon, shows a "Copied" toast) and "Open in ▾" (menu: ChatGPT, Claude, Perplexity, View as Markdown). Secondary-button style, 32px tall.
+**Action buttons** (Explained): "Copy Markdown" (copy icon, shows a "Copied" toast) and "Open in ▾" (menu: ChatGPT, Claude, Perplexity, View as Markdown). Secondary-button style, 32px tall.
 
-**Feed item** (home and lists): a grid of [text 1fr | thumbnail 112×112 (desktop) / 80×80 (mobile)]. The text holds the overlap chip, title (Schibsted 700, 1.25rem, `--text`), dek (2 lines, `--text-muted`) and meta (date · reading time · type). The row has a hairline divider and no card background. Hover brightens the title underline in `--accent`.
+**Kicker row** (stories): section label (`--text`, links to its front) · a 24px `--border-strong` rule · the kicker (format label or column name) in `--accent-text`. All `--fs-eyebrow`, uppercase. This is the header region's one accent moment.
 
-**Featured card:** the only card with a surface. `--surface`, `--r-md`, with the cover image on the right (16:10), eyebrow "Featured", title in Newsreader display at h2 size.
+**Story list item** (fronts and lists): kicker (eyebrow, `--text-muted`), headline (Newsreader 500, `--fs-h3`, `--text`), standfirst (`--text-muted`, max 2 lines in bands), meta (section · date · reading time). Hairline divider, no card background. Optional thumbnail on the right (112×112 desktop / 80×80 mobile) with a 1px `--border` frame. Hover underlines the headline in `--accent`.
+
+**Lead story** (front page and section fronts): no card and no surface. Cover image 16:10 with a 1px `--border` frame, kicker, headline in Newsreader display, italic standfirst, byline meta. Type and rules carry the hierarchy (Srihari, 2026-10-29: no cards in grids).
+
+**Section band** (front page): the section label in eyebrow style above a full-width 1px `--text` rule, a "More in <Section> →" link on the right, then up to 3 story list items in columns.
+
+**"Explained in 60 seconds" box:** `--surface`, 1px `--border`, `--r-md`, padding `--s-5`. Eyebrow label "Explained in 60 seconds", then 3–5 bullet lines in `--text` with `--accent` markers.
 
 **Callouts:** `--surface` background, a 3px left border in the semantic colour, an icon and a bold label (Note, Tip, Warning, Danger). Danger uses `--accent`.
 
@@ -166,7 +174,7 @@ Each component needs these states: default, hover, focus-visible (2px `--focus` 
 
 **Code block:** `--code-bg`, `--r-sm`, a filename tab in mono `--fs-meta`, a copy button top-right (appears on hover and is always visible on touch), line highlights with a `--selection` background, and a horizontal scroll inside the block only. Use the "github-dark-dimmed" theme in dark mode and "github-light" in light mode, adjusting any token below 4.5:1.
 
-**Sidebar tree:** group header (Schibsted 600 `--fs-ui`, chevron), items `--text-muted` turning `--text` on hover. Active item: `--text`, a 2px `--accent` left bar and a `--raised` background. View switch at top: a two-segment control (Paths | All guides).
+**Sidebar tree:** group header (Schibsted 600 `--fs-ui`, chevron), items `--text-muted` turning `--text` on hover. Active item: `--text`, a 2px `--accent` left bar and a `--raised` background. View switch at top: a two-segment control (Paths | All Explained).
 
 **TOC:** "On this page" label (eyebrow), items `--fs-meta`, active item `--accent-text` with a 2px left bar, scroll-spy driven by IntersectionObserver.
 

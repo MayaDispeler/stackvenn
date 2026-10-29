@@ -1,0 +1,74 @@
+---
+// A rule-separated list of stories: kicker, headline, standfirst, meta. No cards.
+import { formatDate, kickerOf, readingTime, urlOf, type Post } from '../lib/posts';
+import { SECTION } from '../lib/taxonomy';
+
+interface Props {
+  posts: Post[];
+  /** Show the section label in the meta line (off on section fronts, where it's implied). */
+  showSection?: boolean;
+  headingLevel?: 'h2' | 'h3';
+}
+const { posts, showSection = true, headingLevel = 'h2' } = Astro.props;
+const H = headingLevel;
+---
+
+<ol class="story-list">
+  {posts.map((p) => (
+    <li>
+      <p class="kicker">{kickerOf(p)}</p>
+      <H class="headline">
+        <a href={urlOf(p)}>{p.data.headline}</a>
+      </H>
+      <p class="standfirst">{p.data.standfirst}</p>
+      <p class="meta">
+        {showSection && <span>{SECTION[p.data.section].label} · </span>}
+        <time datetime={p.data.published.toISOString()}>{formatDate(p.data.published)}</time>
+        {' · '}
+        {readingTime(p.body)} min read
+      </p>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .story-list {
+    list-style: none;
+    padding: 0;
+  }
+  li {
+    padding-block: var(--s-5);
+    border-block-end: var(--bw) solid var(--border);
+  }
+  li:first-child {
+    padding-block-start: 0;
+  }
+  .kicker {
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .headline {
+    margin-block: var(--s-2) var(--s-2);
+    font-family: var(--font-read);
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
+    font-weight: 500;
+  }
+  .headline a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .headline a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  .standfirst {
+    color: var(--text-muted);
+    max-width: var(--measure);
+    margin-block-end: var(--s-2);
+  }
+</style>

@@ -10,6 +10,7 @@ for (const page of PAGES) {
         await p.addInitScript((t) => localStorage.setItem('theme', t), theme);
         await p.setViewportSize({ width, height: 900 });
         await p.goto(page.path);
+        await p.waitForLoadState('load');
         const results = await new AxeBuilder({ page: p })
           .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
           .analyze();

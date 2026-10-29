@@ -1,0 +1,35 @@
+---
+// Interim author page (Person entity). The full page (portrait, story, proof links) lands in Phase 2e.
+import List from '../../layouts/List.astro';
+import StoryList from '../../components/StoryList.astro';
+import { getStories } from '../../lib/posts';
+import { SITE } from '../../lib/site';
+
+const posts = await getStories();
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': `${SITE.url}/author/${SITE.author.slug}#person`,
+  name: SITE.author.name,
+  url: `${SITE.url}/author/${SITE.author.slug}`,
+  jobTitle: 'AI engineer',
+  sameAs: [SITE.author.url],
+};
+---
+
+<List
+  title={SITE.author.name}
+  heading={SITE.author.name}
+  lede={`${SITE.author.role}. More at iamsrihari.com.`}
+  description={`Stories by ${SITE.author.name} on Stackvenn: ${SITE.author.role}.`}
+  path={`/author/${SITE.author.slug}`}
+  jsonLd={[person]}
+>
+  <p class="meta">
+    Portfolio and work history:{' '}
+    <a href={SITE.author.url} rel="me">
+      iamsrihari.com
+    </a>
+  </p>
+  <StoryList posts={posts} />
+</List>

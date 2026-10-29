@@ -40,8 +40,8 @@ Any missing secret means that channel is skipped with a warning, never a failed 
 Claude:
 1. Reads GSC queries with impressions but no matching post, PostHog search terms with no results, open `idea` issues, and Srihari's repos' recent commits and READMEs (his real work is the best source).
 2. Scores ideas: search demand × Srihari's first-hand experience × gap vs existing results.
-3. Opens up to **2 draft PRs** in `content/` with `status: review`. Each PR includes:
-   - the full draft in Srihari's voice (learn the voice from `content/essays/*` and keep `docs/VOICE.md` updated);
+3. Opens up to **2 draft PRs** in `src/content/stories/` with `status: review`. Each PR includes:
+   - the full draft in Srihari's voice (learn the voice from `src/content/stories/*` and keep `docs/VOICE.md` updated);
    - a brief (target query, reader, promise, sources);
    - a `distribution/<slug>.md` file with per-channel copy;
    - a checklist of claims that need Srihari's confirmation, marked `[[CONFIRM: …]]`.
@@ -53,7 +53,7 @@ Fail the check if any of these is true:
 - A number without a source, or an unresolved `[[CONFIRM]]`.
 - Banned phrases: "in today's fast-paced world", "delve", "unlock", "game-changer", "it's important to note", "in conclusion", "revolutionize", "leverage" (as a verb).
 - Readability: average sentence length over 22 words, or paragraphs over 5 sentences.
-- Missing dek, sources, internal links, or alt text.
+- Missing standfirst, sources, internal links, or alt text.
 Claude also posts a review comment with a 1–10 usefulness score and the 3 biggest improvements.
 
 ### 3.3 `deploy.yml`: on push to `main`
@@ -70,7 +70,7 @@ State lives in `data/distribution.json` (slug → channel → {id, url, postedAt
 | +4h | Threads post |
 | +3 days | dev.to and Hashnode copies with canonical URL, the original's title, and a "Originally published on Stackvenn" footer |
 | +7 days | Second LinkedIn angle (a different takeaway, no link in the body; link in the first comment if the API allows, otherwise in the body) |
-| +30 / +90 days | Evergreen resurfacing on Bluesky, Mastodon and Threads, for guides only |
+| +30 / +90 days | Evergreen resurfacing on Bluesky, Mastodon and Threads, for Explained pieces only |
 
 Per-channel copy rules:
 - Write native copy for each channel; never paste the same text everywhere.
@@ -79,13 +79,13 @@ Per-channel copy rules:
 - Respect rate limits; back off on 429 errors; retry at most twice, then open a `human` issue.
 
 ### 3.5 `newsletter.yml`: weekly digest (Fri 18:00 IST, cron `30 12 * * 5`)
-Content: the week's posts (title, dek, link), one "field note" paragraph written fresh by Claude from the week's work, and one older evergreen guide. The issue is also published as a web page at `/newsletter/<issue>`. Send in batches within the free daily limit. Track opens only through Resend's default (no extra pixel tracking).
+Content: the week's stories (headline, standfirst, link), one short "from the desk" paragraph written fresh by Claude from the week's work, and one older evergreen Explained piece. The issue is also published as a web page at `/newsletter/<issue>`. Send in batches within the free daily limit. Track opens only through Resend's default (no extra pixel tracking).
 
 ### 3.6 `report.yml`: weekly growth report (Mon 08:00 IST, cron `30 2 * * 1`)
 Pull GSC (clicks, impressions, CTR, position by page and query), PostHog (engaged reads, top pages, referrers including AI assistants, newsletter conversions), Cloudflare (bot analytics, cache hit), D1 (subscribers), and dev.to/Hashnode stats. Write `reports/2026-WNN.md` and open an issue containing:
 - 5 numbers vs last week;
 - top 3 wins and top 3 problems;
-- **5 concrete next actions**, each created as its own issue with a `growth` label (for example "Refresh /guides/retrieval/hybrid-search: position 11 for 'hybrid search rag', 540 impressions").
+- **5 concrete next actions**, each created as its own issue with a `growth` label (for example "Refresh /ai/hybrid-search-explained: position 11 for 'hybrid search rag', 540 impressions").
 Also update the `/experiment` page data.
 
 ### 3.7 `refresh.yml`: monthly (1st, 07:00 IST)
@@ -105,7 +105,7 @@ For posts at positions 8–20 with at least 100 impressions, or older than 9 mon
 2. **Linkable tools:** the token-cost calculator, an eval-checklist generator, an MCP tool-schema linter. Each gets its own launch notes.
 3. **Original data:** quarterly "State of my agent stack" with real cost and latency numbers from Srihari's projects (only what he approves).
 4. **Series over one-offs:** "Start here", "Building Orqestra", "Evals from zero". Series keep readers and earn links.
-5. **Glossary flywheel:** each guide links its terms; each term links back to guides.
+5. **Terms flywheel:** each Explained piece links its Terms; each Term links back to the pieces that use it.
 6. **LinkedIn first:** Srihari's existing network is the fastest early channel. Optimise the LinkedIn copy hardest.
 7. **Newsletter referral:** a "Forward this to one engineer who'd use it" line plus a web version. No paid referral tools.
 

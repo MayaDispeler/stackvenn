@@ -1,37 +1,73 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
-import { TYPE_DIR } from '../content.config';
+import {
+  COLUMNS,
+  FORMAT_DIR,
+  FORMAT_LABEL,
+  RESERVED_SLUGS,
+  SECTION,
+  type Section,
+} from './taxonomy';
 
 export type Post = CollectionEntry<'posts'>;
 
 const showDrafts = import.meta.env.DEV || import.meta.env.SHOW_DRAFTS === 'true';
 
-/** Folder must match `type`, so URLs can never drift from the content model. */
-function assertFolder(post: Post) {
-  const dir = post.id.split('/')[0];
-  if (dir !== TYPE_DIR[post.data.type]) {
-    throw new Error(
-      `${post.id}: type "${post.data.type}" must live in src/content/${TYPE_DIR[post.data.type]}/`,
-    );
-  }
-}
-
 export function slugOf(post: Post): string {
   return post.id.split('/').at(-1)!;
 }
 
+/** Permanent URL: stories at /<section>/<slug>, terms at /terms/<slug>, tools at /tools/<slug>. */
 export function urlOf(post: Post): string {
-  const { type, pillar } = post.data;
+  const dir = FORMAT_DIR[post.data.format];
   const slug = slugOf(post);
-  if (type === 'guide') return `/guides/${pillar}/${slug}`;
-  return `/${TYPE_DIR[type]}/${slug}`;
+  return dir === 'stories' ? `/${post.data.section}/${slug}` : `/${dir}/${slug}`;
 }
 
+/** Kicker above the headline: override, column name, or format label. */
+export function kickerOf(post: Post): string {
+  const d = post.data;
+  if (d.kicker) return d.kicker;
+  if (d.format === 'column' && d.column) return COLUMNS[d.column].name;
+  return FORMAT_LABEL[d.format];
+}
+
+export function sectionLabel(section: Section): string {
+  return SECTION[section].label;
+}
+
+/** Build-time guards: folder matches format, slugs are unique and not reserved. */
+function validate(all: Post[]) {
+  const seen = new Map<string, string>();
+  for (const post of all) {
+    const dir = post.id.split('/')[0];
+    const want = FORMAT_DIR[post.data.format];
+    if (dir !== want) {
+      throw new Error(`${post.id}: format "${post.data.format}" must live in src/content/${want}/`);
+    }
+    const slug = slugOf(post);
+    if (RESERVED_SLUGS.includes(slug)) throw new Error(`${post.id}: slug "${slug}" is reserved`);
+    const other = seen.get(slug);
+    if (other) throw new Error(`Duplicate slug "${slug}": ${other} and ${post.id}`);
+    seen.set(slug, post.id);
+  }
+}
+
+let cache: Promise<Post[]> | undefined;
+
+/** All published posts (drafts too in dev / SHOW_DRAFTS), newest first. */
 export async function getPosts(filter?: (p: Post) => boolean): Promise<Post[]> {
-  const all = await getCollection('posts', (p) => showDrafts || p.data.status !== 'draft');
-  all.forEach(assertFolder);
-  return all
-    .filter((p) => (filter ? filter(p) : true))
-    .sort((a, b) => b.data.published.valueOf() - a.data.published.valueOf());
+  cache ??= getCollection('posts', (p) => showDrafts || p.data.status !== 'draft').then((all) => {
+    validate(all);
+    return all.sort((a, b) => b.data.published.valueOf() - a.data.published.valueOf());
+  });
+  const all = await cache;
+  return filter ? all.filter(filter) : all;
+}
+
+export const isStory = (p: Post) => FORMAT_DIR[p.data.format] === 'stories';
+
+export async function getStories(filter?: (p: Post) => boolean): Promise<Post[]> {
+  return getPosts((p) => isStory(p) && (filter ? filter(p) : true));
 }
 
 export function readingTime(body = ''): number {

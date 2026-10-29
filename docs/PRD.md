@@ -1,10 +1,10 @@
 # PRD — Stackvenn
 
-Owner: Srihari Venkatesan · Builder and operator: Claude · Status: v1.0 · Last updated: 2026-10-29
+Owner: Srihari Venkatesan · Builder and operator: Claude · Status: v1.1 (editorial model) · Last updated: 2026-10-29
 
 ## 1. One-liner
 
-**Stackvenn is where AI engineering, software and work overlap: practical field notes from someone who ships agentic AI in production.**
+**Stackvenn is where AI engineering, software and work overlap: reporting, analysis and explainers from someone who ships agentic AI in production.**
 
 The name is the idea. Each post sits in the overlap of two "stacks" (for example AI × Work, or Engineering × Careers), and the site shows that overlap visually.
 
@@ -29,133 +29,160 @@ The name is the idea. Each post sits in the overlap of two "stacks" (for example
 
 | Persona | Need | What wins them |
 |---|---|---|
-| AI and software engineers (primary) | Working patterns for agents, RAG, MCP, evals; real numbers | Reproducible guides, code, architectures, honest failure stories |
+| AI and software engineers (primary) | Working patterns for agents, RAG, MCP, evals; real numbers | Reproducible Explained pieces, code, architectures, honest failure stories |
 | Hiring managers and tech leads | Signal on how this person thinks | Clear writing, depth, results with numbers, decision logs |
 | Founders and product people | What AI can actually do for a business | Case studies, cost and ROI framing, plain language |
-| Career readers (from the existing 19 essays) | Perspective on work, growth and productivity | Short, sharp essays with a strong point of view |
+| Career readers (from the existing 19 articles) | Perspective on work, growth and productivity | Short, sharp Opinion and Column pieces with a strong point of view |
 
-## 5. Positioning and content pillars
+## 5. Positioning, editorial model and sections
 
 Wedge: **"AI engineering in production, explained by someone who ships it."**
 
-Pillars (max 6, used as topic hubs):
-1. **Agentic systems:** orchestration, tools, MCP, multi-agent patterns.
-2. **Retrieval:** RAG, hybrid search, chunking, evaluation.
-3. **Evals and reliability:** LLM-as-judge, regression suites, graceful degradation.
-4. **Cost and performance:** token budgets, caching, latency, inference cost.
-5. **Shipping AI at work:** adoption, workflows, ROI, RevOps and Ops automation.
-6. **Careers** · 7. **Work and productivity** · 8. **Life and mindset** · 9. **Society and values:** the existing essay categories from `data/blog-posts.json`, kept as topic hubs. The old "AI and technology" category maps to the AI pillars above.
+**The bar is a publication, not a hobby blog** (Srihari, 2026-10-29): Medium, The Hindu, The Economic Times, Deccan Chronicle. The words "essays", "guides" and "notes" are not used in the UI, URLs or docs.
 
-**Columns (series with a voice):** "2 AM" is Srihari's existing late-night essay column (3 posts). Keep it as a named series with its own page at `/series/2-am` and its tagline from the posts ("A 2am essay for …").
+**Sections** are the main navigation, as in a newspaper. Each has a section front at `/<section>`.
 
-## 6. Content types (each has its own layout)
+| Section | Covers | Old pillars mapped here |
+|---|---|---|
+| **AI** | Agents, MCP, retrieval, evals, model cost | agentic, retrieval, evals, cost (chosen per story) |
+| **Engineering** | Building, testing and running software | agentic, retrieval, evals, cost (chosen per story) |
+| **Careers** | Promotions, pay, switching jobs | careers |
+| **Work** | Productivity, process, adopting tools, ROI | work, shipping |
+| **Life** | Mindset, learning, habits | life |
+| **Society** | Values, public life, systems | society |
 
-| Type | Purpose | Layout | Cadence target |
+**Columns** are named series with a voice. The first is **"2 AM"**, Srihari's late-night column (3 pieces), at `/columns/2-am`.
+
+## 6. Formats (shown as a kicker above the headline, never in the nav)
+
+| Format | What it is | Layout | Cadence target |
 |---|---|---|---|
-| **Guide** | Evergreen, searchable how-to or reference ("pillar" pages) | Docs layout, 3 columns (like a help centre) | 2 per month |
-| **Essay** | Point of view, story, opinion | Medium-like single column | 2 per month |
-| **Field note** | Short (300–700 words) lesson from real work | Essay layout, compact | 1–2 per week |
-| **Glossary term** | One precise definition plus example and links | Docs layout, short | Batch of 20 at launch, then as needed |
-| **Tool** | Free interactive asset (calculator, checklist, template) | Tool page | 1 per quarter |
+| **Explained** | Step-by-step, evergreen, searchable (the old "guides") | Docs layout, 3 columns, with an "Explained in 60 seconds" box | 2 per month |
+| **Analysis** | Data- or argument-led long read | Story page | 1–2 per month |
+| **Opinion** | Point-of-view piece | Story page | 1–2 per month |
+| **Column** | A piece in a named column (first: 2 AM) | Story page, column kicker | As written |
+| **Brief** | Short dispatch, 300–700 words (the old "notes") | Story page, compact | 1–2 per week |
+| **Terms** | One precise definition plus example and links (the old glossary) | Docs layout, short | Batch of 20 at launch |
+| **Tools** | Free interactive asset (calculator, checklist) | Tool page | 1 per quarter |
 | **Book** | *The Mellivora Paradox* landing page | Feature page | Once |
 
 Cadence is a target, not a quota. Never publish to hit a number.
 
+**Newsroom vocabulary** used in components, schema and docs: kicker, headline, standfirst, byline, dateline, "Updated", pull quote, "Explained in 60 seconds".
+
 ## 7. Information architecture and URLs (stable forever)
 
+Nothing was live before 2026-10-29, so these are set once and never change. A slug or section change needs a 301 in the same PR.
+
 ```
-/                          Home (Medium-like feed)
-/guides/                   Guides index, grouped by pillar
-/guides/<pillar>/<slug>    Guide (docs layout)
-/essays/<slug>             Essay
-/notes/<slug>              Field note
-/glossary/  /glossary/<term>
-/tools/<slug>
-/topics/<pillar>           Topic hub: pillar intro + all posts
-/series/<slug>             Ordered series ("Start here", "Building Orqestra")
-/about                     Author page (Person entity, links to iamsrihari.com)
-/newsletter                Subscribe page
-/experiment                "How this site runs itself": live stats and monthly reports
+/                                Front page (newspaper hierarchy)
+/<section>                       Section front: ai, engineering, careers, work, life, society
+/<section>/page/<n>              Section front, page n (crawlable pagination)
+/<section>/<slug>                Every story: Explained, Analysis, Opinion, Column, Brief
+/explained                       Hub for the Explained format, grouped by section
+/columns/<column>                Column page, e.g. /columns/2-am
+/terms   /terms/<slug>           Terms (A–Z index and term page)
+/tools/<slug>                    Tools
+/author/srihari-venkatesan       Author page (Person entity, links to iamsrihari.com)
+/about                           About Stackvenn and how it runs
+/newsletter                      Subscribe page and issue archive
+/experiment                      "How this site runs itself": live stats and monthly reports
 /book/the-mellivora-paradox
-/search                    Search results (with a ⌘/Ctrl+K modal everywhere)
-/rss.xml  /feed.json  /sitemap.xml  /robots.txt  /llms.txt  /llms-full.txt
-/<any-post-url>.md         Raw markdown twin of every post
+/search                          Search results (with a ⌘/Ctrl+K modal everywhere)
+/admin                           Writing desk (git-based CMS; noindex)
+/rss.xml  /feed.json  /sitemap-index.xml  /robots.txt  /llms.txt  /llms-full.txt
+/<any-story-url>.md              Raw markdown twin of every story
 ```
+
+Slugs are unique across the whole site. `page`, `index`, `rss` and `feed` are reserved and fail the build.
 
 ## 8. Features
 
 Priority: **P0** = launch, **P1** = within 30 days of launch, **P2** = later.
 
 ### Global
-- P0 Top bar: Venn logo + "Stackvenn"; nav (Guides, Essays, Notes, Topics ▾, About); search button with ⌘K / Ctrl K hint; theme toggle (Dark / Light / System); Subscribe button.
-- P0 Search modal (Pagefind): full text, filter by type and topic, keyboard navigation, recent searches (localStorage).
-- P0 Footer: about blurb, topics, RSS, newsletter, socials, iamsrihari.com link, "Built and run by Claude: see the experiment".
-- P0 Themes: dark default (brand), light, and system; remembered per viewer; no flash on load.
-- P1 Language: English only at launch. P2 to evaluate Hindi or Tamil editions, human-reviewed only.
+- P0 Header: Venn logo + "Stackvenn"; **section nav** (AI · Engineering · Careers · Work · Life · Society); search with ⌘K / Ctrl K hint; theme toggle (Dark / Light / System); Subscribe.
+- P0 Search modal (Pagefind): full text, filter by section and format, keyboard navigation, recent searches (localStorage).
+- P0 Mobile menu drawer: sections, columns, Explained, theme toggle, Subscribe.
+- P0 Footer: sections, columns, Explained, RSS, newsletter, iamsrihari.com, "Built and run by Claude: see the experiment".
+- P0 Themes: dark default (brand), light, system; remembered per viewer; no flash on load.
+- P1 English only at launch. P2 to evaluate Hindi or Tamil editions, human-reviewed only.
 
-### Home (Medium-like, simple and powerful)
-- P0 Masthead: one-line promise + subscribe field.
-- P0 Tabs: Latest · Guides · Essays · Notes (filter in place; each tab has a real crawlable URL).
-- P0 Featured post (one, editor-picked in config).
-- P0 Feed list: title, dek, topic overlap chip, reading time, date, thumbnail on the right. Paginated pages (`/page/2`), not infinite scroll, so everything stays crawlable.
-- P0 Right rail (desktop): Start here (series), topics, newsletter, short author card.
-- P1 "Most read this month" (from PostHog, refreshed at build).
+### Front page (newspaper hierarchy without newspaper clutter)
+- P0 Masthead: Venn mark, "Stackvenn", today's date in IST, a one-line promise.
+- P0 Lead story (big headline, standfirst, image) with 3–4 "Top stories" beside it. Editor-picked in `src/data/frontpage.json`, falling back to the latest.
+- P0 A rule-separated band per section (headlines + standfirsts; one with an image).
+- P0 "Most read" (editor picks until PostHog data exists, then refreshed at build).
+- P0 An "Explained" strip, the "2 AM" column block, and the newsletter sign-up.
+- Rules and type do the work: no cards in grids.
 
-### Essay and field-note page
-- P0 Single 680px column; title, dek, author line, date, updated date, reading time, topic overlap chip.
-- P0 Reading progress bar; footnotes as hover sidenotes on wide screens; images with captions and lightbox; code blocks with copy.
+### Section front
+- P0 Section name as a large title, a lead story, then a list; paginated at `/<section>/page/<n>`, never infinite scroll.
+
+### Story page (Analysis, Opinion, Column, Brief)
+- P0 Kicker (format or column name), headline, standfirst, byline with avatar, dateline + "Updated", reading time.
+- P0 Reading progress bar; pull quotes; footnotes as sidenotes on wide screens; images with captions and lightbox; code blocks with copy.
 - P0 Share: copy link, LinkedIn, X (intent link only), Bluesky, WhatsApp, Email.
-- P0 Ends with: author card, newsletter CTA, related posts (3, same pillar), previous and next in series.
+- P0 Ends with: sources, author box, newsletter CTA, "More in <Section>", "Most read".
 - P1 Comments (Giscus, lazy-loaded on click).
-- P1 "Helpful?" reaction (👍/👎 via a PostHog survey or event; no counts shown).
+- P1 "Helpful?" reaction (no counts shown).
 
-### Guide page (docs layout, feature parity with a modern help centre)
-- P0 Left sidebar: view switch **Paths** (curated learning order) / **All guides** (by pillar); collapsible tree; active state; scrolls independently.
-- P0 Eyebrow (pillar), H1, dek.
-- P0 Meta row: Level (Beginner / Intermediate / Advanced), reading time, Updated date, **Tested with** (tool and model versions).
-- P0 Actions: **Copy Markdown** · **Open in ▾** (ChatGPT, Claude, Perplexity, View .md). The prompt opened says "Read <url> and help me apply it", which spreads the page into AI tools.
+### Explained page (docs layout, feature parity with a modern help centre)
+- P0 Left sidebar: **Paths** (curated order) / **All Explained** (by section); collapsible; active state; sticky, never scrolling on its own.
+- P0 Kicker (Explained · Section), headline, standfirst, **"Explained in 60 seconds"** box (3–5 takeaways).
+- P0 Meta row: Level, reading time, Updated, **Tested with** (tool and model versions).
+- P0 Actions: **Copy Markdown** · **Open in ▾** (ChatGPT, Claude, Perplexity, View .md). The prompt says "Read <url> and help me apply it".
 - P0 Right "On this page" TOC with scroll-spy.
-- P0 Content components: numbered steps, callouts (Note / Tip / Warning / Danger), tabs (for example Python | TypeScript), code with filename, "Go deeper" links, comparison tables.
-- P0 Footer: prev and next in path, "Edit on GitHub", last updated, changelog of the guide.
-- P1 Copy-link anchors on every heading; deep link to any step.
+- P0 Content components: numbered steps, callouts (Note / Tip / Warning / Danger), tabs, code with filename, "Go deeper" links, comparison tables.
+- P0 Footer: prev and next in path, "Edit on GitHub", last updated, changelog.
+- P1 Copy-link anchors on every heading.
 
 ### Other pages
-- P0 Topic hub, series page, about, newsletter, 404 (with search), RSS and JSON feeds, `/experiment`.
-- P1 Glossary index (A–Z), tools pages, book page.
+- P0 Section fronts, column page, Explained hub, author page, about, newsletter, 404 (with search), RSS and JSON feeds, `/experiment`.
+- P1 Terms index (A–Z), tools pages, book page.
 - P1 Newsletter: double opt-in, weekly digest, one-click unsubscribe.
 
-## 9. Content model (frontmatter, validated with zod)
+### Writing desk (`/admin`)
+- P0 A free, git-based web editor (Decap CMS or Sveltia CMS, GitHub backend, OAuth proxy on a free Cloudflare Worker) with collections matching §9 and a mobile-friendly editor. Srihari's own saves count as approval; Claude's drafts still go through PRs.
+
+## 9. Content model (frontmatter, validated with zod in `src/content.config.ts`)
+
+Files: stories in `src/content/stories/<slug>.mdx`, terms in `src/content/terms/`, tools in `src/content/tools/`.
 
 ```yaml
-title: string            # ≤ 60 chars preferred for SERP
-dek: string              # 1 sentence, 120–160 chars; doubles as meta description
-type: guide | essay | note | glossary | tool
-pillar: agentic | retrieval | evals | cost | shipping | careers | work | life | society
-overlap: [string, string]  # the two stacks this post joins, e.g. ["AI", "Work"]
-series: string?           # slug
-order: number?            # position in series/path
-level: beginner | intermediate | advanced?   # guides only
+headline: string          # ≤ 60 chars preferred for SERP
+standfirst: string        # 120–160 chars; doubles as meta description
+format: explained | analysis | opinion | column | brief | term | tool
+section: ai | engineering | careers | work | life | society
+kicker: string?           # override; default = format label, or the column name
+column: 2-am?             # required when format = column
+overlap: [string, string] # the two stacks this story joins, e.g. ["AI", "Work"]
+series: string?           # path slug (Explained) or reading series
+order: number?
+level: beginner | intermediate | advanced?   # Explained only (required there)
 tested_with: string[]?    # e.g. ["Claude Opus 5.5", "LangGraph 1.x"]
+summary: string[]?        # "Explained in 60 seconds", 3–5 lines; Explained only (required there)
+dateline: string?         # place, e.g. "Chennai"
 published: date
 updated: date?
-status: draft | review | approved
-canonical: url?           # always self (stackvenn.in); never points to LinkedIn/Medium
+status: draft | review | approved   # draft never ships; review/approved ship once merged
+canonical: url?           # always self (stackvenn.in)
 first_published: { platform: LinkedIn|Medium|Kissflow|2 AM, date, url }?  # record only, NEVER rendered as a link
-migrated: bool?           # true for imported posts
-sources: [{ title, url }] # required if the post states facts or numbers
-cover: image?             # optional; OG image is generated if absent
-distribute: { devto: bool, hashnode: bool, bluesky: bool, mastodon: bool, threads: bool, linkedin: bool }
-faq: [{ q, a }]?          # optional Q&A block rendered at the end
+migrated: bool?
+sources: [{ title, url }] # required if the story states facts or numbers
+cover: image?  cover_alt: string?  cover_credit: string?
+distribute: { devto, hashnode, bluesky, mastodon, threads, linkedin: bool }
+faq: [{ q, a }]?
 ```
 
 ## 10. Seed content (launch with depth, not volume)
 
-1. **Migrate all 19 existing articles** listed in `data/blog-posts.json` (3 from Notion "2 AM", 11 LinkedIn, 4 Medium, 1 Kissflow), published **in full** on stackvenn.in. See `MIGRATION.md`. The copies on LinkedIn and Medium stay where they are, but the blog never links readers there.
+1. **Migrate all 19 existing articles** in `data/blog-posts.json` (3 from the "2 AM" column, 11 LinkedIn, 4 Medium, 1 Kissflow), published **in full** at their new URLs (`MIGRATION.md`). The copies on LinkedIn and Medium stay up, but Stackvenn never links readers there.
 2. **Book page** for *The Mellivora Paradox* (Amazon link, synopsis, sample chapter if allowed).
-3. **5 pillar guides** built from real work: Orqestra (97 agents, 101 skills), Savepoint, Stack Failure Drill, hybrid-retrieval RAG at Kissflow (only the numbers already public on iamsrihari.com).
-4. **20 glossary terms** (MCP, RAG, hybrid retrieval, LLM-as-judge, token budget, harness engineering…).
-5. **1 tool:** an LLM token-cost calculator (a linkable asset).
-6. **"Start here" series** and the **/experiment** page with month-0 baseline.
+3. **5 Explained pieces** built from real work: Orqestra (97 agents, 101 skills), Savepoint, Stack Failure Drill, hybrid-retrieval RAG at Kissflow (only the numbers already public on iamsrihari.com).
+4. **20 Terms** (MCP, RAG, hybrid retrieval, LLM-as-judge, token budget, harness engineering…).
+5. **1 tool:** an LLM token-cost calculator.
+6. **"Start here" path** and the **/experiment** page with a month-0 baseline.
 
 ## 11. Success metrics (reach only)
 

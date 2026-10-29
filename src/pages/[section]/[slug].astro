@@ -1,0 +1,28 @@
+---
+// Every story lives at /<section>/<slug>. Explained pieces get the docs layout; the rest get the story page.
+import { render } from 'astro:content';
+import Story from '../../layouts/Story.astro';
+import Explained from '../../layouts/Explained.astro';
+import { getStories, slugOf, type Post } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const stories = await getStories();
+  return stories.map((post) => ({
+    params: { section: post.data.section, slug: slugOf(post) },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content, headings } = await render(post);
+---
+
+{post.data.format === 'explained' ? (
+  <Explained post={post} headings={headings}>
+    <Content />
+  </Explained>
+) : (
+  <Story post={post}>
+    <Content />
+  </Story>
+)}

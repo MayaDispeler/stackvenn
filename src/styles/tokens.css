@@ -97,8 +97,8 @@
   --lh-h2: 1.25;
   --fs-h3: 1.25rem;
   --lh-h3: 1.35;
-  --fs-dek: 1.25rem;
-  --lh-dek: 1.5;
+  --fs-standfirst: 1.25rem;
+  --lh-standfirst: 1.5;
   --fs-body: 1.1875rem;
   --lh-body: 1.7;
   --fs-ui: 0.9375rem;
@@ -141,8 +141,8 @@
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 
   --w-page: 1280px;
-  --w-essay: 680px;
-  --w-guide: 740px;
+  --w-story: 680px;
+  --w-explained: 740px;
   --w-sidebar: 264px;
   --w-toc: 224px;
   --w-feed: 728px;
