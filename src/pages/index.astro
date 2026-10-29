@@ -106,7 +106,7 @@ const twoAm = COLUMNS['2-am'];
       </section>
     ))}
 
-    <div class="lower">
+    <div class="lower" hidden={!front.explained.length && !front.picks.length}>
       {front.explained.length > 0 && (
         <section class="explained" aria-labelledby="explained-h">
           <header class="band-head">
@@ -236,9 +236,6 @@ const twoAm = COLUMNS['2-am'];
     font-size: var(--fs-standfirst);
     line-height: var(--lh-standfirst);
     color: var(--text-soft);
-  }
-  .dateline {
-    font-variant-numeric: tabular-nums;
   }
   @media (min-width: 768px) {
     .masthead {
@@ -462,12 +459,12 @@ const twoAm = COLUMNS['2-am'];
     font-variant-numeric: tabular-nums;
   }
   @media (min-width: 960px) {
-    .lower {
+    .lower:has(> :nth-child(2)) {
       grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     }
-    .lower > .picks:only-child {
-      grid-column: 2;
-    }
+  }
+  .lower[hidden] {
+    display: none;
   }
 
   /* 2 AM column block */

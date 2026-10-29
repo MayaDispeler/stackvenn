@@ -70,11 +70,14 @@ export async function getFrontPage(): Promise<FrontPage> {
     ...(leadImage && picks.leadImageCaption ? { leadImageCaption: picks.leadImageCaption } : {}),
     top,
     bands,
-    // Picks may repeat stories above: it's a short ranked list, like a paper's "editor's picks".
-    picks: picks.picks
-      .map((s) => bySlug.get(s))
-      .filter((p): p is Post => !!p)
-      .slice(0, 5),
+    // A short ranked list of stories not already on the page; hidden unless at least 3 qualify.
+    picks: (() => {
+      const unused = picks.picks
+        .map((s) => bySlug.get(s))
+        .filter((p): p is Post => !!p && !used.has(p.id))
+        .slice(0, 5);
+      return unused.length >= 3 ? unused : [];
+    })(),
     explained: all.filter((p) => isExplained(p) && !used.has(p.id)).slice(0, 4),
     // The 2 AM block always renders (name + link); it lists only pieces not already shown.
     column: all.filter((p) => isColumn(p) && !used.has(p.id)).slice(0, 3),
