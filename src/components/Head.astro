@@ -1,0 +1,67 @@
+---
+import { Font } from 'astro:assets';
+import { SITE } from '../lib/site';
+import ThemeScript from './ThemeScript.astro';
+
+export interface SeoProps {
+  title: string;
+  description: string;
+  /** Path of the page, e.g. /essays/foo. Canonical is always self on stackvenn.in. */
+  path?: string | undefined;
+  ogImage?: string | undefined;
+  ogType?: 'website' | 'article' | undefined;
+  markdownTwin?: string | undefined;
+  noindex?: boolean | undefined;
+  jsonLd?: Record<string, unknown>[] | undefined;
+  publishedTime?: Date | undefined;
+  modifiedTime?: Date | undefined;
+}
+
+const p = Astro.props as SeoProps;
+const path = (p.path ?? Astro.url.pathname).replace(/\/$/, '') || '/';
+const canonical = new URL(path, SITE.url).href;
+const fullTitle = p.title === SITE.name ? SITE.name : `${p.title} · ${SITE.name}`;
+const og = new URL(p.ogImage ?? '/og/default.png', SITE.url).href;
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<ThemeScript />
+<title>{fullTitle}</title>
+<meta name="description" content={p.description} />
+<link rel="canonical" href={canonical} />
+{p.noindex && <meta name="robots" content="noindex" />}
+<meta name="theme-color" content="#0a0a0a" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#f7f2e8" media="(prefers-color-scheme: light)" />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="alternate" type="application/rss+xml" title="Stackvenn" href="/rss.xml" />
+<link rel="alternate" type="application/feed+json" title="Stackvenn" href="/feed.json" />
+{p.markdownTwin && <link rel="alternate" type="text/markdown" href={p.markdownTwin} />}
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="me" href={SITE.author.url} />
+
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:type" content={p.ogType ?? 'website'} />
+<meta property="og:title" content={p.title} />
+<meta property="og:description" content={p.description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={og} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en" />
+{p.publishedTime && (
+  <meta property="article:published_time" content={p.publishedTime.toISOString()} />
+)}
+{p.modifiedTime && <meta property="article:modified_time" content={p.modifiedTime.toISOString()} />}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={p.title} />
+<meta name="twitter:description" content={p.description} />
+<meta name="twitter:image" content={og} />
+
+<Font cssVariable="--font-schibsted" preload />
+<Font cssVariable="--font-newsreader" preload />
+<Font cssVariable="--font-jetbrains" />
+
+{p.jsonLd?.map((d) => (
+  <script type="application/ld+json" set:html={JSON.stringify(d)} />
+))}

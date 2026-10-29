@@ -1,0 +1,76 @@
+---
+// Feed pages: home tabs, type indexes, topic hubs, series. Feed column + right rail (stacks below 960).
+import Shell from './Shell.astro';
+import type { SeoProps } from '../components/Head.astro';
+
+interface Props extends SeoProps {
+  heading?: string;
+  lede?: string;
+  /** Hide the visible heading (the home page uses its masthead instead). */
+  hideHeading?: boolean;
+}
+const { heading, lede, hideHeading = false, ...seo } = Astro.props;
+const hasRail = Astro.slots.has('rail');
+---
+
+<Shell {...seo}>
+  <slot name="masthead" />
+  <div class:list={['container', 'list', { 'has-rail': hasRail }]}>
+    <section class="feed" aria-labelledby="list-heading">
+      <header class:list={{ 'visually-hidden': hideHeading }}>
+        {hideHeading ? (
+          <h2 id="list-heading">{heading ?? seo.title}</h2>
+        ) : (
+          <h1 id="list-heading">{heading ?? seo.title}</h1>
+        )}
+        {lede && <p class="lede">{lede}</p>}
+      </header>
+      <slot />
+    </section>
+    {hasRail && (
+      <aside class="rail" aria-label="More from Stackvenn">
+        <slot name="rail" />
+      </aside>
+    )}
+  </div>
+</Shell>
+
+<style>
+  .list {
+    display: grid;
+    gap: var(--s-8);
+    padding-block-start: var(--s-7);
+  }
+  .feed {
+    min-width: 0;
+    max-width: var(--w-feed);
+  }
+  h1 {
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+    font-weight: 700;
+    letter-spacing: var(--ls-h1);
+  }
+  .lede {
+    margin-block: var(--s-3) var(--s-6);
+    font-size: var(--fs-dek);
+    line-height: var(--lh-dek);
+    color: var(--text-muted);
+    max-width: var(--measure);
+  }
+  .rail {
+    display: grid;
+    gap: var(--s-7);
+    align-content: start;
+  }
+  @media (min-width: 960px) {
+    .has-rail {
+      grid-template-columns: minmax(0, var(--w-feed)) var(--w-rail);
+      justify-content: space-between;
+    }
+    .rail {
+      position: sticky;
+      top: calc(var(--h-header) + var(--s-5));
+    }
+  }
+</style>

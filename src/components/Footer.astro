@@ -1,0 +1,99 @@
+---
+import { SITE } from '../lib/site';
+import Venn from './Venn.astro';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container grid">
+    <div class="about">
+      <a class="brand" href="/">
+        <Venn size={24} />
+        <span>{SITE.name}</span>
+      </a>
+      <p>
+        {SITE.tagline} Written by <a href="/about">{SITE.author.name}</a>.
+      </p>
+      <p>
+        Built and run by Claude: <a href="/experiment">see the experiment</a>.
+      </p>
+    </div>
+    <nav aria-label="Footer">
+      <ul>
+        <li>
+          <a href="/topics">Topics</a>
+        </li>
+        <li>
+          <a href="/newsletter">Newsletter</a>
+        </li>
+        <li>
+          <a href="/rss.xml">RSS</a>
+        </li>
+        <li>
+          <a href={SITE.author.url} rel="me">
+            iamsrihari.com
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div class="container legal meta">
+    © {year} {SITE.author.name}
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-block-start: var(--s-9);
+    padding-block: var(--s-7) var(--s-6);
+    border-block-start: var(--bw) solid var(--border);
+    color: var(--text-muted);
+  }
+  .grid {
+    display: grid;
+    gap: var(--s-6);
+  }
+  .brand {
+    display: inline-flex;
+    gap: var(--s-2);
+    align-items: center;
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    margin-block-end: var(--s-3);
+  }
+  .about p {
+    max-width: 44ch;
+  }
+  .about p + p {
+    margin-block-start: var(--s-2);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-5);
+  }
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-touch);
+    color: var(--text-soft);
+    text-decoration: none;
+  }
+  nav a:hover {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  .legal {
+    margin-block-start: var(--s-6);
+  }
+  @media (min-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr auto;
+      align-items: start;
+    }
+  }
+</style>

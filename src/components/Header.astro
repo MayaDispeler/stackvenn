@@ -1,0 +1,269 @@
+---
+import { NAV, SITE } from '../lib/site';
+import Venn from './Venn.astro';
+import ThemeToggle from './ThemeToggle.astro';
+const here = Astro.url.pathname;
+const isActive = (href: string) => here === href || here.startsWith(`${href}/`);
+---
+
+<header class="site-header" data-header>
+  <div class="container bar">
+    <a class="brand" href="/" aria-label={`${SITE.name}, home`}>
+      <Venn size={28} />
+      <span>{SITE.name}</span>
+    </a>
+
+    <nav class="primary" aria-label="Main">
+      <ul>
+        {NAV.map((n) => (
+          <li>
+            <a href={n.href} aria-current={isActive(n.href) ? 'page' : undefined}>
+              {n.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="actions">
+      <a class="btn btn-ghost search" href="/search" data-search-open>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <span class="search-label">Search</span>
+        <kbd class="search-kbd" aria-hidden="true">
+          Ctrl K
+        </kbd>
+      </a>
+      <div class="theme-wide">
+        <ThemeToggle />
+      </div>
+      <a class="btn btn-primary subscribe" href="/newsletter">
+        Subscribe
+      </a>
+      <details class="menu">
+        <summary class="btn btn-icon" aria-label="Menu">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16M4 12h16M4 17h16"></path>
+          </svg>
+        </summary>
+        <div class="menu-panel">
+          <nav aria-label="Main (menu)">
+            <ul>
+              {NAV.map((n) => (
+                <li>
+                  <a href={n.href} aria-current={isActive(n.href) ? 'page' : undefined}>
+                    {n.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <ThemeToggle />
+          <a class="btn btn-primary" href="/newsletter">
+            Subscribe
+          </a>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Apple platforms get the Command-key hint.
+  if (/Mac|iPhone|iPad/.test(navigator.userAgent)) {
+    document.querySelectorAll('.search-kbd').forEach((k) => (k.textContent = '⌘K'));
+  }
+  const header = document.querySelector<HTMLElement>('[data-header]');
+  const mobile = matchMedia('(max-width: 959px)');
+  let last = scrollY;
+  addEventListener(
+    'scroll',
+    () => {
+      if (!header) return;
+      header.toggleAttribute('data-scrolled', scrollY > 4);
+      // Hide on scroll down, show on scroll up, mobile only (DESIGN §1).
+      header.toggleAttribute('data-hidden', mobile.matches && scrollY > last && scrollY > 120);
+      last = scrollY;
+    },
+    { passive: true },
+  );
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-block-end: var(--bw) solid transparent;
+    transition:
+      transform var(--d-mid) var(--ease),
+      border-color var(--d-mid) var(--ease);
+  }
+  .site-header[data-scrolled] {
+    border-block-end-color: var(--border);
+  }
+  .site-header[data-hidden] {
+    transform: translateY(-100%);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    height: var(--h-header);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: var(--size-touch);
+    color: var(--text);
+    font-weight: 600;
+    font-size: var(--fs-h3);
+    text-decoration: none;
+  }
+  .brand:hover {
+    color: var(--text);
+  }
+  .primary {
+    display: none;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: var(--s-1);
+  }
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--h-button);
+    padding: 0 var(--s-3);
+    color: var(--text-soft);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  nav a:hover {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  nav a[aria-current='page'] {
+    color: var(--text);
+  }
+  .actions {
+    margin-inline-start: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+  .search-kbd,
+  .theme-wide,
+  .subscribe {
+    display: none;
+  }
+  /* Visible from 1200px; below that it stays in the accessibility tree as the button's name. */
+  .search-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .search {
+    padding: 0 var(--s-2);
+  }
+  kbd {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta);
+    color: var(--text-muted);
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 1px var(--s-1);
+  }
+  .menu {
+    position: relative;
+  }
+  .menu summary {
+    list-style: none;
+  }
+  .menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .menu-panel {
+    position: absolute;
+    inset-inline-end: 0;
+    top: calc(100% + var(--s-2));
+    width: min(320px, calc(100vw - 2 * var(--s-4)));
+    display: grid;
+    gap: var(--s-4);
+    padding: var(--s-4);
+    background: var(--raised);
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-menu);
+  }
+  .menu-panel ul {
+    flex-direction: column;
+  }
+  @media (min-width: 960px) {
+    .primary {
+      display: block;
+    }
+    .subscribe {
+      display: inline-flex;
+    }
+    .menu-panel nav,
+    .menu-panel .btn {
+      display: none;
+    }
+    .menu-panel {
+      width: auto;
+    }
+  }
+  /* Full header only where it fits (critique #4). Below 1200 the theme control lives in the menu. */
+  @media (min-width: 1200px) {
+    .search {
+      min-width: 168px;
+      padding: 0 var(--s-3);
+      border-color: var(--border);
+      justify-content: flex-start;
+    }
+    .search-label {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip: auto;
+      margin-inline-end: auto;
+    }
+    .search-kbd,
+    .theme-wide {
+      display: inline-flex;
+    }
+    .menu {
+      display: none;
+    }
+  }
+</style>

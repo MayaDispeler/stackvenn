@@ -1,0 +1,46 @@
+---
+title: 'Typography fixture: every element an essay can use'
+dek: 'A draft-only page that exercises headings, lists, quotes, code, tables and footnotes, so layout tests have real material to render.'
+type: essay
+pillar: work
+overlap: ['Design', 'Engineering']
+series: 2-am
+published: 2026-10-29
+status: draft
+first_published: { platform: '2 AM', date: 2026-10-01 }
+sources:
+  - { title: 'WCAG 2.2', url: 'https://www.w3.org/TR/WCAG22/' }
+---
+
+This page never ships. It exists so the screenshot and accessibility suites have a long essay to render in both themes, at every width.
+
+## A section heading
+
+Body copy is set in Newsreader at 19px with a 1.7 line height. A paragraph should hold between sixty-two and seventy-two characters per line, which keeps the eye from losing its place on the return sweep. Here is a [link inside a sentence](/about) and some `inline code`.
+
+- One item in an unordered list
+- A second item that runs long enough to wrap onto a second line on a phone screen
+- A third
+
+> A pull quote sits in Newsreader italic with a thin accent rule on its left.
+
+### A smaller heading
+
+1. First step
+2. Second step
+3. Third step
+
+```ts title="example.ts"
+export function budget(tokens: number, pricePerMillion: number): number {
+  return (tokens / 1_000_000) * pricePerMillion;
+}
+```
+
+| Model tier | Input | Output |
+| ---------- | ----: | -----: |
+| Small      |  0.25 |   1.25 |
+| Large      |  3.00 |  15.00 |
+
+That table is fixture data, not real pricing.[^1]
+
+[^1]: A footnote, rendered at the end of the article.

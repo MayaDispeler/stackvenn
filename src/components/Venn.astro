@@ -1,0 +1,38 @@
+---
+// The Stackvenn mark (DESIGN_SYSTEM §1): two equal circles overlapping by 40% of the diameter.
+// Left stroke --text, right stroke --accent, lens solid --accent. Never animated in a loop.
+interface Props {
+  size?: number;
+  lensOnly?: boolean;
+  class?: string;
+  title?: string;
+}
+const { size = 24, lensOnly = false, class: cls, title } = Astro.props;
+const lens = 'M11.95 2.15A7 7 0 0 1 11.95 13.35A7 7 0 0 1 11.95 2.15Z';
+---
+
+<svg
+  class:list={['venn', cls]}
+  width={size}
+  height={Math.round((size * 15.5) / 23.9)}
+  viewBox="0 0 23.9 15.5"
+  fill="none"
+  role={title ? 'img' : undefined}
+  aria-hidden={title ? undefined : 'true'}
+  aria-label={title}
+>
+  {!lensOnly && (
+    <>
+      <circle class="venn-left" cx="7.75" cy="7.75" r="7" stroke="var(--text)" stroke-width="1.5" />
+      <circle
+        class="venn-right"
+        cx="16.15"
+        cy="7.75"
+        r="7"
+        stroke="var(--accent)"
+        stroke-width="1.5"
+      />
+    </>
+  )}
+  <path class="venn-lens" d={lens} fill="var(--accent)"></path>
+</svg>

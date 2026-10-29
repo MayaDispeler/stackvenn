@@ -1,0 +1,386 @@
+---
+// Guides and glossary terms (DESIGN §4): docs layout.
+// ≥1200px: sidebar | content | TOC. 960–1199: sidebar | content, TOC as a bar. <960: sidebar in a disclosure.
+// The sidebar is sticky but never scrolls on its own: only the active pillar is expanded.
+import type { MarkdownHeading } from 'astro';
+import Shell from './Shell.astro';
+import { SITE } from '../lib/site';
+import { PILLAR_LABEL } from '../lib/pillars';
+import { formatDate, getPosts, readingTime, urlOf, type Post } from '../lib/posts';
+
+interface Props {
+  post: Post;
+  headings: MarkdownHeading[];
+}
+const { post, headings } = Astro.props;
+const d = post.data;
+const url = urlOf(post);
+const minutes = readingTime(post.body);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+
+const guides = await getPosts((p) => p.data.type === 'guide');
+const byPillar = new Map<string, Post[]>();
+for (const g of guides) byPillar.set(g.data.pillar, [...(byPillar.get(g.data.pillar) ?? []), g]);
+
+const levelLabel = d.level ? d.level[0]!.toUpperCase() + d.level.slice(1) : undefined;
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': d.type === 'glossary' ? 'DefinedTerm' : 'TechArticle',
+    headline: d.title,
+    name: d.title,
+    description: d.dek,
+    url: new URL(url, SITE.url).href,
+    datePublished: d.published.toISOString(),
+    dateModified: (d.updated ?? d.published).toISOString(),
+    inLanguage: SITE.locale,
+    author: { '@id': `${SITE.url}/about#person` },
+    publisher: { '@id': `${SITE.url}/#org` },
+    about: d.pillar,
+    ...(d.level ? { proficiencyLevel: levelLabel } : {}),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: SITE.name, item: SITE.url },
+      { '@type': 'ListItem', position: 2, name: 'Guides', item: `${SITE.url}/guides` },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: PILLAR_LABEL[d.pillar],
+        item: `${SITE.url}/topics/${d.pillar}`,
+      },
+      { '@type': 'ListItem', position: 4, name: d.title, item: new URL(url, SITE.url).href },
+    ],
+  },
+];
+---
+
+<Shell
+  title={d.title}
+  description={d.dek}
+  path={url}
+  ogType="article"
+  markdownTwin={`${url}.md`}
+  publishedTime={d.published}
+  modifiedTime={d.updated}
+  noindex={d.status === 'draft'}
+  jsonLd={jsonLd}
+>
+  <div class="container docs">
+    <details class="sidebar" open data-sidebar>
+      <summary class="btn btn-secondary btn-sm">All guides</summary>
+      <nav aria-label="Guides">
+        {[...byPillar].map(([pillar, items]) => (
+          <details class="group" open={pillar === d.pillar}>
+            <summary>{PILLAR_LABEL[pillar as keyof typeof PILLAR_LABEL]}</summary>
+            <ul>
+              {items.map((g) => (
+                <li>
+                  <a href={urlOf(g)} aria-current={g.id === post.id ? 'page' : undefined}>
+                    {g.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
+        ))}
+      </nav>
+    </details>
+
+    <article class="content">
+      <header>
+        <p class="eyebrow">{PILLAR_LABEL[d.pillar]}</p>
+        <h1>{d.title}</h1>
+        <p class="dek">{d.dek}</p>
+        <dl class="meta-row">
+          {levelLabel && (
+            <div>
+              <dt>Level</dt>
+              <dd>{levelLabel}</dd>
+            </div>
+          )}
+          <div>
+            <dt>Read</dt>
+            <dd>{minutes} min</dd>
+          </div>
+          <div>
+            <dt>Updated</dt>
+            <dd>
+              <time datetime={(d.updated ?? d.published).toISOString()}>
+                {formatDate(d.updated ?? d.published)}
+              </time>
+            </dd>
+          </div>
+          {d.tested_with && d.tested_with.length > 0 && (
+            <div>
+              <dt>Tested with</dt>
+              <dd class="mono">{d.tested_with.join(', ')}</dd>
+            </div>
+          )}
+        </dl>
+        <slot name="actions" />
+      </header>
+
+      {toc.length > 1 && (
+        <details class="toc-bar">
+          <summary>On this page</summary>
+          <ol>
+            {toc.map((h) => (
+              <li class={`d${h.depth}`}>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ol>
+        </details>
+      )}
+
+      <div class="prose guide-body">
+        <slot />
+      </div>
+
+      <footer class="foot meta">
+        <slot name="pager" />
+        <a href={`${SITE.repo}/edit/main/src/content/${post.id}.mdx`}>Edit on GitHub</a>
+      </footer>
+    </article>
+
+    {toc.length > 1 && (
+      <nav class="toc" aria-label="On this page">
+        <p class="eyebrow">On this page</p>
+        <ol>
+          {toc.map((h) => (
+            <li class={`d${h.depth}`}>
+              <a href={`#${h.slug}`} data-toc-link>
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
+  </div>
+</Shell>
+
+<script>
+  // Sidebar starts collapsed on small screens; open on desktop (no-JS default is open).
+  const sidebar = document.querySelector<HTMLDetailsElement>('[data-sidebar]');
+  const wide = matchMedia('(min-width: 960px)');
+  const syncSidebar = () => sidebar && (sidebar.open = wide.matches);
+  wide.addEventListener('change', syncSidebar);
+  syncSidebar();
+
+  // TOC scroll-spy.
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+  const targets = links
+    .map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))))
+    .filter((el): el is HTMLElement => !!el);
+  if (targets.length) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting);
+        if (!visible.length) return;
+        const id = visible[0]!.target.id;
+        links.forEach((a) => a.toggleAttribute('data-active', a.hash === `#${id}`));
+      },
+      { rootMargin: '-80px 0px -70% 0px' },
+    );
+    targets.forEach((t) => io.observe(t));
+  }
+</script>
+
+<style>
+  .docs {
+    display: grid;
+    gap: var(--s-6);
+    padding-block-start: var(--s-6);
+  }
+  .content {
+    min-width: 0;
+    max-width: var(--w-guide);
+  }
+
+  /* Sidebar */
+  .sidebar > summary {
+    list-style: none;
+  }
+  .sidebar > summary::-webkit-details-marker {
+    display: none;
+  }
+  .sidebar nav {
+    margin-block-start: var(--s-4);
+    display: grid;
+    gap: var(--s-2);
+  }
+  .group > summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text);
+    padding-block: var(--s-2);
+  }
+  .group ul {
+    list-style: none;
+    padding: 0;
+  }
+  .group a {
+    display: block;
+    padding: var(--s-2) var(--s-3);
+    color: var(--text-muted);
+    text-decoration: none;
+    border-inline-start: var(--bw-active) solid transparent;
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  }
+  .group a:hover {
+    color: var(--text);
+  }
+  .group a[aria-current='page'] {
+    color: var(--text);
+    background: var(--raised);
+    border-inline-start-color: var(--accent);
+  }
+
+  /* Header block */
+  h1 {
+    margin-block-start: var(--s-3);
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+    font-weight: 700;
+    letter-spacing: var(--ls-h1);
+  }
+  .dek {
+    margin-block-start: var(--s-3);
+    font-size: var(--fs-dek);
+    line-height: var(--lh-dek);
+    color: var(--text-muted);
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    margin-block: var(--s-5);
+  }
+  .meta-row div {
+    display: inline-flex;
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-full);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-meta);
+    overflow: hidden;
+  }
+  .meta-row dt,
+  .meta-row dd {
+    padding: var(--s-1) var(--s-3);
+  }
+  .meta-row dt {
+    color: var(--text-muted);
+    border-inline-end: var(--bw) solid var(--border);
+  }
+  .meta-row dd {
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+
+  /* Guide prose uses the UI face for headings */
+  .guide-body {
+    font-family: var(--font-ui);
+    font-size: 1.0625rem;
+    max-width: none;
+  }
+  .guide-body :global(h2),
+  .guide-body :global(h3) {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  /* TOC: bar below 1200, rail at 1200+ */
+  .toc-bar {
+    margin-block-end: var(--s-6);
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-md);
+    padding: var(--s-3) var(--s-4);
+  }
+  .toc-bar summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .toc-bar ol,
+  .toc ol {
+    list-style: none;
+    padding: 0;
+  }
+  .toc-bar ol {
+    margin-block-start: var(--s-3);
+  }
+  .toc-bar a,
+  .toc a {
+    display: block;
+    padding-block: var(--s-1);
+    font-size: var(--fs-meta);
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  .toc-bar .d3,
+  .toc .d3 {
+    padding-inline-start: var(--s-3);
+  }
+  .toc {
+    display: none;
+  }
+  .toc a {
+    padding-inline-start: var(--s-3);
+    border-inline-start: var(--bw-active) solid transparent;
+  }
+  .toc a:hover {
+    color: var(--text);
+  }
+  .toc a[data-active] {
+    color: var(--accent-text);
+    border-inline-start-color: var(--accent);
+  }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-4);
+    margin-block-start: var(--s-8);
+    padding-block-start: var(--s-5);
+    border-block-start: var(--bw) solid var(--border);
+  }
+
+  @media (min-width: 960px) {
+    .docs {
+      grid-template-columns: var(--w-sidebar) minmax(0, 1fr);
+      gap: var(--s-7);
+    }
+    .sidebar > summary {
+      display: none;
+    }
+    .sidebar,
+    .toc {
+      position: sticky;
+      top: calc(var(--h-header) + var(--s-5));
+      align-self: start;
+    }
+  }
+  @media (min-width: 1200px) {
+    .docs {
+      grid-template-columns: var(--w-sidebar) minmax(0, var(--w-guide)) var(--w-toc);
+      justify-content: space-between;
+      gap: var(--s-6);
+    }
+    .toc {
+      display: block;
+    }
+    .toc-bar {
+      display: none;
+    }
+    .toc .eyebrow {
+      margin-block-end: var(--s-3);
+    }
+  }
+</style>

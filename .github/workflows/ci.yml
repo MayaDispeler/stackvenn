@@ -1,0 +1,42 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  ASTRO_TELEMETRY_DISABLED: 1
+jobs:
+  check-build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Check (astro check, eslint, prettier, contrast)
+        run: npm run check
+      - name: Production build (drafts excluded)
+        run: npm run build
+      - name: Test build (drafts included as fixtures)
+        run: npm run build
+        env:
+          SHOW_DRAFTS: 'true'
+      - run: npx playwright install --with-deps chromium
+      - name: Screenshots (360-1440 x dark/light) and axe
+        run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: |
+            tests/screenshots/__output__/
+            playwright-report/
+          retention-days: 14

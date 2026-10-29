@@ -1,0 +1,9 @@
+dist
+.astro
+node_modules
+assets-staging
+imports
+data/blog-posts.json
+package-lock.json
+docs/*.md
+*.md

@@ -1,0 +1,186 @@
+/*
+ * Stackvenn design tokens. The only file allowed to hold raw colours, sizes or font names.
+ * Source of truth: docs/DESIGN_SYSTEM.md. Contrast is enforced by scripts/check-contrast.mjs,
+ * which parses this file, so keep one declaration per line.
+ */
+
+/* ---------- Colour: dark (default) ---------- */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0a0a0a;
+  --surface: #131211;
+  --raised: #1b1917;
+  --border: #2c2824;
+  --border-strong: #3d3832;
+  --border-control: #6d655a; /* input and control outlines, 3:1 (WCAG 1.4.11); see docs/DECISIONS.md */
+  --text: #e6d5bd;
+  --text-soft: #bdb09c;
+  --text-muted: #948a7b;
+  --accent: #d5360c;
+  --accent-text: #f0643a;
+  --accent-hover: #e8481c;
+  --on-accent: #ffffff;
+  --code-bg: #161412;
+  --success: #3fb97a;
+  --warning: #e0a93b;
+  --info: #7fa7d9;
+  --selection: rgb(213 54 12 / 0.35);
+  --focus: #f0643a;
+  --shadow-menu: none;
+}
+
+/* ---------- Colour: light ---------- */
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f7f2e8;
+  --surface: #fffcf6;
+  --raised: #efe7d8;
+  --border: #ddd2bf;
+  --border-strong: #c7b9a2;
+  --border-control: #8c8273;
+  --text: #101010;
+  --text-soft: #3a3631;
+  --text-muted: #6b6358;
+  --accent: #d5360c;
+  --accent-text: #b02a06;
+  --accent-hover: #b02a06;
+  --on-accent: #ffffff;
+  --code-bg: #f0e9dc;
+  --success: #186a41;
+  --warning: #8a5a00;
+  --info: #2d5b91;
+  --selection: rgb(213 54 12 / 0.22);
+  --focus: #b02a06;
+  --shadow-menu: 0 1px 2px rgb(16 16 16 / 0.06);
+}
+
+/* "System" without JS: apply light when the OS asks and no theme has been resolved yet. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    color-scheme: light;
+    --bg: #f7f2e8;
+    --surface: #fffcf6;
+    --raised: #efe7d8;
+    --border: #ddd2bf;
+    --border-strong: #c7b9a2;
+    --border-control: #8c8273;
+    --text: #101010;
+    --text-soft: #3a3631;
+    --text-muted: #6b6358;
+    --accent: #d5360c;
+    --accent-text: #b02a06;
+    --accent-hover: #b02a06;
+    --on-accent: #ffffff;
+    --code-bg: #f0e9dc;
+    --success: #186a41;
+    --warning: #8a5a00;
+    --info: #2d5b91;
+    --selection: rgb(213 54 12 / 0.22);
+    --focus: #b02a06;
+    --shadow-menu: 0 1px 2px rgb(16 16 16 / 0.06);
+  }
+}
+
+/* ---------- Type, space, shape, motion, layout ---------- */
+:root {
+  /* Families: the Astro font API exposes --font-schibsted etc. with metric-matched fallbacks. */
+  --font-ui: var(--font-schibsted), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-read: var(--font-newsreader), Georgia, 'Times New Roman', serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, Menlo, Consolas, monospace;
+
+  --fs-display: clamp(2.5rem, 5vw, 3.75rem);
+  --lh-display: 1.05;
+  --fs-h1: clamp(2rem, 3.6vw, 2.75rem);
+  --lh-h1: 1.1;
+  --fs-h2: 1.625rem;
+  --lh-h2: 1.25;
+  --fs-h3: 1.25rem;
+  --lh-h3: 1.35;
+  --fs-dek: 1.25rem;
+  --lh-dek: 1.5;
+  --fs-body: 1.1875rem;
+  --lh-body: 1.7;
+  --fs-ui: 0.9375rem;
+  --lh-ui: 1.5;
+  --fs-meta: 0.8125rem;
+  --lh-meta: 1.4;
+  --fs-eyebrow: 0.75rem;
+  --lh-eyebrow: 1.2;
+  --ls-eyebrow: 0.12em;
+  --ls-h1: -0.02em;
+  --fs-code: 0.875rem;
+  --lh-code: 1.6;
+  --fs-pullquote: 1.6rem;
+  --fs-feed-title: 1.25rem;
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+  --s-9: 96px;
+
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-full: 999px;
+
+  --bw: 1px;
+  --bw-active: 2px;
+  --bw-callout: 3px;
+  --focus-ring: 2px;
+  --focus-offset: 2px;
+
+  --d-fast: 120ms;
+  --d-mid: 200ms;
+  --d-slow: 320ms;
+  --d-venn: 400ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --w-page: 1280px;
+  --w-essay: 680px;
+  --w-guide: 740px;
+  --w-sidebar: 264px;
+  --w-toc: 224px;
+  --w-feed: 728px;
+  --w-rail: 320px;
+  --w-modal: 640px;
+  --h-header: 60px;
+  --h-button: 40px;
+  --h-button-sm: 32px;
+  --h-chip: 26px;
+  --h-input-search: 52px;
+  --h-progress: 2px;
+  --size-icon-btn: 36px;
+  --size-touch: 44px;
+  --size-avatar: 48px;
+  --size-thumb: 112px;
+  --size-thumb-sm: 80px;
+  --size-step: 28px;
+  --size-venn-chip: 14px;
+  --size-venn-divider: 16px;
+  --scroll-offset: 80px;
+  --measure: 68ch;
+
+  --gutter: max(16px, env(safe-area-inset-left));
+  --gutter-r: max(16px, env(safe-area-inset-right));
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: max(24px, env(safe-area-inset-left));
+    --gutter-r: max(24px, env(safe-area-inset-right));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --d-fast: 0ms;
+    --d-mid: 0ms;
+    --d-slow: 0ms;
+    --d-venn: 0ms;
+  }
+}

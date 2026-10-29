@@ -4,7 +4,7 @@ Work top to bottom. `[H]` = needs Srihari once (Claude opens a `human` issue wit
 Tick boxes in the PR that completes them.
 
 ## Phase 0 — One-time human setup (≈ 1 hour in total, done once)
-- [ ] [H] Create the GitHub repo `stackvenn` (public) and run `gh auth login` locally.
+- [x] [H] Create the GitHub repo `stackvenn` (public) and run `gh auth login` locally. Done by Claude: MayaDispeler/stackvenn.
 - [ ] [H] Run `claude setup-token`, then `/install-github-app` in Claude Code, and choose the subscription token. This saves the `CLAUDE_CODE_OAUTH_TOKEN` secret.
 - [ ] [H] Confirm stackvenn.in and iamsrihari.com are on Cloudflare DNS (leave stackvenn.com untouched; it is reserved); if not, change nameservers at the registrar. Create a scoped Cloudflare API token (Workers, Pages, D1, DNS edit, Zone settings).
 - [ ] [H] Google Search Console sign-in plus a service account added as Owner (REACHABILITY §6).
@@ -13,21 +13,21 @@ Tick boxes in the PR that completes them.
 - [ ] [H] Enable GitHub Discussions and install the Giscus app on the repo.
 - [ ] [H] Decide the Training-crawler setting (default: Allow) and the masthead line (default in DESIGN.md §2).
 - [ ] [H] Upload source material: the cream-blazer portrait, book cover, and any project numbers he approves for publishing.
-- [ ] [H] Grant Claude access to the iamsrihari.com repo (for covers under `public/writing`, the Writing section and the Notion sync code).
+- [x] [H] Grant Claude access to the iamsrihari.com repo (Local at Portfolio Pages/Portfolio; no action needed.) (for covers under `public/writing`, the Writing section and the Notion sync code).
 - [ ] [H] LinkedIn data export: Settings → Data privacy → Get a copy of your data → tick **Articles** → request. LinkedIn emails a download link; put the zip in `imports/linkedin/`. This is the only reliable way to get the 11 LinkedIn article bodies (LinkedIn blocks automated fetching).
 - [ ] [H] Medium export: Settings → Security and apps → Download your information. Put the zip in `imports/medium/`. (Claude first tries Medium's public RSS and page fetch; the export is the fallback.)
 - [ ] [H] Kissflow post ("The Clockwork Efficiency"): confirm in an issue whether you hold the rights to republish it. If not, Claude writes a new essay on the same idea instead of copying it.
 
 ## Phase 1 — Foundation
-- [ ] Install skills and tools (CLAUDE.md "Skills and tools").
-- [ ] Add `imports/`, `.env*` and `*.pem` to `.gitignore` in the first commit (personal data exports must never be pushed).
-- [ ] Scaffold Astro + TypeScript strict + MDX + sitemap + Expressive Code; set up ESLint, Prettier and `astro check`.
-- [ ] `tokens.css` with both themes exactly as in DESIGN_SYSTEM.md §2; theme script with no flash; a contrast-check script in CI.
-- [ ] Self-hosted fonts (Schibsted Grotesk, Newsreader, JetBrains Mono) with metric-matched fallbacks.
-- [ ] Content collections with the zod schema (PRD §9); fail the build on invalid frontmatter.
-- [ ] Base layouts: Shell, Essay, Guide, List, Page. Run the Impeccable `critique` on wireframes first.
-- [ ] Wrangler config; deploy a preview to Cloudflare; set up the custom domain; redirects (www, .in, trailing slash).
-- [ ] Playwright screenshot suite (360/390/768/1280/1440 × dark/light) and an axe accessibility suite in CI.
+- [ ] Install skills and tools (CLAUDE.md "Skills and tools"). Impeccable, frontend-design and project tooling done; UI UX Pro Max waits on Srihari running /plugin (blocked locally, see DECISIONS).
+- [x] Add `imports/`, `.env*` and `*.pem` to `.gitignore` in the first commit (personal data exports must never be pushed).
+- [x] Scaffold Astro + TypeScript strict + MDX + sitemap + Expressive Code; set up ESLint, Prettier and `astro check`.
+- [x] `tokens.css` with both themes exactly as in DESIGN_SYSTEM.md §2; theme script with no flash; a contrast-check script in CI.
+- [x] Self-hosted fonts (Schibsted Grotesk, Newsreader, JetBrains Mono) with metric-matched fallbacks.
+- [x] Content collections with the zod schema (PRD §9); fail the build on invalid frontmatter.
+- [x] Base layouts: Shell, Essay, Guide, List, Page. Run the Impeccable `critique` on wireframes first.
+- [ ] Wrangler config; deploy a preview to Cloudflare; set up the custom domain; redirects (www, .in, trailing slash). **Partial:** Preview live at stackvenn.ksvhari007.workers.dev and trailing-slash handled; custom domain + www redirect wait on #2.
+- [x] Playwright screenshot suite (360/390/768/1280/1440 × dark/light) and an axe accessibility suite in CI.
 
 ## Phase 2 — Components and pages
 - [ ] Venn mark (SVG), logo, favicon set, overlap chip.
