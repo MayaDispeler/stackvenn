@@ -6,6 +6,8 @@ export const PAGES = [
   { name: 'section', path: '/work' },
   { name: 'explained-hub', path: '/explained' },
   { name: 'author', path: '/author/srihari-venkatesan' },
+  { name: 'story-images', path: '/society/anything-that-can-go-wrong-murphys-law' },
+  { name: 'book', path: '/book/the-mellivora-paradox' },
   { name: '404', path: '/404' },
 ];
 export const WIDTHS = [360, 390, 768, 1280, 1440];
