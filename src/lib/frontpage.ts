@@ -16,8 +16,8 @@ export function storyImage(rel: string | undefined): ImageMetadata | undefined {
 }
 
 export interface FrontPage {
-  lead?: Post;
-  leadImage?: ImageMetadata;
+  lead?: Post | undefined;
+  leadImage?: ImageMetadata | undefined;
   leadImageCaption?: string;
   top: Post[];
   bands: { section: Section; posts: Post[] }[];
