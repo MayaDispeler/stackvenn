@@ -2,6 +2,14 @@
 
 Newest first. Each entry: what was decided, why, and who decided.
 
+## 2026-10-29: Merge policy, living docs, Node pin (Srihari)
+
+**Merge policy.** Claude may merge code, design and infra PRs once CI is fully green and, for UI PRs, the Impeccable audit is clean. Content PRs (new or migrated articles) wait for Srihari. His own saves in the `/admin` writing desk count as approval; Claude's drafts still go through PRs. Recorded in CLAUDE.md.
+
+**Living docs.** A decision that changes the plan updates the affected spec docs and `docs/TODO.md` in the same PR. Struck TODO items keep a one-line reason.
+
+**Node pinned** to 22.23.4 in `.nvmrc`; `engines` requires ≥22.23.4; CI uses `node-version-file: .nvmrc`. TypeScript stays on 6.x.
+
 ## 2026-10-29: Phase 0 and Phase 1
 
 **GitHub owner is `MayaDispeler`.** Repo: https://github.com/MayaDispeler/stackvenn (public). Chosen by Srihari when asked which of the two logged-in gh accounts to use.

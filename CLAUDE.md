@@ -89,6 +89,13 @@ MCP servers available to you: **Cloudflare** (DNS, Workers, Pages, D1, R2, setti
 
 ---
 
+## Merge policy and living docs (Srihari, 2026-10-29)
+
+- **Code, design and infra PRs:** Claude may merge them once CI is fully green and, for any PR that touches UI, the Impeccable `audit` is clean.
+- **Content PRs** (new or migrated articles): only Srihari merges. Saves Srihari makes himself in the `/admin` writing desk count as his approval.
+- **Living docs:** when a decision changes the plan, update every affected doc (PRD, DESIGN, DESIGN_SYSTEM, REACHABILITY, MARKETING_AUTOMATION, MIGRATION) and `docs/TODO.md` in the **same PR**. TODO.md always reflects reality: tick what's done, add new items, and strike items that no longer apply (`~~item~~`, with a one-line reason).
+- **Toolchain:** Node is pinned in `.nvmrc` (and `engines`); CI reads `.nvmrc`. TypeScript stays on 6.x until `@astrojs/check` and `typescript-eslint` support 7.
+
 ## How to work on any task
 
 1. Read the relevant doc sections. Restate the goal in one line in the PR description.
