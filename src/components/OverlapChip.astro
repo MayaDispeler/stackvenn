@@ -1,0 +1,31 @@
+---
+import Venn from './Venn.astro';
+interface Props {
+  overlap: [string, string];
+}
+const [a, b] = Astro.props.overlap;
+---
+
+<span class="overlap-chip">
+  <Venn size={22} />
+  <span>
+    {a} <span aria-hidden="true">×</span>
+    <span class="visually-hidden">and</span> {b}
+  </span>
+</span>
+
+<style>
+  .overlap-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-family: var(--font-ui);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-meta);
+    color: var(--text-soft);
+  }
+  .overlap-chip :global(.venn) {
+    width: auto;
+    height: var(--size-venn-chip);
+  }
+</style>

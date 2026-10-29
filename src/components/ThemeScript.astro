@@ -1,0 +1,29 @@
+---
+// Runs before first paint: resolves the stored preference (dark | light | system) so there is no flash.
+---
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const mq = matchMedia('(prefers-color-scheme: light)');
+    let pref = 'system';
+    try {
+      pref = localStorage.getItem('theme') || 'system';
+    } catch {}
+    const apply = (p) => {
+      root.dataset.themePref = p;
+      root.dataset.theme = p === 'system' ? (mq.matches ? 'light' : 'dark') : p;
+    };
+    apply(pref);
+    mq.addEventListener('change', () => {
+      if (root.dataset.themePref === 'system') apply('system');
+    });
+    window.__setTheme = (p) => {
+      try {
+        localStorage.setItem('theme', p);
+      } catch {}
+      apply(p);
+      document.dispatchEvent(new CustomEvent('themechange', { detail: p }));
+    };
+  })();
+</script>

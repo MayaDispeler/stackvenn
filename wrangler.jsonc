@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "stackvenn",
+  "account_id": "676811ceab4966a5996a8636dcc5949e",
+  "compatibility_date": "2026-10-01",
+  // Static site on Workers static assets. Custom domain stackvenn.in is attached once the zone is on Cloudflare (issue #2).
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "404-page",
+  },
+  "workers_dev": true,
+  "preview_urls": true,
+}

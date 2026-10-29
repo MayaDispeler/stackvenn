@@ -1,0 +1,20 @@
+---
+import { render } from 'astro:content';
+import Guide from '../../../layouts/Guide.astro';
+import { getPosts, slugOf, type Post } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPosts((p) => p.data.type === 'guide');
+  return posts.map((post) => ({
+    params: { pillar: post.data.pillar, slug: slugOf(post) },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content, headings } = await render(post);
+---
+
+<Guide post={post} headings={headings}>
+  <Content />
+</Guide>

@@ -1,0 +1,46 @@
+---
+// Plain content pages: About, Newsletter, Experiment, 404.
+import Shell from './Shell.astro';
+import type { SeoProps } from '../components/Head.astro';
+
+interface Props extends SeoProps {
+  heading?: string;
+  lede?: string;
+}
+const { heading, lede, ...seo } = Astro.props;
+---
+
+<Shell {...seo}>
+  <article class="container page">
+    <header>
+      <h1>{heading ?? seo.title}</h1>
+      {lede && <p class="lede">{lede}</p>}
+    </header>
+    <div class="prose">
+      <slot />
+    </div>
+  </article>
+</Shell>
+
+<style>
+  .page {
+    max-width: calc(var(--w-essay) + 2 * var(--s-6));
+    padding-block-start: var(--s-8);
+  }
+  h1 {
+    font-family: var(--font-read);
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 72;
+  }
+  .lede {
+    margin-block: var(--s-4) var(--s-7);
+    font-family: var(--font-read);
+    font-style: italic;
+    font-size: var(--fs-dek);
+    line-height: var(--lh-dek);
+    color: var(--text-muted);
+    max-width: var(--measure);
+  }
+</style>
