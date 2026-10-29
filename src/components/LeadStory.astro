@@ -1,0 +1,115 @@
+---
+// Lead story (DESIGN_SYSTEM §7): no card, no surface. Image, kicker, headline, standfirst, byline meta.
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { SITE } from '../lib/site';
+import { SECTION } from '../lib/taxonomy';
+import { formatDate, kickerOf, readingTime, urlOf, type Post } from '../lib/posts';
+
+interface Props {
+  post: Post;
+  /** Overrides the cover (e.g. an in-story image, when the cover is a title card). */
+  image?: ImageMetadata | undefined;
+  caption?: string | undefined;
+  headingLevel?: 'h2' | 'h3';
+  showSection?: boolean;
+}
+const { post, image, caption, headingLevel = 'h2', showSection = true } = Astro.props;
+const d = post.data;
+const H = headingLevel;
+const img = image ?? d.cover;
+const alt = image ? '' : (d.cover_alt ?? '');
+---
+
+<article class="lead">
+  {img && (
+    <a class="media" href={urlOf(post)} tabindex="-1" aria-hidden="true">
+      <Image
+        src={img}
+        alt={alt}
+        widths={[480, 800, 1200]}
+        sizes="(min-width: 960px) 760px, 100vw"
+        loading="eager"
+        fetchpriority="high"
+      />
+    </a>
+  )}
+  {img && caption && <p class="caption meta">{caption}</p>}
+  <p class="kicker">
+    {showSection && <span class="section">{SECTION[d.section].label}</span>}
+    <span>{kickerOf(post)}</span>
+  </p>
+  <H class="headline">
+    <a href={urlOf(post)}>{d.headline}</a>
+  </H>
+  <p class="standfirst">{d.standfirst}</p>
+  <p class="meta">
+    By {SITE.author.name} ·{' '}
+    <time datetime={d.published.toISOString()}>{formatDate(d.published)}</time>·{' '}
+    {readingTime(post.body)} min read
+  </p>
+</article>
+
+<style>
+  .media {
+    display: block;
+    margin-block-end: var(--s-4);
+  }
+  .media :global(img) {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-sm);
+  }
+  .caption {
+    margin-block: calc(-1 * var(--s-2)) var(--s-4);
+  }
+  .kicker {
+    display: flex;
+    gap: var(--s-2);
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--accent-text);
+  }
+  .kicker .section {
+    color: var(--text);
+  }
+  .kicker .section::after {
+    content: '·';
+    margin-inline-start: var(--s-2);
+    color: var(--text-muted);
+  }
+  .headline {
+    margin-block: var(--s-3);
+    font-family: var(--font-read);
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 72;
+    letter-spacing: -0.01em;
+  }
+  .headline a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .headline a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+  }
+  .standfirst {
+    font-family: var(--font-read);
+    font-style: italic;
+    font-size: var(--fs-standfirst);
+    line-height: var(--lh-standfirst);
+    color: var(--text-muted);
+    max-width: var(--measure);
+  }
+  .meta {
+    margin-block-start: var(--s-3);
+  }
+</style>

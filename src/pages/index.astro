@@ -1,101 +1,508 @@
 ---
-// Interim front page: masthead + latest list. The newspaper front page (DESIGN §2) replaces it in the next PR.
-import List from '../layouts/List.astro';
-import OverlapChip from '../components/OverlapChip.astro';
+// Front page (DESIGN §2): a newspaper front, quiet. Rules and type do the work; no cards in grids.
+import { Image } from 'astro:assets';
+import Shell from '../layouts/Shell.astro';
 import Venn from '../components/Venn.astro';
+import LeadStory from '../components/LeadStory.astro';
 import { SITE } from '../lib/site';
-import { formatDate, getStories, kickerOf, readingTime, urlOf } from '../lib/posts';
+import { COLUMNS, SECTION } from '../lib/taxonomy';
+import { getFrontPage } from '../lib/frontpage';
+import { formatDate, kickerOf, readingTime, urlOf } from '../lib/posts';
 
-const posts = await getStories();
+const front = await getFrontPage();
+const now = new Date();
+const dateIST = now.toLocaleDateString('en-GB', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  timeZone: SITE.timeZone,
+});
+const twoAm = COLUMNS['2-am'];
 ---
 
-<List title={SITE.name} description={SITE.description} heading="Latest" path="/" hideHeading>
-  <section class="masthead container" slot="masthead" aria-labelledby="promise">
-    <Venn size={64} class="mark" />
-    <h1 id="promise">Where AI engineering, software and work overlap.</h1>
-    <p class="standfirst">From an engineer who ships agentic AI in production.</p>
-  </section>
+<Shell title={SITE.name} description={SITE.description} path="/">
+  <div class="container front">
+    <header class="masthead">
+      <div class="wordmark">
+        <Venn size={56} class="mark" />
+        <h1>{SITE.name}</h1>
+      </div>
+      <p class="promise">{SITE.tagline}</p>
+      <p class="dateline meta">
+        <time datetime={now.toISOString().slice(0, 10)} data-today>
+          {dateIST}
+        </time>
+      </p>
+    </header>
 
-  {posts.length === 0 ? (
-    <p class="empty">The first posts are on their way.</p>
-  ) : (
-    <ol class="feed-list">
-      {posts.map((p) => (
-        <li>
-          <OverlapChip overlap={p.data.overlap} />
-          <h2>
-            <a href={urlOf(p)}>{p.data.headline}</a>
+    {front.lead ? (
+      <section class="above-fold" aria-label="Lead and top stories">
+        <div class="lead-col">
+          <LeadStory post={front.lead} image={front.leadImage} caption={front.leadImageCaption} />
+        </div>
+        {front.top.length > 0 && (
+          <aside class="top" aria-labelledby="top-h">
+            <h2 id="top-h" class="label">
+              Top stories
+            </h2>
+            <ol>
+              {front.top.map((p) => (
+                <li>
+                  <p class="kicker">{kickerOf(p)}</p>
+                  <h3 class="headline">
+                    <a href={urlOf(p)}>{p.data.headline}</a>
+                  </h3>
+                  <p class="meta">
+                    {SECTION[p.data.section].label} · {readingTime(p.body)} min read
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        )}
+      </section>
+    ) : (
+      <p class="empty meta">The first stories are on their way.</p>
+    )}
+
+    {front.bands.map((band, i) => (
+      <section class="band" aria-labelledby={`band-${band.section}`}>
+        <header class="band-head">
+          <h2 id={`band-${band.section}`} class="label">
+            <a href={`/${band.section}`}>{SECTION[band.section].label}</a>
           </h2>
-          <p class="item-standfirst">{p.data.standfirst}</p>
-          <p class="meta">
-            {formatDate(p.data.published)} · {readingTime(p.body)} min · {kickerOf(p)}
-          </p>
-        </li>
-      ))}
-    </ol>
-  )}
-</List>
+          <a class="more meta" href={`/${band.section}`}>
+            More in {SECTION[band.section].label} <span aria-hidden="true">→</span>
+          </a>
+        </header>
+        <ol class="band-items">
+          {band.posts.map((p, j) => (
+            <li>
+              {i === 0 && j === 0 && p.data.cover && (
+                <a class="thumb" href={urlOf(p)} tabindex="-1" aria-hidden="true">
+                  <Image
+                    src={p.data.cover}
+                    alt=""
+                    widths={[400, 640]}
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                  />
+                </a>
+              )}
+              <p class="kicker">{kickerOf(p)}</p>
+              <h3 class="headline">
+                <a href={urlOf(p)}>{p.data.headline}</a>
+              </h3>
+              <p class="standfirst">{p.data.standfirst}</p>
+              <p class="meta">
+                <time datetime={p.data.published.toISOString()}>
+                  {formatDate(p.data.published)}
+                </time>{' '}
+                · {readingTime(p.body)} min read
+              </p>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))}
+
+    <div class="lower">
+      {front.explained.length > 0 && (
+        <section class="explained" aria-labelledby="explained-h">
+          <header class="band-head">
+            <h2 id="explained-h" class="label">
+              <a href="/explained">Explained</a>
+            </h2>
+            <a class="more meta" href="/explained">
+              All Explained <span aria-hidden="true">→</span>
+            </a>
+          </header>
+          <ol class="plain">
+            {front.explained.map((p) => (
+              <li>
+                <h3 class="headline">
+                  <a href={urlOf(p)}>{p.data.headline}</a>
+                </h3>
+                <p class="meta">
+                  {SECTION[p.data.section].label}
+                  {p.data.level && ` · ${p.data.level[0]!.toUpperCase()}${p.data.level.slice(1)}`}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      {front.picks.length > 0 && (
+        <section class="picks" aria-labelledby="picks-h">
+          <header class="band-head">
+            <h2 id="picks-h" class="label">
+              Editor’s picks
+            </h2>
+          </header>
+          <ol class="ranked">
+            {front.picks.map((p) => (
+              <li>
+                <h3 class="headline">
+                  <a href={urlOf(p)}>{p.data.headline}</a>
+                </h3>
+                <p class="meta">{SECTION[p.data.section].label}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+    </div>
+
+    <section class="column" aria-labelledby="col-h">
+      <header class="band-head">
+        <h2 id="col-h" class="label">
+          <a href="/columns/2-am">{twoAm.name}</a>
+        </h2>
+        <a class="more meta" href="/columns/2-am">
+          Read the column <span aria-hidden="true">→</span>
+        </a>
+      </header>
+      <p class="column-blurb">{twoAm.description}</p>
+      {front.column.length > 0 && (
+        <ol class="plain">
+          {front.column.map((p) => (
+            <li>
+              <h3 class="headline">
+                <a href={urlOf(p)}>{p.data.headline}</a>
+              </h3>
+            </li>
+          ))}
+        </ol>
+      )}
+    </section>
+
+    <section class="newsletter" aria-labelledby="nl-h">
+      <h2 id="nl-h">One useful note a week</h2>
+      <p>
+        The newsletter opens soon. Until then, follow Stackvenn by RSS and every new story reaches
+        you the day it's published.
+      </p>
+      <a class="btn btn-secondary" href="/rss.xml">
+        Follow by RSS
+      </a>
+    </section>
+  </div>
+</Shell>
+
+<script>
+  // The date is rendered at build; refresh it so a cached page never shows yesterday (IST).
+  const t = document.querySelector<HTMLTimeElement>('[data-today]');
+  if (t) {
+    const now = new Date();
+    t.textContent = now.toLocaleDateString('en-GB', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'Asia/Kolkata',
+    });
+    t.dateTime = now.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+  }
+</script>
 
 <style>
+  .front {
+    padding-block-start: var(--s-6);
+  }
+
+  /* Masthead */
   .masthead {
-    padding-block: var(--s-8) var(--s-6);
-    border-block-end: var(--bw) solid var(--border);
+    display: grid;
+    gap: var(--s-2);
+    padding-block-end: var(--s-5);
+    border-block-end: var(--bw-active) solid var(--text);
   }
-  .masthead :global(.mark) {
-    margin-block-end: var(--s-5);
+  .wordmark {
+    display: flex;
+    align-items: center;
+    gap: var(--s-4);
   }
-  .masthead h1 {
-    max-width: 18ch;
-    font-family: var(--font-read);
+  .wordmark h1 {
+    font-family: var(--font-ui);
     font-size: var(--fs-display);
-    line-height: var(--lh-display);
-    font-weight: 500;
-    font-variation-settings: 'opsz' 72;
-    letter-spacing: -0.015em;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.03em;
   }
-  .standfirst {
-    margin-block-start: var(--s-4);
+  .promise {
     font-family: var(--font-read);
     font-style: italic;
     font-size: var(--fs-standfirst);
     line-height: var(--lh-standfirst);
-    color: var(--text-muted);
+    color: var(--text-soft);
   }
-  .feed-list {
-    list-style: none;
-    padding: 0;
+  .dateline {
+    font-variant-numeric: tabular-nums;
   }
-  .feed-list li {
-    padding-block: var(--s-5);
-    border-block-end: var(--bw) solid var(--border);
+  @media (min-width: 768px) {
+    .masthead {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+    .wordmark {
+      grid-column: 1 / -1;
+    }
+    .dateline {
+      text-align: end;
+    }
   }
-  .feed-list li:first-child {
-    padding-block-start: 0;
+
+  /* One-time Venn moment (DESIGN_SYSTEM §5): circles slide together, then the lens fills. */
+  @media (prefers-reduced-motion: no-preference) {
+    .masthead :global(.mark .venn-left) {
+      animation: venn-in-left var(--d-venn) var(--ease) both;
+    }
+    .masthead :global(.mark .venn-right) {
+      animation: venn-in-right var(--d-venn) var(--ease) both;
+    }
+    .masthead :global(.mark .venn-lens) {
+      animation: venn-lens var(--d-mid) var(--ease) var(--d-venn) both;
+    }
   }
-  .feed-list h2 {
-    margin-block: var(--s-2) var(--s-1);
-    font-size: var(--fs-feed-title);
-    line-height: var(--lh-h3);
+  @keyframes venn-in-left {
+    from {
+      transform: translateX(-3px);
+    }
+  }
+  @keyframes venn-in-right {
+    from {
+      transform: translateX(3px);
+    }
+  }
+  @keyframes venn-lens {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /* Shared typographic pieces */
+  .label {
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
     font-weight: 700;
-  }
-  .feed-list h2 a {
     color: var(--text);
+  }
+  .label a {
+    color: inherit;
     text-decoration: none;
   }
-  .feed-list h2 a:hover {
+  .label a:hover {
     text-decoration: underline;
     text-decoration-color: var(--accent);
   }
-  .item-standfirst {
+  .kicker {
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 600;
     color: var(--text-muted);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
     margin-block-end: var(--s-2);
   }
-  .empty {
+  .headline {
+    font-family: var(--font-read);
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
+    font-weight: 500;
+  }
+  .headline a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .headline a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  .standfirst {
+    margin-block: var(--s-2);
     color: var(--text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  ol {
+    list-style: none;
+    padding: 0;
+  }
+  .meta {
+    margin-block-start: var(--s-1);
+  }
+
+  /* Lead + top stories */
+  .above-fold {
+    display: grid;
+    gap: var(--s-6);
+    padding-block: var(--s-6) var(--s-7);
+  }
+  .top .label {
+    padding-block-end: var(--s-3);
+    border-block-end: var(--bw) solid var(--text);
+  }
+  .top li {
+    padding-block: var(--s-4);
+    border-block-end: var(--bw) solid var(--border);
+  }
+  .top li:last-child {
+    border-block-end: 0;
+  }
+  @media (min-width: 960px) {
+    .above-fold {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+      gap: 0;
+    }
+    .lead-col {
+      padding-inline-end: var(--s-6);
+      border-inline-end: var(--bw) solid var(--border);
+    }
+    .top {
+      padding-inline-start: var(--s-6);
+    }
+  }
+
+  /* Section bands */
+  .band,
+  .lower,
+  .column {
+    padding-block: var(--s-6);
+  }
+  .band-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-4);
+    padding-block-end: var(--s-3);
+    margin-block-end: var(--s-5);
+    border-block-end: var(--bw) solid var(--text);
+  }
+  .more {
+    color: var(--text-soft);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .more:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+  .band-items {
+    display: grid;
+    gap: var(--s-5);
+  }
+  .thumb {
+    display: block;
+    margin-block-end: var(--s-3);
+  }
+  .thumb :global(img) {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-sm);
+  }
+  @media (min-width: 768px) {
+    .band-items {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0;
+    }
+    .band-items li {
+      padding-inline: var(--s-5);
+      border-inline-start: var(--bw) solid var(--border);
+    }
+    .band-items li:first-child {
+      padding-inline-start: 0;
+      border-inline-start: 0;
+    }
+  }
+  @media (max-width: 767px) {
+    .band-items li + li {
+      padding-block-start: var(--s-5);
+      border-block-start: var(--bw) solid var(--border);
+    }
+  }
+
+  /* Explained strip + picks */
+  .lower {
+    display: grid;
+    gap: var(--s-7);
+  }
+  .plain li,
+  .ranked li {
+    padding-block: var(--s-3);
+    border-block-end: var(--bw) solid var(--border);
+  }
+  .plain li:last-child,
+  .ranked li:last-child {
+    border-block-end: 0;
+  }
+  .ranked {
+    counter-reset: rank;
+  }
+  .ranked li {
+    counter-increment: rank;
+    display: grid;
+    grid-template-columns: var(--s-7) 1fr;
+    column-gap: var(--s-3);
+  }
+  .ranked li::before {
+    content: counter(rank);
+    grid-row: span 2;
+    font-family: var(--font-mono);
+    font-size: var(--fs-h2);
+    line-height: 1;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  @media (min-width: 960px) {
+    .lower {
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    }
+    .lower > .picks:only-child {
+      grid-column: 2;
+    }
+  }
+
+  /* 2 AM column block */
+  .column-blurb {
+    font-family: var(--font-read);
+    font-style: italic;
+    font-size: var(--fs-standfirst);
+    line-height: var(--lh-standfirst);
+    color: var(--text-soft);
+    max-width: var(--measure);
+    margin-block-end: var(--s-3);
+  }
+
+  /* Newsletter (honest until Phase 4 ships the form) */
+  .newsletter {
+    margin-block-start: var(--s-6);
+    padding: var(--s-6);
+    background: var(--surface);
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-md);
+    display: grid;
+    gap: var(--s-3);
+    justify-items: start;
+  }
+  .newsletter h2 {
+    font-family: var(--font-read);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    font-weight: 500;
+  }
+  .newsletter p {
+    color: var(--text-soft);
+    max-width: var(--measure);
+  }
+  .empty {
+    padding-block: var(--s-7);
   }
 </style>
