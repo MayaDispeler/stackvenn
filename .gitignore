@@ -1,0 +1,27 @@
+# Personal data exports: never push (LinkedIn/Medium zips contain messages, contacts, emails)
+imports/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+.dev.vars
+
+# Build output
+node_modules/
+dist/
+.astro/
+.wrangler/
+pagefind/
+
+# Test artefacts
+test-results/
+playwright-report/
+tests/screenshots/__output__/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
