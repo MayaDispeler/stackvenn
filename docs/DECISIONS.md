@@ -2,6 +2,16 @@
 
 Newest first. Each entry: what was decided, why, and who decided.
 
+## 2026-10-29: No AI slop (Srihari asked; Claude chose the tools)
+
+**Skills:** [blader/humanizer](https://github.com/blader/humanizer) (MIT, about 62k stars; 26 patterns from Wikipedia's "Signs of AI writing"; keeps meaning and voice, never adds facts) for the editing pass, and [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop) (MIT, about 18k stars; drafting rules plus a 50-point score) for drafting. Vendored into `.claude/skills/` at pinned commits so every session and every GitHub Actions run uses the same version. Copied instead of run through `npx skills add`: the README supports copying SKILL.md, and it avoids executing an installer.
+
+**Not chosen:** "No AI Slop" (new, little track record) and `unslop` (aimed at config files, not prose). A third overlapping skill would make it unclear which one fires.
+
+**Enforcement:** `scripts/check-slop.mjs` runs in `npm run check` and CI. It fails on strong tells in Claude-written text, warns on weak ones, and self-tests every run.
+
+**Scope:** Srihari's own words (migrated bodies, his `/admin` saves) are exempt; his voice and dashes stay. Humanizer's voice rule beats stop-slop's absolutes; VOICE.md will beat both.
+
 ## 2026-10-29: Editorial model, a publication rather than a blog (Srihari)
 
 **The bar** is Medium, The Hindu, The Economic Times and Deccan Chronicle. "Essays", "Guides" and "Notes" are removed from the UI, URLs and docs.

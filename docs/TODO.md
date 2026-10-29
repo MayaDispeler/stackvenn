@@ -19,7 +19,8 @@ Tick boxes in the PR that completes them.
 - [ ] [H] Kissflow post ("The Clockwork Efficiency"): confirm in an issue whether you hold the rights to republish it. If not, Claude writes a new original piece on the same idea instead of copying it.
 
 ## Phase 1 — Foundation
-- [ ] Install skills and tools (CLAUDE.md "Skills and tools"). Impeccable, frontend-design and project tooling done; UI UX Pro Max waits on Srihari running /plugin (blocked locally, see DECISIONS).
+- [ ] Install skills and tools (CLAUDE.md "Skills and tools").
+- [x] Anti-AI-slop: vendor the humanizer and stop-slop skills into `.claude/skills/` (pinned), add the "No AI slop" rules to CLAUDE.md, and enforce strong tells in CI with `npm run slop` (Srihari, 2026-10-29). Impeccable, frontend-design and project tooling done; UI UX Pro Max waits on Srihari running /plugin (blocked locally, see DECISIONS).
 - [x] Add `imports/`, `.env*` and `*.pem` to `.gitignore` in the first commit (personal data exports must never be pushed).
 - [x] Scaffold Astro + TypeScript strict + MDX + sitemap + Expressive Code; set up ESLint, Prettier and `astro check`.
 - [x] `tokens.css` with both themes exactly as in DESIGN_SYSTEM.md §2; theme script with no flash; a contrast-check script in CI.

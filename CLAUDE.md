@@ -83,11 +83,22 @@ When to use which skill:
 - [[USE SKILL: ui-ux-pro-max]] when choosing or checking layout, spacing, type scale and component states. It is a reference, not a source of new styles; `DESIGN_SYSTEM.md` wins on any conflict.
 - [[USE SKILL: impeccable]]: `critique` before building a page, `polish` after, `audit` before every merge that touches UI.
 - [[USE SKILL: frontend-design]] (optional) when crafting individual components.
-- [[USE SKILL: add any SEO, analytics or writing skill here]]
+- [[USE SKILL: stop-slop]] while drafting any prose, and [[USE SKILL: humanizer]] before committing it (see "No AI slop" below). Both are vendored in `.claude/skills/`.
+- [[USE SKILL: add any SEO or analytics skill here]]
 
 MCP servers available to you: **Cloudflare** (DNS, Workers, Pages, D1, R2, settings), **PostHog** (events, dashboards, insights, surveys) and **GitHub**.
 
 ---
+
+## No AI slop (Srihari, 2026-10-29)
+
+Nothing Stackvenn publishes may read as machine-made. Two vendored skills (`.claude/skills/`, pinned in `.claude/skills/VENDORED.md`) and one CI check enforce it.
+
+- **While drafting** any prose (Explained pieces, Analysis, Briefs, Terms, standfirsts, summaries, UI copy, newsletter issues, distribution posts, PR and issue bodies): follow [[USE SKILL: stop-slop]]. Score the draft on its 5 dimensions; **below 35/50, revise** before showing anyone.
+- **Before any prose is committed:** run [[USE SKILL: humanizer]] over it (file mode for content files). It keeps every fact and adds none, which matches golden rule 2.
+- **CI:** `npm run slop` (inside `npm run check`) fails on strong tells: chatbot residue, staged run-ups, one-line closers, "not X but Y", stock AI words, the MARKETING_AUTOMATION banned phrases, em/en dashes in our copy, and the retired words "essay/guide/field note" in UI copy. It self-tests on every run.
+- **Srihari's own words are exempt.** Migrated story bodies (`migrated: true`) and anything he writes in `/admin` keep his voice, dashes included; MIGRATION.md §3 governs them. Never "humanize" his text. Headlines and standfirsts of migrated stories are still checked, because Claude edits those.
+- **Conflicts:** `docs/VOICE.md` (once written) beats both skills. Humanizer's "keep the writer's voice" beats stop-slop's absolutes (for example "no adverbs at all" is a check, not a rule for his voice).
 
 ## Merge policy and living docs (Srihari, 2026-10-29)
 
