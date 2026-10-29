@@ -68,7 +68,7 @@ export const FORMAT_DIR: Record<Format, 'stories' | 'terms' | 'tools'> = {
 export const COLUMNS = {
   '2-am': {
     name: '2 AM',
-    description: 'Essays written at 2am, about work, careers and everything going wrong.',
+    description: 'Written at 2am, about work, careers and the things that go wrong.',
   },
 } as const;
 export type ColumnSlug = keyof typeof COLUMNS;

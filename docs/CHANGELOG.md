@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-29: No AI slop
+
+- Vendored the humanizer and stop-slop skills (`.claude/skills/`, pinned in VENDORED.md).
+- `npm run slop`: self-testing check for strong AI-writing tells and retired vocabulary, part of `npm run check`.
+- 2 AM column description no longer says "Essays".
+
 ## 2026-10-29: Phase 1 foundation
 
 - Astro 7.4 + TypeScript strict(est) + MDX + sitemap + Expressive Code; ESLint (with jsx-a11y), Prettier, `astro check`.

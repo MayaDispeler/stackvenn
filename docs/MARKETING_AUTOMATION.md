@@ -51,7 +51,8 @@ Claude:
 Fail the check if any of these is true:
 - No first-hand element (code, data, decision, failure, or Srihari's experience).
 - A number without a source, or an unresolved `[[CONFIRM]]`.
-- Banned phrases: "in today's fast-paced world", "delve", "unlock", "game-changer", "it's important to note", "in conclusion", "revolutionize", "leverage" (as a verb).
+- Banned phrases: "in today's fast-paced world", "delve", "unlock", "game-changer", "it's important to note", "in conclusion", "revolutionize", "leverage" (as a verb). These and the other strong AI-writing tells are enforced by `npm run slop` (`scripts/check-slop.mjs`, built from the vendored humanizer and stop-slop skills).
+- A stop-slop score below 35/50 on any Claude-written draft (the review comment reports the five scores).
 - Readability: average sentence length over 22 words, or paragraphs over 5 sentences.
 - Missing standfirst, sources, internal links, or alt text.
 Claude also posts a review comment with a 1–10 usefulness score and the 3 biggest improvements.
