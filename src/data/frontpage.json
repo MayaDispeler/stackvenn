@@ -1,0 +1,14 @@
+{
+  "$comment": "Editor-picked front page. Slugs that do not exist (yet) are skipped and the newest stories fill the gaps. leadImage overrides the cover for the lead, as a path under src/assets/stories/.",
+  "lead": "anything-that-can-go-wrong-murphys-law",
+  "leadImage": "anything-that-can-go-wrong-murphys-law/rocket-sled.png",
+  "leadImageCaption": "Illustration, not an archival photograph.",
+  "top": ["career-growth-paradox", "why-ai-is-not-free", "why-requirements-keep-changing"],
+  "picks": [
+    "why-ai-is-not-free",
+    "career-growth-paradox",
+    "chiselling-ourselves",
+    "overthinking-secret-catalyst",
+    "how-to-live-a-kickass-life"
+  ]
+}
