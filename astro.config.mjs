@@ -3,7 +3,9 @@ import { defineConfig, fontProviders } from 'astro/config';
 import expressiveCode from 'astro-expressive-code';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import { rehypeHeadingIds } from '@astrojs/markdown-remark';
 import rehypeFigure from './src/lib/rehype-figure.mjs';
+import rehypeAnchors from './src/lib/rehype-anchors.mjs';
 
 /** Code blocks scroll sideways, so keyboard users must be able to focus them (axe scrollable-region-focusable). */
 const focusablePre = {
@@ -26,7 +28,8 @@ export default defineConfig({
   // One URL per page, no trailing slash (REACHABILITY §1). Wrangler drops the slash at the edge.
   trailingSlash: 'never',
   build: { format: 'file' },
-  markdown: { rehypePlugins: [rehypeFigure] },
+  // Heading ids first, so anchors can link to them (Astro keeps ids that already exist).
+  markdown: { rehypePlugins: [rehypeHeadingIds, rehypeAnchors, rehypeFigure] },
   integrations: [
     expressiveCode({
       themes: ['github-dark-dimmed', 'github-light'],
