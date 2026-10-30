@@ -23,6 +23,8 @@ jobs:
       - run: npm ci
       - name: Check (astro check, eslint, prettier, contrast)
         run: npm run check
+      - name: Unit tests (edge Worker, preview hosts are noindex)
+        run: npm run test:unit
       - name: Production build (drafts excluded)
         run: npm run build
       - name: Test build (drafts included as fixtures)

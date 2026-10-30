@@ -3,6 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 // Runs against the production build (npm run build first). Drafts are included via SHOW_DRAFTS=true.
 export default defineConfig({
   testDir: 'tests',
+  testIgnore: 'unit/**',
   outputDir: 'test-results',
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,

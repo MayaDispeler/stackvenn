@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-30: Preview safety
+
+- Edge Worker marks every host except stackvenn.in as noindex, nofollow and serves a disallow-all robots.txt there.
+- Production robots.txt added (Content Signals follow in Phase 3).
+- Unit tests for the Worker run in CI.
+
 ## 2026-10-29: No AI slop
 
 - Vendored the humanizer and stop-slop skills (`.claude/skills/`, pinned in VENDORED.md).
