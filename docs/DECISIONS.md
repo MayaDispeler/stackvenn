@@ -2,6 +2,18 @@
 
 Newest first. Each entry: what was decided, why, and who decided.
 
+## 2026-10-30: Writing desk is Decap CMS (Claude, per Srihari's brief)
+
+**Choice:** Decap CMS 3.16.3, loaded from unpkg with a Subresource Integrity hash, GitHub backend, `publish_mode: editorial_workflow`. Each save opens a draft pull request; the board moves it Draft → In review → Ready; Publish merges it. Srihari's Publish is his approval.
+
+**Why not Sveltia CMS (yet):** it is lighter and better on phones, but its editorial workflow was reported as single-branch in March 2026, and the maintainer's later "feature complete" note has no date. Re-check before launch (TODO).
+
+**Pinned to 3.16.3,** five weeks old: 3.17.2 and 3.17.3 were four days old when chosen.
+
+**Login:** GitHub OAuth through `/api/auth` and `/api/callback` on our own edge Worker (no third-party auth service). Random state cookie, `public_repo` scope, token posted only to the same origin. Needs a GitHub OAuth app (issue #30).
+
+**His words stay his:** the desk writes `written_by: srihari`; the slop check skips those stories.
+
 ## 2026-10-30: Preview hosts are never indexed (Srihari)
 
 **Rule:** every host except `stackvenn.in` serves `X-Robots-Tag: noindex, nofollow` on every page and a disallow-all `robots.txt`. Production on `stackvenn.in` stays indexable.

@@ -1,0 +1,151 @@
+# Stackvenn writing desk (Decap CMS). Fields mirror the schema in src/content.config.ts (PRD §9).
+# The backend (repo, base_url, auth) is set in admin/index.html so login follows the serving host.
+publish_mode: editorial_workflow
+site_url: https://stackvenn.in
+display_url: https://stackvenn.in
+logo_url: /favicon.svg
+show_preview_links: false
+media_folder: src/assets/stories
+public_folder: ../../assets/stories
+
+collections:
+  - name: stories
+    label: Stories
+    label_singular: Story
+    description: >-
+      Everything you write here is saved as a draft pull request. Move it to Ready and press Publish to put it
+      live; nothing goes live before that. The slug is set from the headline once and never changes.
+    folder: src/content/stories
+    extension: md
+    format: frontmatter
+    create: true
+    slug: '{{slug}}'
+    identifier_field: headline
+    summary: '{{headline}} · {{section}} · {{format}}'
+    sortable_fields: [published, headline]
+    # Images uploaded to a story live next to its other images and are referenced relative to the file.
+    media_folder: ../../assets/stories/{{slug}}
+    public_folder: ../../assets/stories/{{slug}}
+    fields:
+      - { name: written_by, widget: hidden, default: srihari }
+      - { name: status, widget: hidden, default: review }
+      - { name: headline, label: Headline, widget: string, hint: 'Aim for 60 characters or fewer.' }
+      - name: standfirst
+        label: Standfirst
+        widget: text
+        hint: 'One or two sentences under the headline, 120–160 characters. It is also the description search engines show.'
+        pattern: ['^[\s\S]{120,160}$', 'The standfirst must be 120–160 characters.']
+      - name: section
+        label: Section
+        widget: select
+        options:
+          - { label: AI, value: ai }
+          - { label: Engineering, value: engineering }
+          - { label: Careers, value: careers }
+          - { label: Work, value: work }
+          - { label: Life, value: life }
+          - { label: Society, value: society }
+      - name: format
+        label: Format
+        widget: select
+        default: opinion
+        options:
+          - { label: Opinion, value: opinion }
+          - { label: Analysis, value: analysis }
+          - { label: Column, value: column }
+          - { label: Brief, value: brief }
+          - { label: Explained, value: explained }
+      - name: column
+        label: Column
+        widget: select
+        required: false
+        hint: 'Only for format Column.'
+        options:
+          - { label: 2 AM, value: 2-am }
+      - name: overlap
+        label: Overlap (the two stacks this story joins)
+        widget: list
+        hint: 'Exactly two, for example AI and Work.'
+        min: 2
+        max: 2
+        field: { name: stack, label: Stack, widget: string }
+      - {
+          name: published,
+          label: Published,
+          widget: datetime,
+          date_format: 'YYYY-MM-DD',
+          time_format: false,
+          format: 'YYYY-MM-DD',
+        }
+      - {
+          name: updated,
+          label: Updated,
+          widget: datetime,
+          required: false,
+          date_format: 'YYYY-MM-DD',
+          time_format: false,
+          format: 'YYYY-MM-DD',
+          hint: 'Only for a real change to the content.',
+        }
+      - {
+          name: dateline,
+          label: Dateline,
+          widget: string,
+          required: false,
+          hint: 'Place, for example Chennai.',
+        }
+      - {
+          name: kicker,
+          label: Kicker override,
+          widget: string,
+          required: false,
+          hint: 'Leave empty to use the format or column name.',
+        }
+      - { name: cover, label: Cover image, widget: image, required: false }
+      - {
+          name: cover_alt,
+          label: Cover description,
+          widget: string,
+          required: false,
+          hint: 'Required if there is a cover: what the image shows.',
+        }
+      - { name: cover_credit, label: Cover credit, widget: string, required: false }
+      - name: level
+        label: Level (Explained only)
+        widget: select
+        required: false
+        options: [beginner, intermediate, advanced]
+      - name: tested_with
+        label: Tested with (Explained only)
+        widget: list
+        required: false
+        field: { name: tool, label: Tool and version, widget: string }
+      - name: summary
+        label: Explained in 60 seconds (Explained only, 3–5 lines)
+        widget: list
+        required: false
+        field: { name: line, label: Line, widget: string }
+      - name: sources
+        label: Sources
+        widget: list
+        required: false
+        summary: '{{fields.title}}'
+        fields:
+          - { name: title, label: Title, widget: string }
+          - { name: url, label: URL, widget: string }
+      - name: corrections
+        label: Corrections
+        widget: list
+        required: false
+        summary: '{{fields.date}}: {{fields.text}}'
+        fields:
+          - {
+              name: date,
+              label: Date,
+              widget: datetime,
+              date_format: 'YYYY-MM-DD',
+              time_format: false,
+              format: 'YYYY-MM-DD',
+            }
+          - { name: text, label: What was corrected, widget: text }
+      - { name: body, label: Story, widget: markdown }
