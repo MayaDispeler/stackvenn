@@ -35,26 +35,30 @@ Tick boxes in the PR that completes them.
 Rewritten 2026-10-29 for the newspaper editorial model (PRD §5–§9). Old items struck below with the reason.
 
 - [x] Editorial model: sections in the nav (AI · Engineering · Careers · Work · Life · Society), formats as kickers, permanent URLs `/<section>/<slug>`, `/explained`, `/columns/<column>`, `/terms/<slug>`, `/tools/<slug>`, `/author/srihari-venkatesan`; schema `format`/`section`/`headline`/`standfirst`/`column`/`summary`/`dateline`; Story and Explained layouts; docs updated.
-- [ ] Local preview: dev server (drafts visible) from the `preview` worktree at http://localhost:4321; 2 AM + Medium stories seeded as drafts.
+- [x] Local preview: dev server (drafts visible) from the `preview` worktree at http://localhost:4321; 2 AM + Medium stories seeded as drafts.
 - [ ] Venn mark (SVG), logo, favicon set, overlap chip.
 - [x] Header with section nav, mobile drawer, footer (sections, columns, RSS, newsletter), theme toggle, Ctrl/Cmd+K search modal (Pagefind), toast. Done 2026-10-30: search (Ctrl/Cmd+K and `/`, Pagefind index of story bodies with section and format filters, recent searches, /search page that also works without JS); share toast done. mobile drawer (native dialog), footer.
-- [ ] Buttons, links, chips, meta badges, callouts, steps, tabs, code block, tables, figure + lightbox, pull quotes, sidenotes and footnotes.
+- [ ] Buttons, links, chips, meta badges, callouts, steps, tabs, code block, tables, figure + lightbox, pull quotes, sidenotes and footnotes. **Partial (2026-10-30):** figure + lightbox (native dialog, no library, Esc closes), callouts, steps, code block, sidenotes done. Tabs and footnote styling still to do.
 - [ ] Front page: masthead (Venn, wordmark, IST date, promise), lead story + 3–4 top stories, section bands, Most read (editor picks), Explained strip, 2 AM column block, newsletter. `src/data/frontpage.json` for picks.
 - [x] Section fronts: large title, lead story, list, pagination at `/<section>/page/<n>`. Done 2026-10-30, with a designed empty state for sections that have no stories yet.
 - [x] Story page: kicker, headline, standfirst, byline with avatar, dateline + Updated, reading time, share row, pull quotes, sidenotes, sources, author box, "More in <Section>", Most read, Giscus on click. Done 2026-10-30; "Most read" is labelled Editor's picks until PostHog data exists, comments show "Comments open soon" until #6. Image lightbox still to do.
 - [ ] Explained page: sidebar (Paths / All Explained), meta row, "Explained in 60 seconds" box, Copy Markdown, Open in ▾, TOC scroll-spy, heading anchors, steps, callouts, prev/next, "Helpful?", Edit on GitHub, changelog. **Partial (2026-10-30):** done: All Explained sidebar, meta row, 60-second box, Copy Markdown, Open in (ChatGPT, Claude, Perplexity, .md), scroll-spy TOC, Steps and Callout components, Edit on GitHub. Heading anchors, prev/next within a path (series + order) and "Helpful?" (sends helpful_vote once PostHog exists) done 2026-10-30. Still to do: Paths view and changelog (need a first series).
-- [ ] Column page, Explained hub, author page, About, Newsletter (+ issue archive), /experiment, Terms index and term page, tool page shell, book page, 404, search page. **Partial (2026-10-30):** column page, 404 (search + stories), search page, book page and Explained hub done. Author page done (code); its bio, role lines and the /about page wait in a content PR. Still to do: Newsletter, /experiment, Terms, tool shell.
+- [ ] Column page, Explained hub, author page, About, Newsletter (+ issue archive), /experiment, Terms index and term page, tool page shell, book page, 404, search page. **Partial (2026-10-30):** column page, 404 (search + stories), search page, book page and Explained hub done. Author page done (code); its bio, role lines and the /about page wait in a content PR. Newsletter (form falls back to "Sign-up opens soon" until the Phase 4 Worker), /experiment (build-time counts only, "Coming soon" otherwise) and Terms index + term page done 2026-10-30 (#34–#37); 5 starter terms wait in content PR #38. Still to do: tool page shell.
 - [x] Writing desk at `/admin` (2026-10-30: Decap CMS, see DECISIONS; login works once #30 is done): evaluate Decap CMS vs Sveltia CMS (GitHub backend, draft → review workflow, OAuth proxy on a free Cloudflare Worker), collections matching the schema, mobile-friendly.
 - [x] [H] GitHub OAuth app for the writing desk: issue #30, added to #12.
 - [ ] Re-evaluate Sveltia CMS (better on phones) once its editorial workflow is confirmed multi-branch.
 - [ ] After #2: switch the OAuth app to stackvenn.in (steps in #30).
 - [x] Corrections field in the schema, shown as "Correction, <date>: …" on stories and in .md twins (2026-10-30).
 - [ ] Run the Impeccable `critique` before and `polish` + `audit` after every page; fix all findings.
-- [ ] End of Phase 2: Lighthouse on front page, a section front, a story and an Explained page (both themes, mobile); post scores on #12.
+- [x] End of Phase 2: Lighthouse on front page, a section front, a story and an Explained page (both themes, mobile); post scores on #12.
 - ~~Home: masthead (one-time Venn animation), tabs, featured card, feed, pagination, right rail.~~ Replaced by the newspaper front page (Srihari, 2026-10-29).
 - ~~Essay and note template: …~~ Replaced by the Story page (formats Analysis, Opinion, Column, Brief).
 - ~~Guide template: sidebar (Paths / All guides) …~~ Replaced by the Explained page.
 - ~~Topic hubs, series pages, glossary index …~~ Replaced by section fronts, column pages and Terms.
+
+## Priority (Srihari, 2026-10-30)
+
+Product first. Phases 3 (reachability), 4 (newsletter Worker), 6 (automation) and marketing resume on **Tue 3 Nov 2026**, after Srihari reviews the UI. Until then only product fixes he asks for. Resume from `docs/NEXT.md`.
 
 ## Phase 3 — Reachability (REACHABILITY.md)
 - [x] Preview safety: every host except stackvenn.in is noindex (X-Robots-Tag + disallow-all robots.txt), with unit tests (Srihari, 2026-10-30).
