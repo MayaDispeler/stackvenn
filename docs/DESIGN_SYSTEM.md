@@ -190,6 +190,8 @@ Each component needs these states: default, hover, focus-visible (2px `--focus` 
 
 **Toast:** `--text` background, `--bg` text, bottom-centre, 1.6s.
 
+**Image lightbox** (stories and Explained): article images not inside a link open in a native `<dialog>` with the largest image, its caption in `--text-soft` `--fs-meta`, and a secondary "Close" button. Enter or Space opens, Esc or a backdrop click closes, and focus returns to the image. Backdrop is `--bg` at 92%. No library.
+
 ---
 
 ## 8. Accessibility

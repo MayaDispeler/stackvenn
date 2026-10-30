@@ -2,6 +2,7 @@
 // Story page: Analysis, Opinion, Column and Brief (DESIGN §3). One 680px column.
 import Shell from './Shell.astro';
 import Corrections from '../components/Corrections.astro';
+import Lightbox from '../components/Lightbox.astro';
 import { Image } from 'astro:assets';
 import OverlapChip from '../components/OverlapChip.astro';
 import ShareRow from '../components/ShareRow.astro';
@@ -211,6 +212,7 @@ const jsonLd = [
       </section>
     )}
   </div>
+  <Lightbox />
 </Shell>
 
 <script>
