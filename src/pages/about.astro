@@ -1,0 +1,265 @@
+---
+// /about: the publication page (Srihari, 2026-10-30). What Stackvenn is, who runs it, how stories are
+// made and corrected, and what it will never do. The anchors are the URLs in the Organization JSON-LD.
+import Shell from '../layouts/Shell.astro';
+import { SITE } from '../lib/site';
+import { FORMAT_LABEL, SECTION, SECTIONS } from '../lib/taxonomy';
+
+const base = `${SITE.url}/about`;
+const author = `/author/${SITE.author.slug}`;
+const formats = [
+  [
+    'explained',
+    'Step by step, so you can apply it to your own project. Each piece names the tools and versions it was written against.',
+  ],
+  ['analysis', 'A long read led by data or a careful argument, with every number sourced.'],
+  ['opinion', 'A point of view, argued plainly and signed.'],
+  ['column', 'A named series with its own voice. The first is 2 AM, written late at night.'],
+  ['brief', 'A short dispatch: one lesson from real work, in a few hundred words.'],
+] as const;
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    url: base,
+    name: `About ${SITE.name}`,
+    mainEntity: { '@id': `${SITE.url}/#org` },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'NewsMediaOrganization',
+    '@id': `${SITE.url}/#org`,
+    name: SITE.name,
+    url: SITE.url,
+    logo: `${SITE.url}/favicon.svg`,
+    founder: { '@id': `${SITE.url}${author}#person` },
+    publishingPrinciples: `${base}#standards`,
+    correctionsPolicy: `${base}#corrections`,
+    ethicsPolicy: `${base}#independence`,
+    email: SITE.author.email,
+  },
+];
+---
+
+<Shell
+  title="About Stackvenn"
+  description="What Stackvenn is, who writes it, how stories are sourced and corrected, how AI is used to make it, and why it carries no ads or sponsored posts."
+  path="/about"
+  jsonLd={jsonLd}
+>
+  <article class="container about">
+    <header class="head">
+      <h1>About Stackvenn</h1>
+      <p class="standfirst">
+        Stackvenn publishes reporting, analysis and explainers where AI engineering, software and
+        work overlap, written by someone who ships agentic AI in production.
+      </p>
+    </header>
+
+    <section aria-labelledby="who-h">
+      <h2 id="who-h">Who it is for</h2>
+      <p>
+        It is written for engineers who build with language models and want patterns that hold up in
+        production, for the people who hire and lead them, for founders who need to know what AI can
+        do for a business, and for readers of the 2 AM column, which is about careers and work.
+      </p>
+    </section>
+
+    <section aria-labelledby="masthead-h">
+      <h2 id="masthead-h">Masthead</h2>
+      <dl class="masthead">
+        <div>
+          <dt>Founder and editor</dt>
+          <dd>
+            <a href={author}>{SITE.author.name}</a>
+          </dd>
+        </div>
+        <div>
+          <dt>Production</dt>
+          <dd>
+            <a href="/experiment">Built and run with Claude</a>
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <section aria-labelledby="sections-h">
+      <h2 id="sections-h">Sections and formats</h2>
+      <p>
+        Stories are filed under six sections:{' '}
+        {SECTIONS.map((s, i) => (
+          <>
+            <a href={`/${s}`}>{SECTION[s].label}</a>
+            {i < SECTIONS.length - 1 ? ', ' : '. '}
+          </>
+        ))}
+        The label above each headline tells you what kind of story it is:
+      </p>
+      <dl class="formats">
+        {formats.map(([f, line]) => (
+          <div>
+            <dt>{FORMAT_LABEL[f]}</dt>
+            <dd>{line}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section aria-labelledby="standards-h" id="standards">
+      <h2 id="standards-h">Editorial standards</h2>
+      <ul>
+        <li>
+          <strong>Sources.</strong> New stories that state a fact or a number list where it came
+          from, in a Sources section at the end.
+          Pieces republished from elsewhere keep the sources their author gave at the time.
+        </li>
+        <li>
+          <strong>First-hand work.</strong> Explained pieces come from things Srihari has built and
+          run, and name the tools and model versions they were written against.
+        </li>
+        <li>
+          <strong>How AI is used.</strong> Claude helps draft stories and runs the production: the
+          site, the checks and distribution. Every story is read and approved by Srihari before it
+          is published.
+        </li>
+        <li>
+          <strong>No AI slop.</strong> Drafts go through two writing checks that remove the habits
+          of machine-written prose, and an automatic check blocks the worst of them before anything
+          is published.
+        </li>
+        <li>
+          <strong>Older pieces.</strong> Stories first published elsewhere are republished here in
+          full, lightly edited, with a note at the end saying where and when they first appeared.
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="corrections-h" id="corrections">
+      <h2 id="corrections-h">Corrections</h2>
+      <p>
+        If something in a story is wrong, email the address below with the story's link and what
+        needs fixing. Corrections are made in the story and noted at the end with the date, in the
+        form "Correction, 30 Oct 2026: …", so you can see what changed.
+      </p>
+      <p class="email">
+        <span>{SITE.author.email}</span>
+        <button type="button" class="btn btn-secondary btn-sm" data-copy-email={SITE.author.email}>
+          Copy email
+        </button>
+        <span class="meta" role="status" aria-live="polite" data-copied></span>
+      </p>
+    </section>
+
+    <section aria-labelledby="independence-h" id="independence">
+      <h2 id="independence-h">Independence</h2>
+      <p>
+        Stackvenn carries no ads, no sponsored posts and no affiliate links. The only shop link on
+        the site goes to Srihari's own book, and it is a plain link, not an affiliate one.
+      </p>
+    </section>
+
+    <section aria-labelledby="contact-h">
+      <h2 id="contact-h">Contact and newsletter</h2>
+      <p>
+        Write to the address above. The newsletter opens soon; until then, every new story reaches
+        you through <a href="/rss.xml">RSS</a>.
+      </p>
+    </section>
+  </article>
+</Shell>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-email]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      const out = b.parentElement?.querySelector<HTMLElement>('[data-copied]');
+      try {
+        await navigator.clipboard.writeText(b.dataset.copyEmail ?? '');
+        if (out) out.textContent = 'Copied';
+      } catch {
+        if (out) out.textContent = 'Select the address to copy it';
+      }
+    }),
+  );
+</script>
+
+<style>
+  .about {
+    max-width: calc(var(--w-story) + var(--gutter) + var(--gutter-r));
+    padding-block-start: var(--s-7);
+    display: grid;
+    gap: var(--s-7);
+    font-family: var(--font-read);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--text-soft);
+  }
+  .head {
+    padding-block-end: var(--s-5);
+    border-block-end: var(--bw-active) solid var(--text);
+  }
+  h1 {
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 72;
+  }
+  .standfirst {
+    margin-block-start: var(--s-3);
+    font-style: italic;
+    font-size: var(--fs-standfirst);
+    line-height: var(--lh-standfirst);
+    color: var(--text-muted);
+  }
+  h2 {
+    font-family: var(--font-ui);
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text);
+    padding-block-end: var(--s-3);
+    margin-block-end: var(--s-4);
+    border-block-end: var(--bw) solid var(--text);
+  }
+  section > * + * {
+    margin-block-start: var(--s-3);
+  }
+  ul {
+    padding-inline-start: 1.1em;
+    display: grid;
+    gap: var(--s-3);
+  }
+  strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+  dl > div {
+    display: grid;
+    gap: var(--s-1) var(--s-5);
+    padding-block: var(--s-3);
+    border-block-end: var(--bw) solid var(--border);
+  }
+  @media (min-width: 640px) {
+    dl > div {
+      grid-template-columns: 11rem 1fr;
+      align-items: baseline;
+    }
+  }
+  dt {
+    font-family: var(--font-ui);
+    font-size: var(--fs-ui);
+    font-weight: 600;
+    color: var(--text);
+  }
+  .email {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-ui);
+    color: var(--text);
+  }
+</style>
