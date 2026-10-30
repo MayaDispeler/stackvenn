@@ -1,0 +1,155 @@
+---
+// Newsletter (DESIGN §5): the promise, the form, then past issues.
+// The form posts to /api/subscribe, which the Phase 4 Worker (D1 + Resend) will serve.
+// Until then the endpoint answers non-2xx and the script points readers to RSS.
+import Page from '../layouts/Page.astro';
+---
+
+<Page
+  title="Newsletter"
+  heading="One useful note a week"
+  lede="Every Friday: the week's stories, a short note from the desk, and one older Explained piece worth a second read."
+  description="The Stackvenn newsletter arrives every Friday with the week's stories, a note from the desk and one older Explained piece. Confirm by email; leave in one click."
+  path="/newsletter"
+>
+  <section class="signup" aria-labelledby="signup-h">
+    <h2 id="signup-h">Sign up</h2>
+    <p>
+      You confirm by email before anything arrives, and every issue has a one-click unsubscribe.
+    </p>
+    <form class="form" method="post" action="/api/subscribe" data-subscribe novalidate>
+      <label for="nl-email">Email address</label>
+      <div class="row">
+        <input
+          id="nl-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          inputmode="email"
+          required
+          aria-describedby="nl-status"
+        />
+        <button class="btn btn-accent" type="submit">
+          Subscribe
+        </button>
+      </div>
+      <p id="nl-status" class="status" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <section aria-labelledby="issues-h">
+    <h2 id="issues-h">Past issues</h2>
+    <p class="empty">No issues yet. The first one goes out after launch.</p>
+  </section>
+</Page>
+
+<script>
+  const MSG = {
+    invalid: "That email doesn't look right. Check it and try again.",
+    ok: "Check your inbox to confirm. One click and you're in.",
+  };
+
+  for (const form of document.querySelectorAll<HTMLFormElement>('[data-subscribe]')) {
+    const input = form.querySelector<HTMLInputElement>('input[type=email]');
+    const status = form.querySelector<HTMLElement>('[role=status]');
+    const button = form.querySelector<HTMLButtonElement>('button[type=submit]');
+    if (!input || !status || !button) continue;
+
+    const say = (text: string) => {
+      status.textContent = text;
+    };
+    // Until the Phase 4 Worker exists, /api/subscribe answers non-2xx.
+    const notOpenYet = () => {
+      const a = document.createElement('a');
+      a.href = '/rss.xml';
+      a.textContent = 'Follow the RSS feed';
+      status.textContent = 'Sign-up opens soon. ';
+      status.append(a, ' meanwhile.');
+    };
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!input.checkValidity()) {
+        input.setAttribute('aria-invalid', 'true');
+        say(MSG.invalid);
+        input.focus();
+        return;
+      }
+      input.removeAttribute('aria-invalid');
+      button.disabled = true;
+      say('Sending…');
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+        if (res.ok) {
+          say(MSG.ok);
+          form.reset();
+        } else {
+          notOpenYet();
+        }
+      } catch {
+        notOpenYet();
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+</script>
+
+<style>
+  .signup {
+    padding: var(--s-6);
+    background: var(--surface);
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-md);
+  }
+  .signup h2,
+  section h2 {
+    margin-block-start: 0;
+  }
+  .signup p {
+    margin-block-end: var(--s-4);
+  }
+  .form {
+    display: grid;
+    gap: var(--s-2);
+    font-family: var(--font-ui);
+    font-size: var(--fs-ui);
+    line-height: var(--lh-ui);
+  }
+  label {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+  input {
+    flex: 1 1 16rem;
+    min-width: 0;
+    min-height: var(--size-touch);
+    padding-inline: var(--s-3);
+    background: var(--bg);
+    color: var(--text);
+    border: var(--bw) solid var(--border-control);
+    border-radius: var(--r-sm);
+  }
+  input[aria-invalid='true'] {
+    border-color: var(--accent-text);
+  }
+  .row .btn {
+    min-height: var(--size-touch);
+  }
+  .status {
+    min-height: 1lh;
+    margin: 0;
+    color: var(--text-soft);
+  }
+  section + section {
+    margin-block-start: var(--s-8);
+  }
+  .empty {
+    color: var(--text-muted);
+  }
+</style>
