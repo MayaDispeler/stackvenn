@@ -41,7 +41,7 @@ Rewritten 2026-10-29 for the newspaper editorial model (PRD §5–§9). Old item
 - [ ] Buttons, links, chips, meta badges, callouts, steps, tabs, code block, tables, figure + lightbox, pull quotes, sidenotes and footnotes.
 - [ ] Front page: masthead (Venn, wordmark, IST date, promise), lead story + 3–4 top stories, section bands, Most read (editor picks), Explained strip, 2 AM column block, newsletter. `src/data/frontpage.json` for picks.
 - [ ] Section fronts: large title, lead story, list, pagination at `/<section>/page/<n>`.
-- [ ] Story page: kicker, headline, standfirst, byline with avatar, dateline + Updated, reading time, share row, pull quotes, sidenotes, sources, author box, "More in <Section>", Most read, Giscus on click.
+- [x] Story page: kicker, headline, standfirst, byline with avatar, dateline + Updated, reading time, share row, pull quotes, sidenotes, sources, author box, "More in <Section>", Most read, Giscus on click. Done 2026-10-30; "Most read" is labelled Editor's picks until PostHog data exists, comments show "Comments open soon" until #6. Image lightbox still to do.
 - [ ] Explained page: sidebar (Paths / All Explained), meta row, "Explained in 60 seconds" box, Copy Markdown, Open in ▾, TOC scroll-spy, heading anchors, steps, callouts, prev/next, "Helpful?", Edit on GitHub, changelog.
 - [ ] Column page, Explained hub, author page, About, Newsletter (+ issue archive), /experiment, Terms index and term page, tool page shell, book page, 404, search page.
 - [ ] Writing desk at `/admin`: evaluate Decap CMS vs Sveltia CMS (GitHub backend, draft → review workflow, OAuth proxy on a free Cloudflare Worker), collections matching the schema, mobile-friendly.

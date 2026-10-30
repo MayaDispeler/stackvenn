@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-30: Story page
+
+- Byline with avatar, share row (top and end), figures with captions, sidenotes at ≥1200px, author box, comments placeholder, More in <Section>, Editor's picks.
+- Dates use fixed three-letter months ("1 Sep 2025").
+- Added @astrojs/markdown-remark so rehype plugins run under Astro 7.
+
 ## 2026-10-30: Preview safety
 
 - Edge Worker marks every host except stackvenn.in as noindex, nofollow and serves a disallow-all robots.txt there.
