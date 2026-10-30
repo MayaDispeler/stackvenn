@@ -134,7 +134,9 @@ Job: within 5 seconds, a visitor knows what Stackvenn is, sees what's important 
 - **Author page** (`/author/srihari-venkatesan`, alias `/about/srihari`): a columnist's profile, not a résumé. Portrait (placeholder until issue #8), name, "AI engineer · writes the 2 AM column", dateline Chennai; a 120–180-word first-person bio (content PR); "What I write about" (sections with counts); "Where I've worked" and Education as quiet rule-separated timelines; the book; open-source work linking to Explained pieces once published, GitHub until then; every story (20 per page, `/page/<n>`); contact with the email as copyable text, LinkedIn, GitHub, "Work with me". ProfilePage + Person JSON-LD; every byline uses the same Person @id. Facts only from iamsrihari.com (`src/data/author.ts`).
 - **About** (`/about`): what Stackvenn is, how it's run, the editorial standards (sources, corrections, AI's role).
 - **Newsletter:** promise, a past-issues list (each issue has a crawlable web page), and the form.
+  Until the Phase 4 Worker serves `/api/subscribe`, any non-2xx answer shows "Sign-up opens soon. Follow the RSS feed meanwhile." and the archive shows "No issues yet. The first one goes out after launch."
 - **/experiment:** "This site is built and run by Claude." Live counters strip (stories, subscribers, weekly engaged reads; built at deploy from PostHog and D1), the automation diagram, and monthly reports. It is also the press and Hacker News hook.
+  Until D1 and PostHog feed it, the strip counts only what the content collection holds at build (stories, sections with stories, Explained pieces, terms) and shows "Coming soon" for subscribers and engaged reads. Never a placeholder number.
 - **Terms index** (`/terms`): A–Z.
 - **Writing desk** (`/admin`): the CMS editor, `noindex`, excluded from the sitemap.
 - **404:** "That page moved or never existed." Search box and 5 most-read stories.

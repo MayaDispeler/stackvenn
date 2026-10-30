@@ -1,0 +1,195 @@
+---
+// /experiment (DESIGN §5): who runs the site, the counters, how work flows, monthly reports.
+// Counters come only from the content collection at build time. Subscribers and engaged
+// reads have no data source yet (D1 and PostHog arrive later), so they say so.
+import Page from '../layouts/Page.astro';
+import { getPosts, getStories } from '../lib/posts';
+import { SECTIONS } from '../lib/taxonomy';
+
+const stories = await getStories();
+const sectionsWithStories = new Set(stories.map((p) => p.data.section)).size;
+const explained = (await getPosts((p) => p.data.format === 'explained')).length;
+const terms = (await getPosts((p) => p.data.format === 'term')).length;
+
+const counters: { label: string; value: string; note?: string }[] = [
+  { label: 'Stories published', value: String(stories.length) },
+  {
+    label: 'Sections with stories',
+    value: String(sectionsWithStories),
+    note: `of ${SECTIONS.length}`,
+  },
+  { label: 'Explained pieces', value: String(explained) },
+  { label: 'Terms defined', value: String(terms) },
+  { label: 'Subscribers', value: 'Coming soon' },
+  { label: 'Engaged reads a week', value: 'Coming soon' },
+];
+
+const steps = [
+  {
+    who: 'Claude',
+    what: 'Writes the code, designs the pages and drafts stories on a branch.',
+  },
+  {
+    who: 'Pull request',
+    what: 'Every change, code or content, arrives as a pull request. Nothing reaches the site any other way.',
+  },
+  {
+    who: 'Checks',
+    what: 'CI builds the site and runs type, accessibility, contrast and writing checks.',
+  },
+  {
+    who: 'Srihari',
+    what: 'Reads every story and merges it himself. Claude may merge code only after the checks pass.',
+  },
+  {
+    who: 'Cloudflare',
+    what: 'The merged site deploys on free tiers. Running cost is zero.',
+  },
+];
+---
+
+<Page
+  title="The experiment"
+  heading="This site is built and run by Claude."
+  lede="Srihari Venkatesan writes and approves. Claude does the rest: the code, the design, the drafts and the checks, on free services only."
+  description="Stackvenn is built and run by Claude with Srihari Venkatesan approving every story. See the live counts, how a change reaches the site, and the monthly reports."
+  path="/experiment"
+>
+  <section aria-labelledby="counts-h">
+    <h2 id="counts-h">The counts so far</h2>
+    <dl class="counters">
+      {counters.map((c) => (
+        <div class="counter">
+          <dt>{c.label}</dt>
+          <dd class:list={{ soon: c.value === 'Coming soon' }}>
+            {c.value}
+            {c.note && <span class="note"> {c.note}</span>}
+          </dd>
+        </div>
+      ))}
+    </dl>
+    <p class="fine">
+      Counted from the published content when the site was last built. Subscriber and reader numbers
+      appear once the newsletter and analytics are live.
+    </p>
+  </section>
+
+  <section aria-labelledby="how-h">
+    <h2 id="how-h">How a change reaches the site</h2>
+    <ol class="flow">
+      {steps.map((s) => (
+        <li>
+          <strong>{s.who}</strong>
+          <span>{s.what}</span>
+        </li>
+      ))}
+    </ol>
+    <p>
+      Stories go live only when Srihari merges them. Automatic publishing stays off unless he asks
+      for it in writing.
+    </p>
+  </section>
+
+  <section aria-labelledby="reports-h">
+    <h2 id="reports-h">Monthly reports</h2>
+    <p class="empty">The first monthly report comes after month one.</p>
+  </section>
+</Page>
+
+<style>
+  section + section {
+    margin-block-start: var(--s-8);
+  }
+  section h2 {
+    margin-block-start: 0;
+  }
+  .counters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    border-block: var(--bw) solid var(--border);
+    font-family: var(--font-ui);
+  }
+  .counter {
+    padding: var(--s-4) var(--s-4) var(--s-4) 0;
+    border-block-end: var(--bw) solid var(--border);
+    margin-block-end: calc(-1 * var(--bw));
+  }
+  .counter dt {
+    font-size: var(--fs-meta);
+    line-height: var(--lh-meta);
+    color: var(--text-muted);
+  }
+  .counter dd {
+    margin: var(--s-1) 0 0;
+    font-family: var(--font-read);
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .counter dd.soon {
+    font-family: var(--font-ui);
+    font-size: var(--fs-ui);
+    line-height: var(--lh-ui);
+    color: var(--text-soft);
+    padding-block-start: var(--s-2);
+  }
+  .note {
+    font-family: var(--font-ui);
+    font-size: var(--fs-meta);
+    color: var(--text-muted);
+  }
+  .fine {
+    font-family: var(--font-ui);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-meta);
+    color: var(--text-muted);
+  }
+  .flow {
+    list-style: none;
+    padding: 0;
+    counter-reset: step;
+    font-family: var(--font-ui);
+    font-size: var(--fs-ui);
+    line-height: var(--lh-ui);
+  }
+  .flow li {
+    counter-increment: step;
+    position: relative;
+    display: grid;
+    gap: var(--s-1);
+    padding: 0 0 var(--s-5) calc(var(--size-step) + var(--s-4));
+    margin: 0;
+  }
+  .flow li::before {
+    content: counter(step);
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0;
+    display: grid;
+    place-items: center;
+    width: var(--size-step);
+    height: var(--size-step);
+    border: var(--bw) solid var(--border-strong);
+    border-radius: var(--r-full);
+    font-size: var(--fs-meta);
+    color: var(--text);
+    background: var(--surface);
+  }
+  .flow li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    inset-inline-start: calc(var(--size-step) / 2);
+    inset-block: var(--size-step) 0;
+    border-inline-start: var(--bw) solid var(--border-strong);
+  }
+  .flow strong {
+    color: var(--text);
+  }
+  .flow span {
+    color: var(--text-soft);
+  }
+  .empty {
+    color: var(--text-muted);
+  }
+</style>
