@@ -4,6 +4,7 @@
 // The sidebar is sticky but never scrolls on its own: only the active section is expanded.
 import type { MarkdownHeading } from 'astro';
 import Shell from './Shell.astro';
+import ExplainedActions from '../components/ExplainedActions.astro';
 import { SITE } from '../lib/site';
 import { SECTION, type Section } from '../lib/taxonomy';
 import { formatDate, getPosts, readingTime, urlOf, type Post } from '../lib/posts';
@@ -16,6 +17,8 @@ const { post, headings } = Astro.props;
 const d = post.data;
 const url = urlOf(post);
 const abs = new URL(url, SITE.url).href;
+// The real file (stories may be .md or .mdx), relative to the repo root.
+const editUrl = `${SITE.repo}/edit/main/${(post.filePath ?? `src/content/${post.id}.mdx`).replace(/^\.\//, '')}`;
 const minutes = readingTime(post.body);
 const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
@@ -119,7 +122,7 @@ const jsonLd = [
             </div>
           )}
         </dl>
-        <slot name="actions" />
+        <ExplainedActions url={abs} markdown={`${url}.md`} />
       </header>
 
       {d.summary && (
@@ -152,7 +155,7 @@ const jsonLd = [
 
       <footer class="foot meta">
         <slot name="pager" />
-        <a href={`${SITE.repo}/edit/main/src/content/${post.id}.mdx`}>Edit on GitHub</a>
+        <a href={editUrl}>Edit on GitHub</a>
       </footer>
     </article>
 
@@ -361,7 +364,7 @@ const jsonLd = [
     text-decoration: underline;
   }
   .sixty {
-    margin-block: var(--s-2) var(--s-7);
+    margin-block: var(--s-5) var(--s-7);
     padding: var(--s-5);
     background: var(--surface);
     border: var(--bw) solid var(--border);

@@ -14,6 +14,9 @@ published: 2026-10-29
 status: draft
 ---
 
+import Steps from '../../components/mdx/Steps.astro';
+import Callout from '../../components/mdx/Callout.astro';
+
 This page never ships. It gives the Explained layout enough structure to test.
 
 ## Before you begin
@@ -30,6 +33,18 @@ cd my-site
 ### Install the integrations
 
 Add MDX and the sitemap.
+
+<Steps>
+
+1. **Create the project.** Run the create command and pick the empty template.
+2. **Add the integrations.** MDX and the sitemap go in with one command.
+3. **Start the dev server.** Open the local URL it prints.
+
+</Steps>
+
+<Callout type="tip">Keep the dev server running while you edit; pages reload on save.</Callout>
+
+<Callout type="warning">This page is a fixture and never ships.</Callout>
 
 ## 2. Write the first page
 

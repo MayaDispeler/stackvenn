@@ -1,0 +1,59 @@
+---
+// Numbered steps (DESIGN_SYSTEM §7). In MDX, wrap an ordered list whose items start with a bold title:
+//   <Steps>
+//   1. **Install it.** Run the command…
+//   2. **Run it.** …
+//   </Steps>
+---
+
+<div class="steps">
+  <slot />
+</div>
+
+<style>
+  .steps :global(ol) {
+    list-style: none;
+    padding: 0;
+    counter-reset: step;
+    margin-block: var(--s-6);
+  }
+  .steps :global(ol > li) {
+    counter-increment: step;
+    position: relative;
+    padding-inline-start: calc(var(--size-step) + var(--s-4));
+    padding-block-end: var(--s-5);
+  }
+  .steps :global(ol > li + li) {
+    margin-block-start: 0;
+  }
+  .steps :global(ol > li::before) {
+    content: counter(step);
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 0;
+    display: grid;
+    place-items: center;
+    width: var(--size-step);
+    height: var(--size-step);
+    border: var(--bw) solid var(--border-strong);
+    border-radius: var(--r-full);
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta);
+    color: var(--text);
+    background: var(--bg);
+  }
+  .steps :global(ol > li:not(:last-child)::after) {
+    content: '';
+    position: absolute;
+    inset-inline-start: calc(var(--size-step) / 2);
+    inset-block: calc(var(--size-step) + var(--s-1)) var(--s-1);
+    border-inline-start: var(--bw) solid var(--border);
+  }
+  .steps :global(ol > li > strong:first-child) {
+    display: block;
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
+    color: var(--text);
+    margin-block-end: var(--s-1);
+  }
+</style>
