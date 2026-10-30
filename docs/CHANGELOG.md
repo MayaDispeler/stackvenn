@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-30: Author page, corrections
+
+- Author page with portrait, line, dateline, sections, work and education timelines, book, open-source work, every story (paginated), copyable email, ProfilePage + Person JSON-LD.
+- `/about/srihari` 301s to the author page.
+- Schema field `corrections`, rendered as "Correction, <date>: …".
+
 ## 2026-10-30: Drawer, footer, 404, column page
 
 - Mobile menu is a native dialog drawer: sections, Explained, 2 AM, author, theme, Subscribe; focus trapped, Esc closes.

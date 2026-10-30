@@ -51,6 +51,10 @@ const posts = defineCollection({
           .optional(),
         migrated: z.boolean().optional(),
         sources: z.array(source).default([]),
+        /** Corrections policy (/about#corrections): each is shown at the end as "Correction, <date>: …". */
+        corrections: z
+          .array(z.object({ date: z.coerce.date(), text: z.string().min(1) }))
+          .default([]),
         cover: image().optional(),
         cover_alt: z.string().optional(),
         cover_credit: z.string().optional(),

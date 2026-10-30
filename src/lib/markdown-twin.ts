@@ -29,5 +29,9 @@ export function markdownTwin(post: Post): string {
     ? `\n\n## Sources\n\n${d.sources.map((s, i) => `${i + 1}. [${s.title}](${s.url})`).join('\n')}`
     : '';
 
-  return `# ${d.headline}\n\n*${d.standfirst}*\n\n${meta}${summary}\n\n${body}${sources}\n`;
+  const corrections = d.corrections.length
+    ? `\n\n## Corrections\n\n${d.corrections.map((c) => `- Correction, ${formatDate(c.date)}: ${c.text}`).join('\n')}`
+    : '';
+
+  return `# ${d.headline}\n\n*${d.standfirst}*\n\n${meta}${summary}\n\n${body}${sources}${corrections}\n`;
 }
