@@ -2,6 +2,14 @@
 
 Newest first. Each entry: what was decided, why, and who decided.
 
+## 2026-10-30: Preview hosts are never indexed (Srihari)
+
+**Rule:** every host except `stackvenn.in` serves `X-Robots-Tag: noindex, nofollow` on every page and a disallow-all `robots.txt`. Production on `stackvenn.in` stays indexable.
+
+**How:** a small edge Worker (`worker/index.js`) sits in front of the static assets. It decides by request hostname, so it also covers `*.workers.dev`, `wrangler dev`, `www.stackvenn.in` before its redirect, and any host added later. A build-time flag could not do this, because once the domain is attached the same deployment answers on both hosts. `run_worker_first` routes only pages and `robots.txt` through it; `/_astro/*`, `/pagefind/*` and the favicon skip it and stay free. Unit tests cover both cases (`npm run test:unit`, in CI).
+
+**Cost:** page views now count as Worker requests (Workers Free: 100,000 a day). Hashed assets do not. Recorded in COSTS.md; the weekly cost check will watch it.
+
 ## 2026-10-29: No AI slop (Srihari asked; Claude chose the tools)
 
 **Skills:** [blader/humanizer](https://github.com/blader/humanizer) (MIT, about 62k stars; 26 patterns from Wikipedia's "Signs of AI writing"; keeps meaning and voice, never adds facts) for the editing pass, and [hardikpandya/stop-slop](https://github.com/hardikpandya/stop-slop) (MIT, about 18k stars; drafting rules plus a 50-point score) for drafting. Vendored into `.claude/skills/` at pinned commits so every session and every GitHub Actions run uses the same version. Copied instead of run through `npx skills add`: the README supports copying SKILL.md, and it avoids executing an installer.

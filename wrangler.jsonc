@@ -4,10 +4,15 @@
   "account_id": "676811ceab4966a5996a8636dcc5949e",
   "compatibility_date": "2026-10-01",
   // Static site on Workers static assets. Custom domain stackvenn.in is attached once the zone is on Cloudflare (issue #2).
+  // worker/index.js marks every host except stackvenn.in as noindex (DECISIONS 2026-10-30).
+  "main": "worker/index.js",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "html_handling": "drop-trailing-slash",
     "not_found_handling": "404-page",
+    // Pages and robots.txt go through the Worker; hashed assets skip it and stay free and unlimited.
+    "run_worker_first": ["/*", "!/_astro/*", "!/pagefind/*", "!/favicon.svg"],
   },
   "workers_dev": true,
   "preview_urls": true,

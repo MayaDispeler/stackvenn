@@ -15,6 +15,7 @@
     "contrast": "node scripts/check-contrast.mjs",
     "format": "prettier --write .",
     "test:e2e": "playwright test",
+    "test:unit": "node --test tests/unit/*.test.mjs",
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {

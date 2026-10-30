@@ -54,6 +54,7 @@ Rewritten 2026-10-29 for the newspaper editorial model (PRD §5–§9). Old item
 - ~~Topic hubs, series pages, glossary index …~~ Replaced by section fronts, column pages and Terms.
 
 ## Phase 3 — Reachability (REACHABILITY.md)
+- [x] Preview safety: every host except stackvenn.in is noindex (X-Robots-Tag + disallow-all robots.txt), with unit tests (Srihari, 2026-10-30).
 - [ ] Cloudflare bot and AI settings, Crawler Hints, HTTPS/HSTS, caching (§2).
 - [ ] robots.txt with Content Signals, sitemap index, RSS, JSON Feed, llms.txt, llms-full.txt, `.md` twins (§3).
 - [ ] SEO build checks: titles, descriptions, canonicals, H1, alt text, internal-link minimums, duplicate detection (§4).

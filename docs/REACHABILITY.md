@@ -13,6 +13,7 @@ Work through the sections in order. Each item is a checkbox in `TODO.md`.
 - [ ] iamsrihari.com: the Writing section lists Stackvenn posts (fetched from `/feed.json` at its build time), linking to stackvenn.in. It never hosts copies. Add `rel="me"` links both ways.
 - [ ] 301 every old iamsrihari.com article URL to its new stackvenn.in URL (map in MIGRATION.md), so existing links and rankings carry over.
 - [ ] Trailing-slash policy: pick one (no trailing slash) and enforce it with redirects.
+- [x] Preview hosts are never indexed: `worker/index.js` adds `X-Robots-Tag: noindex, nofollow` and a disallow-all robots.txt on every host except stackvenn.in (DECISIONS 2026-10-30).
 
 ## 2. Cloudflare settings (via the Cloudflare MCP)
 
