@@ -4,6 +4,7 @@ import '../styles/global.css';
 import Head, { type SeoProps } from '../components/Head.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Search from '../components/Search.astro';
 import { SITE } from '../lib/site';
 
 type Props = SeoProps;
@@ -47,5 +48,6 @@ const sitewide = [
       <slot />
     </main>
     <Footer />
+    <Search mode="modal" />
   </body>
 </html>

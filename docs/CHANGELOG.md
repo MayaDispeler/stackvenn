@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-30: Search
+
+- Ctrl/Cmd+K or `/` opens search (native dialog: focus trapped and restored, Esc closes).
+- Pagefind indexes story bodies only, with section and format filters; results grouped by format; arrow keys; recent searches.
+- `/search?q=` works as a page and without JavaScript; it is noindex.
+
 ## 2026-10-30: Explained page
 
 - Copy Markdown and Open in (ChatGPT, Claude, Perplexity, View as Markdown) on every Explained piece.

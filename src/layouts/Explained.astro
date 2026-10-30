@@ -6,7 +6,7 @@ import type { MarkdownHeading } from 'astro';
 import Shell from './Shell.astro';
 import ExplainedActions from '../components/ExplainedActions.astro';
 import { SITE } from '../lib/site';
-import { SECTION, type Section } from '../lib/taxonomy';
+import { FORMAT_LABEL, SECTION, type Section } from '../lib/taxonomy';
 import { formatDate, getPosts, readingTime, urlOf, type Post } from '../lib/posts';
 
 interface Props {
@@ -88,15 +88,21 @@ const jsonLd = [
       </nav>
     </details>
 
-    <article class="content">
+    <article class="content" data-pagefind-body>
+      <span hidden data-pagefind-filter="section">
+        {SECTION[d.section].label}
+      </span>
+      <span hidden data-pagefind-filter="format">
+        {FORMAT_LABEL[d.format]}
+      </span>
       <header>
-        <p class="eyebrow">
+        <p class="eyebrow" data-pagefind-ignore>
           <a href="/explained">Explained</a> <span aria-hidden="true">·</span>{' '}
           <a href={`/${d.section}`}>{SECTION[d.section].label}</a>
         </p>
         <h1>{d.headline}</h1>
         <p class="standfirst">{d.standfirst}</p>
-        <dl class="meta-row">
+        <dl class="meta-row" data-pagefind-ignore>
           {levelLabel && (
             <div>
               <dt>Level</dt>
@@ -122,7 +128,9 @@ const jsonLd = [
             </div>
           )}
         </dl>
-        <ExplainedActions url={abs} markdown={`${url}.md`} />
+        <div data-pagefind-ignore>
+          <ExplainedActions url={abs} markdown={`${url}.md`} />
+        </div>
       </header>
 
       {d.summary && (

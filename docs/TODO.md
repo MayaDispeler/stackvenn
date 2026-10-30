@@ -37,7 +37,7 @@ Rewritten 2026-10-29 for the newspaper editorial model (PRD §5–§9). Old item
 - [x] Editorial model: sections in the nav (AI · Engineering · Careers · Work · Life · Society), formats as kickers, permanent URLs `/<section>/<slug>`, `/explained`, `/columns/<column>`, `/terms/<slug>`, `/tools/<slug>`, `/author/srihari-venkatesan`; schema `format`/`section`/`headline`/`standfirst`/`column`/`summary`/`dateline`; Story and Explained layouts; docs updated.
 - [ ] Local preview: dev server (drafts visible) from the `preview` worktree at http://localhost:4321; 2 AM + Medium stories seeded as drafts.
 - [ ] Venn mark (SVG), logo, favicon set, overlap chip.
-- [ ] Header with section nav, mobile drawer, footer (sections, columns, RSS, newsletter), theme toggle, Ctrl/Cmd+K search modal (Pagefind), toast.
+- [ ] Header with section nav, mobile drawer, footer (sections, columns, RSS, newsletter), theme toggle, Ctrl/Cmd+K search modal (Pagefind), toast. **Partial (2026-10-30):** search done (Ctrl/Cmd+K and `/`, Pagefind index of story bodies with section and format filters, recent searches, /search page that also works without JS); share toast done. Still to do: mobile drawer, footer.
 - [ ] Buttons, links, chips, meta badges, callouts, steps, tabs, code block, tables, figure + lightbox, pull quotes, sidenotes and footnotes.
 - [ ] Front page: masthead (Venn, wordmark, IST date, promise), lead story + 3–4 top stories, section bands, Most read (editor picks), Explained strip, 2 AM column block, newsletter. `src/data/frontpage.json` for picks.
 - [x] Section fronts: large title, lead story, list, pagination at `/<section>/page/<n>`. Done 2026-10-30, with a designed empty state for sections that have no stories yet.
