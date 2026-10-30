@@ -1,8 +1,10 @@
 ---
-import List from '../../layouts/List.astro';
+// Column page (DESIGN §5): the column's name as its own masthead, one line about it, pieces newest first.
+import Shell from '../../layouts/Shell.astro';
 import StoryList from '../../components/StoryList.astro';
-import { getStories } from '../../lib/posts';
+import { SITE } from '../../lib/site';
 import { COLUMNS, COLUMN_SLUGS, type ColumnSlug } from '../../lib/taxonomy';
+import { getStories } from '../../lib/posts';
 
 export function getStaticPaths() {
   return COLUMN_SLUGS.map((column) => ({ params: { column } }));
@@ -10,15 +12,94 @@ export function getStaticPaths() {
 
 const slug = Astro.params.column as ColumnSlug;
 const column = COLUMNS[slug];
-const posts = await getStories((p) => p.data.column === slug);
+const pieces = await getStories((p) => p.data.column === slug);
+const path = `/columns/${slug}`;
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWorkSeries',
+    name: column.name,
+    description: column.description,
+    url: new URL(path, SITE.url).href,
+    author: { '@id': `${SITE.url}/author/${SITE.author.slug}#person` },
+    publisher: { '@id': `${SITE.url}/#org` },
+  },
+];
 ---
 
-<List
-  title={`${column.name}, a column`}
-  heading={column.name}
-  lede={column.description}
-  description={`${column.name}: ${column.description} A column by Srihari Venkatesan on Stackvenn.`}
-  path={`/columns/${slug}`}
+<Shell
+  title={`${column.name}, a column by ${SITE.author.name}`}
+  description={`${column.name}: ${column.description} A column by ${SITE.author.name} on Stackvenn.`}
+  path={path}
+  jsonLd={jsonLd}
 >
-  <StoryList posts={posts} />
-</List>
+  <div class="container column">
+    <header class="head">
+      <p class="kicker">
+        A column by <a href={`/author/${SITE.author.slug}`}>{SITE.author.name}</a>
+      </p>
+      <h1>{column.name}</h1>
+      <p class="description">{column.description}</p>
+      <p class="meta">
+        {pieces.length} {pieces.length === 1 ? 'piece' : 'pieces'}
+      </p>
+    </header>
+    {pieces.length > 0 ? (
+      <StoryList posts={pieces} />
+    ) : (
+      <p class="empty">
+        The first {column.name} pieces are on their way. New ones reach you through{' '}
+        <a href="/rss.xml">RSS</a>.
+      </p>
+    )}
+  </div>
+</Shell>
+
+<style>
+  .column {
+    max-width: calc(var(--w-feed) + var(--gutter) + var(--gutter-r));
+    padding-block-start: var(--s-7);
+  }
+  .head {
+    padding-block-end: var(--s-5);
+    margin-block-end: var(--s-6);
+    border-block-end: var(--bw-active) solid var(--text);
+  }
+  .kicker {
+    font-size: var(--fs-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .kicker a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .kicker a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  h1 {
+    margin-block-start: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .description {
+    margin-block-start: var(--s-3);
+    font-family: var(--font-read);
+    font-style: italic;
+    font-size: var(--fs-standfirst);
+    line-height: var(--lh-standfirst);
+    color: var(--text-soft);
+  }
+  .meta {
+    margin-block-start: var(--s-2);
+  }
+  .empty {
+    color: var(--text-soft);
+  }
+</style>

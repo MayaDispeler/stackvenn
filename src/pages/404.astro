@@ -1,14 +1,46 @@
 ---
+// 404 (DESIGN §5): say what happened, then a search box and a few stories, never a dead end.
 import Page from '../layouts/Page.astro';
+import Search from '../components/Search.astro';
+import StoryList from '../components/StoryList.astro';
+import picks from '../data/frontpage.json';
+import { getStories, slugOf, type Post } from '../lib/posts';
+
+const stories = await getStories();
+const picked = picks.picks
+  .map((s) => stories.find((p) => slugOf(p) === s))
+  .filter((p): p is Post => !!p);
+const shown = (picked.length >= 3 ? picked : stories).slice(0, 5);
 ---
 
 <Page
   title="Page not found"
   heading="That page moved or never existed."
-  description="The page you asked for isn't here. Search Stackvenn or start from the latest posts."
+  lede="Search for it, or start from one of the stories below."
+  description="The page you asked for isn't on Stackvenn. Search the site or start from one of the stories listed here."
   noindex
 >
-  <p>
-    Try <a href="/search">searching</a>, or start from <a href="/">the latest posts</a>.
-  </p>
+  <Search mode="page" />
+  {shown.length > 0 && (
+    <section class="picks" aria-labelledby="picks-h">
+      <h2 id="picks-h">Start here</h2>
+      <StoryList posts={shown} headingLevel="h3" />
+    </section>
+  )}
 </Page>
+
+<style>
+  .picks {
+    margin-block-start: var(--s-8);
+  }
+  .picks h2 {
+    font-family: var(--font-ui);
+    font-size: var(--fs-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 700;
+    padding-block-end: var(--s-3);
+    margin-block-end: var(--s-5);
+    border-block-end: var(--bw) solid var(--text);
+  }
+</style>

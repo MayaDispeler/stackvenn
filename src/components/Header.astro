@@ -2,6 +2,7 @@
 import { NAV, SITE } from '../lib/site';
 import Venn from './Venn.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import Drawer from './Drawer.astro';
 const here = Astro.url.pathname;
 const isActive = (href: string) => here === href || here.startsWith(`${href}/`);
 ---
@@ -51,42 +52,33 @@ const isActive = (href: string) => here === href || here.startsWith(`${href}/`);
       <a class="btn btn-primary subscribe" href="/newsletter">
         Subscribe
       </a>
-      <details class="menu">
-        <summary class="btn btn-icon" aria-label="Menu">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            aria-hidden="true"
-          >
-            <path d="M4 7h16M4 12h16M4 17h16"></path>
-          </svg>
-        </summary>
-        <div class="menu-panel">
-          <nav aria-label="Main (menu)">
-            <ul>
-              {NAV.map((n) => (
-                <li>
-                  <a href={n.href} aria-current={isActive(n.href) ? 'page' : undefined}>
-                    {n.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <ThemeToggle />
-          <a class="btn btn-primary" href="/newsletter">
-            Subscribe
-          </a>
-        </div>
-      </details>
+      <button
+        type="button"
+        class="btn btn-icon menu"
+        aria-label="Menu"
+        aria-haspopup="dialog"
+        aria-controls="site-drawer"
+        aria-expanded="false"
+        data-drawer-open
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M4 7h16M4 12h16M4 17h16"></path>
+        </svg>
+      </button>
     </div>
   </div>
 </header>
+
+<Drawer />
 
 <script>
   // Apple platforms get the Command-key hint.
@@ -202,44 +194,12 @@ const isActive = (href: string) => here === href || here.startsWith(`${href}/`);
     border-radius: var(--r-sm);
     padding: 1px var(--s-1);
   }
-  .menu {
-    position: relative;
-  }
-  .menu summary {
-    list-style: none;
-  }
-  .menu summary::-webkit-details-marker {
-    display: none;
-  }
-  .menu-panel {
-    position: absolute;
-    inset-inline-end: 0;
-    top: calc(100% + var(--s-2));
-    width: min(320px, calc(100vw - 2 * var(--s-4)));
-    display: grid;
-    gap: var(--s-4);
-    padding: var(--s-4);
-    background: var(--raised);
-    border: var(--bw) solid var(--border);
-    border-radius: var(--r-md);
-    box-shadow: var(--shadow-menu);
-  }
-  .menu-panel ul {
-    flex-direction: column;
-  }
   @media (min-width: 960px) {
     .primary {
       display: block;
     }
     .subscribe {
       display: inline-flex;
-    }
-    .menu-panel nav,
-    .menu-panel .btn {
-      display: none;
-    }
-    .menu-panel {
-      width: auto;
     }
   }
   /* Full header only where it fits (critique #4). Below 1200 the theme control lives in the menu. */
