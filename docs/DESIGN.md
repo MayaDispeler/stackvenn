@@ -122,6 +122,7 @@ Job: within 5 seconds, a visitor knows what Stackvenn is, sees what's important 
 - "Open in ▾" builds URLs such as `https://claude.ai/new?q=` and `https://chatgpt.com/?q=`, with the prompt "Read https://stackvenn.in/… and help me apply it to my project." Verify each tool's query parameter when building, and drop any that no longer prefill.
 - "Copy Markdown" fetches `<url>.md` and copies it, falling back to selecting the text.
 - Every heading gets a hover "#" anchor. Pressing `/` focuses search.
+- **Heading anchors:** a `#` link beside each h2/h3 (a sibling, so the heading name stays clean), visible on hover or focus and always on touch screens. **Path pager:** pieces sharing a `series` show Previous / Next cards ordered by `order`. **Helpful?:** Yes / No after the body; one vote per browser, never shown publicly.
 - **Terms** (`/terms/<slug>`) use this layout without the sidebar paths: definition in the first sentence, an example, "Related terms" and "Used in".
 
 ---
@@ -134,7 +135,9 @@ Job: within 5 seconds, a visitor knows what Stackvenn is, sees what's important 
 - **Author page** (`/author/srihari-venkatesan`, alias `/about/srihari`): a columnist's profile, not a résumé. Portrait (placeholder until issue #8), name, "AI engineer · writes the 2 AM column", dateline Chennai; a 120–180-word first-person bio (content PR); "What I write about" (sections with counts); "Where I've worked" and Education as quiet rule-separated timelines; the book; every story (20 per page, `/page/<n>`); contact with the email as copyable text, LinkedIn, GitHub, "Work with me". ProfilePage + Person JSON-LD; every byline uses the same Person @id. Facts only from iamsrihari.com (`src/data/author.ts`).
 - **About** (`/about`): the publication page. What Stackvenn is and who it is for; masthead (Founder and editor: Srihari, linked; Production: "Built and run with Claude", linked to /experiment); the six sections and five formats, one line each; Editorial standards (`#standards`: sources, first-hand work, how AI is used and that every story is approved by Srihari, the anti-slop checks, republished pieces); Corrections (`#corrections`: how to report, copyable email, "Correction, <date>: …"); Independence (`#independence`: no ads, sponsored posts or affiliate links); contact and newsletter. AboutPage + NewsMediaOrganization JSON-LD with publishingPrinciples, correctionsPolicy and ethicsPolicy pointing at those anchors. About is linked from the footer and the drawer, not the header.
 - **Newsletter:** promise, a past-issues list (each issue has a crawlable web page), and the form.
+  Until the Phase 4 Worker serves `/api/subscribe`, any non-2xx answer shows "Sign-up opens soon. Follow the RSS feed meanwhile." and the archive shows "No issues yet. The first one goes out after launch."
 - **/experiment:** "This site is built and run by Claude." Live counters strip (stories, subscribers, weekly engaged reads; built at deploy from PostHog and D1), the automation diagram, and monthly reports. It is also the press and Hacker News hook.
+  Until D1 and PostHog feed it, the strip counts only what the content collection holds at build (stories, sections with stories, Explained pieces, terms) and shows "Coming soon" for subscribers and engaged reads. Never a placeholder number.
 - **Terms index** (`/terms`): A–Z.
 - **Writing desk** (`/admin`): the CMS editor, `noindex`, excluded from the sitemap.
 - **404:** "That page moved or never existed." Search box and 5 most-read stories.

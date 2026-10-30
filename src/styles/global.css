@@ -265,6 +265,46 @@ a:hover {
 .prose h3 + * {
   margin-block-start: 0;
 }
+/* Heading anchors (rehype-anchors.mjs): the wrapper takes the heading's spacing. */
+.prose .hw {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+}
+.prose .hw-2 {
+  margin-block: var(--s-8) var(--s-4);
+}
+.prose .hw-3 {
+  margin-block: var(--s-7) var(--s-3);
+}
+.prose .hw > h2,
+.prose .hw > h3 {
+  margin: 0;
+}
+.prose .hw + * {
+  margin-block-start: 0;
+}
+.prose .anchor {
+  flex: none;
+  font-family: var(--font-ui);
+  font-size: var(--fs-meta);
+  color: var(--text-muted);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity var(--d-fast) var(--ease);
+}
+.prose .hw:hover .anchor,
+.prose .anchor:focus-visible {
+  opacity: 1;
+}
+.prose .anchor:hover {
+  color: var(--accent);
+}
+@media (hover: none) {
+  .prose .anchor {
+    opacity: 1;
+  }
+}
 .prose strong {
   color: var(--text);
   font-weight: 600;

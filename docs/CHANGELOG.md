@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-30: Explained anchors, paths, Helpful?
+
+- Every h2/h3 in a story body gets a `#` link beside it (focusable, labelled "Section titled ..."; shown on hover or focus, always on touch).
+- Explained pieces in a `series` link to the previous and next piece in the path.
+- "Was this helpful?" on Explained pieces: one vote per browser, sent as `helpful_vote` once PostHog exists (`src/lib/analytics.ts`, a no-op until then).
+
 ## 2026-10-30: Writing, not projects
 
 - Author page: the "Open-source work" section is gone; GitHub stays under contact. No Amazon author link in `sameAs`.

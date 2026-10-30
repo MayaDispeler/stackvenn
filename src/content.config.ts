@@ -85,6 +85,8 @@ const posts = defineCollection({
               threads: false,
               linkedin: false,
             }),
+          /** Terms only: slugs of related terms, shown as "Related terms". */
+          related: z.array(z.string().min(1)).optional(),
           faq: z.array(z.object({ q: z.string(), a: z.string() })).optional(),
         })
         .superRefine((d, ctx) => {
@@ -105,6 +107,7 @@ const posts = defineCollection({
           if (d.format === 'explained' && !d.summary) {
             issue('summary', 'Explained pieces need an "Explained in 60 seconds" summary');
           }
+          if (d.format !== 'term' && d.related) issue('related', '`related` is for format: term');
           if (d.updated && d.updated < d.published) issue('updated', 'updated is before published');
           if (d.cover && !d.cover_alt) issue('cover_alt', 'a cover needs alt text');
         }),
