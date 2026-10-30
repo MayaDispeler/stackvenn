@@ -1,0 +1,104 @@
+---
+headline: 'How Orqestra plans a build before the first line of code'
+standfirst: 'Orqestra puts an orchestrator in front of Claude Code agents. It picks the domains, then the agents and their order, and only then lets the work start.'
+format: explained
+section: ai
+overlap: ['AI', 'Engineering']
+level: beginner
+tested_with: ['Claude Code', 'orqestra-ai 1.0.13 [[CONFIRM: latest npm version]]']
+summary:
+  - 'Orqestra installs 97 specialist agents, 101 skills and one orchestrator into Claude Code. [[CONFIRM: the repo has 102 skill folders]]'
+  - 'The orchestrator plans in two passes: which domains a task touches, then which agents run in which order.'
+  - 'It picks agents only from a fixed registry, so it cannot invent an agent that does not exist.'
+  - 'If a task is too vague to plan, it asks three questions and stops.'
+  - 'You add your own agent by writing one file and adding its name to the registry.'
+dateline: 'Chennai'
+published: 2026-10-30
+status: draft
+sources:
+  - { title: 'Orqestra README', url: 'https://github.com/sriharivvenkatesan/orqestra-ai' }
+  - { title: 'orqestra-ai on npm', url: 'https://www.npmjs.com/package/orqestra-ai' }
+---
+
+import Steps from '../../components/mdx/Steps.astro';
+import Callout from '../../components/mdx/Callout.astro';
+
+Orqestra is an open-source set of agents for Claude Code: 97 specialists, 101 skills and one orchestrator that decides which of them should work on a task, in what order, before anyone writes code. [[CONFIRM: 97 and 101 as of the version you want to cite]] This piece shows how that planning step works and how to add an agent of your own.
+
+## Before you begin
+
+You need Claude Code and Node.js 18 or newer. Orqestra installs into `~/.claude/`, so every project you open in Claude Code can use it. It needs no API keys and no settings file.
+
+## Why a plan comes first
+
+In a plain Claude Code session you describe the task and Claude starts building. Which agent does the work, in what order, and what each step hands to the next is left to you. Orqestra adds one agent whose only job is that coordination: the orchestrator. It runs before the specialists and decides who works and when.
+
+## Install and run your first plan
+
+<Steps>
+
+1. **Install Orqestra.** Run one command in any terminal:
+
+   ```bash
+   npx orqestra-ai
+   ```
+
+   Run the same command again later to update.
+
+2. **Describe the task.** Open Claude Code and state what you want built, for example "build a SaaS for managing freelance invoices".
+
+3. **Read the plan.** The orchestrator answers with a plan in two passes before any agent starts. Check it the way you would check a colleague's plan.
+
+4. **Start with the first stage.** The plan ends with the agent to call first, for example `@system-architect`. Each later stage receives the output of the stage before it.
+
+</Steps>
+
+## What the two passes do
+
+**Pass 1 asks which domains the task touches.** For the invoice example, the orchestrator marks engineering (API, database, auth, billing logic), design (invoice UI, dashboard, empty states) and data (revenue metrics) as in scope. It leaves out RevOps and people work, because the task never mentions them.
+
+**Pass 2 picks the agents and their order.** For the same task the plan has five stages:
+
+```text title="The orchestrator's plan for the invoice task (from the README)"
+STAGE 1   system-architect      ← nothing starts without this
+STAGE 2   api-designer          ← parallel
+          ux-designer           ← parallel, both wait for stage 1
+STAGE 3   backend-engineer      ← parallel
+          frontend-engineer     ← parallel, both wait for stage 2
+STAGE 4   data-analyst          ← waits for stage 3
+STAGE 5   qa-engineer           ← final gate
+```
+
+Agents in the same stage can run in parallel. A stage starts only when the one before it has finished, and every agent knows what it must hand to the next stage.
+
+Two rules keep the plan honest. The orchestrator chooses agents only from a fixed registry, so it cannot name an agent that does not exist, and it has to write down why it picked each one. And when a prompt is too vague to plan against, it asks three questions and stops instead of guessing. [[CONFIRM: "three questions" is still the behaviour in the current version]]
+
+<Callout type="tip">
+  If the plan skips a domain you care about, say so before the first stage starts. A change to the
+  plan is cheaper than redoing a stage that has already run.
+</Callout>
+
+## Add your own agent
+
+Every agent is a file in `~/.claude/agents/`, and every skill is a folder in `~/.claude/skills/`. You can open and edit any of them.
+
+<Steps>
+
+1. **Write the agent file.** Add a new file in `~/.claude/agents/`, named after the role. The project's CONTRIBUTING guide describes the format; the README says a new agent takes about 10 minutes and needs no code. [[CONFIRM: 10 minutes]]
+
+2. **Register it.** Open `~/.claude/agents/orchestrator.md` and add the agent's name to the cluster registry for its domain.
+
+3. **Test it with a task.** Give the orchestrator a task that should need your agent and check that Pass 2 selects it.
+
+</Steps>
+
+<Callout type="warning">
+  An agent file without a registry entry is invisible to the orchestrator. Pass 2 only chooses from
+  the registry, so step 2 is not optional.
+</Callout>
+
+That warning comes from Orqestra's own testing. Before release, the orchestrator was run against real tasks and asked to find its own bugs. It found three: two agents that existed as files but were missing from the registry, so Pass 2 could never pick them, and a critical-path reference to a stage that did not exist. [[CONFIRM: the three bugs as described]]
+
+## Where next
+
+The orchestrator is the part to read first: open `~/.claude/agents/orchestrator.md` after installing and you can see the registry and the planning rules for yourself.

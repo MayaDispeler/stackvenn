@@ -7,6 +7,7 @@ export const PAGES = [
   { name: 'section-careers', path: '/careers' },
   { name: 'explained-hub', path: '/explained' },
   { name: 'author', path: '/author/srihari-venkatesan' },
+  { name: 'explained-orqestra', path: '/ai/how-orqestra-plans-a-build' },
   { name: '404', path: '/404' },
 ];
 export const WIDTHS = [360, 390, 768, 1280, 1440];
