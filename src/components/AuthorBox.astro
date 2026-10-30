@@ -1,0 +1,59 @@
+---
+// Author box at the end of every story. Placeholder avatar until the portrait from issue #8 arrives.
+import { Image } from 'astro:assets';
+import avatar from '../assets/author/avatar.webp';
+import { SITE } from '../lib/site';
+const author = `/author/${SITE.author.slug}`;
+---
+
+<aside class="author-box" aria-label="About the author">
+  <a href={author} tabindex="-1" aria-hidden="true">
+    <Image src={avatar} alt="" width={64} height={64} class="avatar" />
+  </a>
+  <div>
+    <p class="name">
+      <a href={author}>{SITE.author.name}</a>
+    </p>
+    <p class="meta">{SITE.author.line}</p>
+    <p class="links meta">
+      <a href={author}>All stories</a> <span aria-hidden="true">·</span>{' '}
+      <a href={SITE.author.url} rel="me">
+        iamsrihari.com
+      </a>
+    </p>
+  </div>
+</aside>
+
+<style>
+  .author-box {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--s-4);
+    align-items: center;
+    padding-block: var(--s-5);
+    border-block: var(--bw) solid var(--border);
+  }
+  .author-box :global(.avatar) {
+    width: var(--s-8);
+    height: var(--s-8);
+    border-radius: var(--r-full);
+    border: var(--bw) solid var(--border);
+    object-fit: cover;
+  }
+  .name {
+    font-family: var(--font-read);
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
+  }
+  .name a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  .name a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  .links a {
+    color: var(--text-soft);
+  }
+</style>

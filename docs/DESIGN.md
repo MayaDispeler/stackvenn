@@ -83,6 +83,10 @@ Job: within 5 seconds, a visitor knows what Stackvenn is, sees what's important 
               More in Work (3 stories) · Most read
               [Load comments]  (Giscus loads on click)
 ```
+- **Share row** (built 2026-10-30): text labels, not brand icons: Copy link · LinkedIn · X · WhatsApp · Email, as plain intent links (no SDKs). It sits under the byline and again at the end.
+- **Sidenotes:** at ≥1200px each footnote also appears in the right margin beside its reference (aria-hidden); the footnote list stays for assistive tech.
+- **Figures:** an image followed by an italic line becomes a figure with a caption at build (rehype-figure).
+- **End of story:** share row, author box, comments ("Comments open soon" until Giscus, issue #6), then "More in <Section>" (3) and "Editor's picks" (the label becomes "Most read" only when PostHog has real data).
 - The kicker row shows the section (link to its front) and the kicker: the format label, or the column name linking to `/columns/<column>`.
 - The progress bar is fixed to the viewport top. The share row repeats at the end; there's no floating share bar.
 - **Brief** uses a smaller headline (h1 size) and a roman (non-italic) standfirst.

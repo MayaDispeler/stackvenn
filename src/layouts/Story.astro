@@ -1,10 +1,24 @@
 ---
 // Story page: Analysis, Opinion, Column and Brief (DESIGN §3). One 680px column.
 import Shell from './Shell.astro';
+import { Image } from 'astro:assets';
 import OverlapChip from '../components/OverlapChip.astro';
+import ShareRow from '../components/ShareRow.astro';
+import AuthorBox from '../components/AuthorBox.astro';
+import StoryList from '../components/StoryList.astro';
+import avatar from '../assets/author/avatar.webp';
+import picks from '../data/frontpage.json';
 import { SITE } from '../lib/site';
 import { COLUMNS, SECTION } from '../lib/taxonomy';
-import { formatDate, kickerOf, readingTime, urlOf, type Post } from '../lib/posts';
+import {
+  formatDate,
+  getStories,
+  kickerOf,
+  readingTime,
+  slugOf,
+  urlOf,
+  type Post,
+} from '../lib/posts';
 
 interface Props {
   post: Post;
@@ -19,6 +33,16 @@ const column = d.column ? COLUMNS[d.column] : undefined;
 const kicker = kickerOf(post);
 const kickerHref = column ? `/columns/${d.column}` : undefined;
 const isBrief = d.format === 'brief';
+
+// "More in <Section>": up to 3 other stories in this section.
+const others = await getStories((p) => p.id !== post.id);
+const moreInSection = others.filter((p) => p.data.section === d.section).slice(0, 3);
+// "Editor's picks" until PostHog has real numbers (then "Most read"); never repeats the list above.
+const shown = new Set(moreInSection.map((p) => p.id));
+const editorsPicks = picks.picks
+  .map((s) => others.find((p) => slugOf(p) === s))
+  .filter((p): p is Post => !!p && !shown.has(p.id))
+  .slice(0, 4);
 const firstPublished = d.first_published
   ? `First published on ${d.first_published.platform}, ${d.first_published.date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric', timeZone: 'UTC' })}. Revised for Stackvenn.`
   : undefined;
@@ -98,7 +122,10 @@ const jsonLd = [
       <p class="standfirst">{d.standfirst}</p>
       <div class="byline">
         <OverlapChip overlap={d.overlap} />
-        <p class="meta">
+        <p class="meta who">
+          <a href="/author/srihari-venkatesan" tabindex="-1" aria-hidden="true">
+            <Image src={avatar} alt="" width={32} height={32} class="avatar" />
+          </a>
           By <a href="/author/srihari-venkatesan">{SITE.author.name}</a>
           <span aria-hidden="true">·</span>
           {d.dateline && <span class="dateline">{d.dateline},</span>}
@@ -114,6 +141,7 @@ const jsonLd = [
           <span aria-hidden="true">·</span>
           <span>{minutes} min read</span>
         </p>
+        <ShareRow url={abs} title={d.headline} />
       </div>
     </header>
 
@@ -137,10 +165,67 @@ const jsonLd = [
     {firstPublished && <p class="origin meta">{firstPublished}</p>}
 
     <slot name="after" />
+
+    <footer class="end">
+      <ShareRow url={abs} title={d.headline} label="Share this story" toast={false} />
+      <AuthorBox />
+      <section class="comments" aria-labelledby="comments-h">
+        <h2 id="comments-h">Comments</h2>
+        {SITE.giscus ? (
+          <button type="button" class="btn btn-secondary" data-load-comments>
+            Load comments
+          </button>
+        ) : (
+          <p class="meta">Comments open soon.</p>
+        )}
+      </section>
+    </footer>
   </article>
+
+  <div class="container more">
+    {moreInSection.length > 0 && (
+      <section aria-labelledby="more-h">
+        <h2 id="more-h" class="label">
+          More in <a href={`/${d.section}`}>{section.label}</a>
+        </h2>
+        <StoryList posts={moreInSection} showSection={false} headingLevel="h3" />
+      </section>
+    )}
+    {editorsPicks.length > 0 && (
+      <section aria-labelledby="picks-h">
+        <h2 id="picks-h" class="label">
+          Editor’s picks
+        </h2>
+        <StoryList posts={editorsPicks} headingLevel="h3" />
+      </section>
+    )}
+  </div>
 </Shell>
 
 <script>
+  // Sidenotes: at ≥1200px each footnote also appears in the margin beside its reference.
+  // The margin copy is aria-hidden; the footnote list stays in the page for assistive tech.
+  const notes = document.querySelector<HTMLElement>('.story .body [data-footnotes]');
+  if (notes) {
+    notes.classList.add('has-sidenotes');
+    document
+      .querySelectorAll<HTMLAnchorElement>('.story .body a[data-footnote-ref]')
+      .forEach((ref) => {
+        const id = decodeURIComponent(ref.hash.slice(1));
+        const note = document.getElementById(id);
+        const block = ref.closest('p, li, blockquote');
+        if (!note || !block) return;
+        const side = document.createElement('span');
+        side.className = 'sidenote';
+        side.setAttribute('aria-hidden', 'true');
+        const clone = note.cloneNode(true) as HTMLElement;
+        clone.querySelectorAll('[data-footnote-backref]').forEach((b) => b.remove());
+        side.innerHTML = '<sup>' + (ref.textContent ?? '') + '</sup> ' + clone.innerHTML;
+        block.classList.add('has-sidenote');
+        block.appendChild(side);
+      });
+  }
+
   const bar = document.querySelector<HTMLElement>('[data-progress]');
   const body = document.querySelector<HTMLElement>('.story .body');
   if (bar && body && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -157,6 +242,101 @@ const jsonLd = [
 </script>
 
 <style>
+  .who {
+    align-items: center;
+  }
+  .who :global(.avatar) {
+    width: var(--s-6);
+    height: var(--s-6);
+    border-radius: var(--r-full);
+    border: var(--bw) solid var(--border);
+  }
+  .byline :global(.share) {
+    margin-block-start: var(--s-2);
+  }
+  .end {
+    display: grid;
+    gap: var(--s-6);
+    margin-block-start: var(--s-8);
+  }
+  .comments h2,
+  .label {
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-block-end: var(--s-3);
+  }
+  .more {
+    max-width: calc(var(--w-story) + var(--gutter) + var(--gutter-r));
+    display: grid;
+    gap: var(--s-7);
+    margin-block-start: var(--s-8);
+  }
+  .more .label {
+    padding-block-end: var(--s-3);
+    margin-block-end: var(--s-5);
+    border-block-end: var(--bw) solid var(--text);
+  }
+  .more .label a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .more .label a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+
+  /* Figures (rehype-figure turns image + italic line into figure + figcaption). */
+  .body :global(figure) {
+    margin-block: var(--s-6);
+  }
+  .body :global(figure img) {
+    width: 100%;
+    height: auto;
+  }
+  .body :global(figcaption) {
+    margin-block-start: var(--s-2);
+    font-family: var(--font-ui);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-meta);
+    color: var(--text-muted);
+  }
+
+  /* Sidenotes: only where the margin fits them. */
+  .body :global(.sidenote) {
+    display: none;
+  }
+  @media (min-width: 1200px) {
+    .body :global(.has-sidenote) {
+      position: relative;
+    }
+    .body :global(.sidenote) {
+      display: block;
+      position: absolute;
+      inset-block-start: 0;
+      inset-inline-start: calc(100% + var(--s-6));
+      width: 220px;
+      font-family: var(--font-ui);
+      font-size: var(--fs-meta);
+      line-height: var(--lh-meta);
+      font-style: normal;
+      color: var(--text-muted);
+    }
+    .body :global(.sidenote p) {
+      display: inline;
+    }
+    .body :global(.has-sidenotes) {
+      position: absolute !important;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+  }
+
   /* Pinned to the viewport top, so it stays put when the mobile header hides. */
   .progress {
     position: fixed;

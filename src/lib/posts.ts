@@ -78,11 +78,9 @@ export function readingTime(body = ''): number {
   return Math.max(1, Math.round(words / 230));
 }
 
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** "1 Sep 2025": fixed three-letter months (en-GB now writes "Sept"). */
 export function formatDate(d: Date): string {
-  return d.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  });
+  return `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
