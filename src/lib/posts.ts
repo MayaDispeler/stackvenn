@@ -64,6 +64,9 @@ export async function getPosts(filter?: (p: Post) => boolean): Promise<Post[]> {
   return filter ? all.filter(filter) : all;
 }
 
+/** Stories per page on the author page. */
+export const AUTHOR_PAGE_SIZE = 20;
+
 /** Stories per section-front page after the lead. */
 export const SECTION_PAGE_SIZE = 10;
 

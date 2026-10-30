@@ -1,0 +1,14 @@
+---
+// /author/srihari-venkatesan/page/<n> for n >= 2.
+import AuthorProfile from '../../../../components/AuthorProfile.astro';
+import { AUTHOR_PAGE_SIZE, getStories } from '../../../../lib/posts';
+
+export async function getStaticPaths() {
+  const pages = Math.ceil((await getStories()).length / AUTHOR_PAGE_SIZE);
+  return Array.from({ length: Math.max(0, pages - 1) }, (_, i) => ({
+    params: { n: String(i + 2) },
+  }));
+}
+---
+
+<AuthorProfile page={Number(Astro.params.n)} />

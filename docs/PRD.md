@@ -84,7 +84,9 @@ Nothing was live before 2026-10-29, so these are set once and never change. A sl
 /terms   /terms/<slug>           Terms (A–Z index and term page)
 /tools/<slug>                    Tools
 /author/srihari-venkatesan       Author page (Person entity, links to iamsrihari.com)
-/about                           About Stackvenn and how it runs
+/author/srihari-venkatesan/page/<n>  Author page, stories page n
+/about/srihari                   301 to /author/srihari-venkatesan
+/about                           The publication page: what Stackvenn is, masthead, formats, editorial standards, corrections policy, independence
 /newsletter                      Subscribe page and issue archive
 /experiment                      "How this site runs itself": live stats and monthly reports
 /book/the-mellivora-paradox
@@ -172,6 +174,7 @@ migrated: bool?
 sources: [{ title, url }] # required if the story states facts or numbers
 cover: image?  cover_alt: string?  cover_credit: string?
 distribute: { devto, hashnode, bluesky, mastodon, threads, linkedin: bool }
+corrections: [{ date, text }]   # rendered at the end as "Correction, <date>: …" (policy at /about#corrections)
 faq: [{ q, a }]?
 ```
 

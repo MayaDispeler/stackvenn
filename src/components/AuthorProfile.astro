@@ -1,0 +1,444 @@
+---
+// Author page (Srihari, 2026-10-30): a columnist's profile, not a résumé. Facts come from
+// src/data/author.ts (copied from iamsrihari.com); the bio arrives through a content PR.
+// Page 1 is /author/<slug>; later story pages are /author/<slug>/page/<n>.
+import { Image } from 'astro:assets';
+import Shell from '../layouts/Shell.astro';
+import StoryList from './StoryList.astro';
+import portrait from '../assets/author/portrait.webp';
+import bookCover from '../assets/book/the-mellivora-paradox.webp';
+import { AUTHOR } from '../data/author';
+import { SITE } from '../lib/site';
+import { SECTION, SECTIONS } from '../lib/taxonomy';
+import { AUTHOR_PAGE_SIZE, getStories, slugOf, urlOf } from '../lib/posts';
+
+interface Props {
+  page: number;
+}
+const { page } = Astro.props;
+const stories = await getStories();
+const pages = Math.max(1, Math.ceil(stories.length / AUTHOR_PAGE_SIZE));
+const list = stories.slice((page - 1) * AUTHOR_PAGE_SIZE, page * AUTHOR_PAGE_SIZE);
+const base = `/author/${SITE.author.slug}`;
+const href = (n: number) => (n === 1 ? base : `${base}/page/${n}`);
+
+const sections = SECTIONS.map((s) => ({
+  s,
+  n: stories.filter((p) => p.data.section === s).length,
+})).filter((x) => x.n > 0);
+
+// Open-source work links to its Explained piece once that piece is published, GitHub until then.
+const projects = AUTHOR.projects.map((p) => {
+  const piece = p.explained
+    ? stories.find((s) => slugOf(s) === p.explained && s.data.status !== 'draft')
+    : undefined;
+  return {
+    ...p,
+    href: piece ? urlOf(piece) : p.github,
+    label: piece ? 'Read the Explained piece' : 'On GitHub',
+  };
+});
+
+const sameAs = [
+  SITE.author.url,
+  AUTHOR.profiles.linkedin,
+  AUTHOR.profiles.github,
+  AUTHOR.profiles.medium,
+  AUTHOR.profiles.amazonAuthor,
+].filter(Boolean);
+const personId = `${SITE.url}${base}#person`;
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    url: new URL(href(page), SITE.url).href,
+    mainEntity: { '@id': personId },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': personId,
+    name: SITE.author.name,
+    url: new URL(base, SITE.url).href,
+    image: new URL(portrait.src, SITE.url).href,
+    jobTitle: AUTHOR.jobTitle,
+    worksFor: { '@type': 'Organization', name: AUTHOR.worksFor },
+    alumniOf: AUTHOR.education.map((e) => ({
+      '@type': 'CollegeOrUniversity',
+      name: e.place.split(',')[0],
+    })),
+    homeLocation: { '@type': 'Place', name: AUTHOR.location },
+    sameAs,
+  },
+];
+const title = page === 1 ? SITE.author.name : `${SITE.author.name}, stories page ${page}`;
+---
+
+<Shell
+  title={title}
+  description={`${SITE.author.name}: ${AUTHOR.jobTitle.toLowerCase()} in ${AUTHOR.location} who writes the 2 AM column on Stackvenn. Every story, work history, the book and open-source projects.`}
+  path={href(page)}
+  jsonLd={jsonLd}
+>
+  <article class="container profile">
+    <header class="hero">
+      <Image
+        src={portrait}
+        alt={`Portrait of ${SITE.author.name}`}
+        widths={[240, 480]}
+        sizes="240px"
+        class="portrait"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <div>
+        <h1>{SITE.author.name}</h1>
+        <p class="line">{SITE.author.line}</p>
+        <p class="meta dateline">{AUTHOR.location}</p>
+      </div>
+    </header>
+
+    {page === 1 && (
+      <>
+        {AUTHOR.bio.length > 0 && (
+          <section class="bio prose" aria-label="About">
+            {AUTHOR.bio.map((p) => (
+              <p>{p}</p>
+            ))}
+          </section>
+        )}
+
+        {sections.length > 0 && (
+          <section aria-labelledby="writes-h">
+            <h2 id="writes-h" class="label">
+              What I write about
+            </h2>
+            <ul class="sections">
+              {sections.map(({ s, n }) => (
+                <li>
+                  <a href={`/${s}`}>{SECTION[s].label}</a>
+                  <span class="meta"> · {n}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        <section aria-labelledby="work-h">
+          <h2 id="work-h" class="label">
+            Where I've worked
+          </h2>
+          <ol class="timeline">
+            {AUTHOR.roles.map((r) => (
+              <li>
+                <p class="when meta">{r.period}</p>
+                <div>
+                  <p class="what">
+                    {r.role}, <span>{r.company}</span>
+                  </p>
+                  {r.line && <p class="meta">{r.line}</p>}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section aria-labelledby="edu-h">
+          <h2 id="edu-h" class="label">
+            Education
+          </h2>
+          <ol class="timeline">
+            {AUTHOR.education.map((e) => (
+              <li>
+                <p class="when meta">{e.year}</p>
+                <p class="what">
+                  {e.title}, <span>{e.place}</span>
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section aria-labelledby="book-h" class="book">
+          <h2 id="book-h" class="label">
+            The book
+          </h2>
+          <a class="book-link" href="/book/the-mellivora-paradox">
+            <Image src={bookCover} alt="" width={96} class="cover" />
+            <span>
+              <span class="what">The Mellivora Paradox</span>
+              <!-- slop-ignore: the book's published subtitle -->
+              <span class="meta">A Field Guide for Those Who Refuse To Die</span>
+              <!-- /slop-ignore -->
+            </span>
+          </a>
+        </section>
+
+        <section aria-labelledby="oss-h">
+          <h2 id="oss-h" class="label">
+            Open-source work
+          </h2>
+          <ul class="projects">
+            {projects.map((p) => (
+              <li>
+                <p class="what">{p.name}</p>
+                <p class="meta">{p.what}</p>
+                <a href={p.href}>{p.label}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </>
+    )}
+
+    <section aria-labelledby="stories-h">
+      <h2 id="stories-h" class="label">
+        {page === 1 ? 'Every story' : `Every story, page ${page} of ${pages}`}
+      </h2>
+      <StoryList posts={list} headingLevel="h3" />
+      {pages > 1 && (
+        <nav class="pager" aria-label="Story pages">
+          {page > 1 ? (
+            <a href={href(page - 1)} rel="prev">
+              ← Newer
+            </a>
+          ) : (
+            <span />
+          )}
+          <span class="meta">
+            Page {page} of {pages}
+          </span>
+          {page < pages ? (
+            <a href={href(page + 1)} rel="next">
+              Older →
+            </a>
+          ) : (
+            <span />
+          )}
+        </nav>
+      )}
+    </section>
+
+    {page === 1 && (
+      <section aria-labelledby="contact-h" class="contact">
+        <h2 id="contact-h" class="label">
+          Contact
+        </h2>
+        <p class="email">
+          <span>{SITE.author.email}</span>
+          <button
+            type="button"
+            class="btn btn-secondary btn-sm"
+            data-copy-email={SITE.author.email}
+          >
+            Copy email
+          </button>
+          <span class="copied meta" role="status" aria-live="polite" data-copied />
+        </p>
+        <ul class="links">
+          <li>
+            <a href={AUTHOR.profiles.linkedin} rel="me">
+              LinkedIn
+            </a>
+          </li>
+          <li>
+            <a href={AUTHOR.profiles.github} rel="me">
+              GitHub
+            </a>
+          </li>
+          <li>
+            <a href={SITE.author.url} rel="me">
+              Work with me (iamsrihari.com)
+            </a>
+          </li>
+        </ul>
+      </section>
+    )}
+  </article>
+</Shell>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-email]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      const out = b.parentElement?.querySelector<HTMLElement>('[data-copied]');
+      try {
+        await navigator.clipboard.writeText(b.dataset.copyEmail ?? '');
+        if (out) out.textContent = 'Copied';
+      } catch {
+        if (out) out.textContent = 'Select the address to copy it';
+      }
+    }),
+  );
+</script>
+
+<style>
+  .profile {
+    max-width: calc(var(--w-story) + var(--gutter) + var(--gutter-r));
+    padding-block-start: var(--s-7);
+    display: grid;
+    gap: var(--s-7);
+  }
+  .hero {
+    display: grid;
+    gap: var(--s-5);
+    align-items: end;
+    padding-block-end: var(--s-5);
+    border-block-end: var(--bw-active) solid var(--text);
+  }
+  .hero :global(.portrait) {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: var(--r-full);
+    border: var(--bw) solid var(--border);
+  }
+  h1 {
+    font-family: var(--font-read);
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 72;
+  }
+  .line {
+    margin-block-start: var(--s-2);
+    font-size: var(--fs-standfirst);
+    color: var(--text-soft);
+  }
+  .dateline {
+    margin-block-start: var(--s-1);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-eyebrow);
+  }
+  @media (min-width: 640px) {
+    .hero {
+      grid-template-columns: auto 1fr;
+    }
+  }
+  .label {
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 700;
+    padding-block-end: var(--s-3);
+    margin-block-end: var(--s-4);
+    border-block-end: var(--bw) solid var(--text);
+  }
+  ul,
+  ol {
+    list-style: none;
+    padding: 0;
+  }
+  .sections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+  }
+  .sections a,
+  .what {
+    font-family: var(--font-read);
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
+    color: var(--text);
+  }
+  .sections a {
+    text-decoration: none;
+    display: inline-flex;
+    min-height: var(--size-touch);
+    align-items: center;
+  }
+  .sections a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  .what span {
+    color: var(--text-soft);
+  }
+  .timeline li {
+    display: grid;
+    gap: var(--s-1) var(--s-5);
+    padding-block: var(--s-3);
+    border-block-end: var(--bw) solid var(--border);
+  }
+  @media (min-width: 640px) {
+    .timeline li {
+      grid-template-columns: 11rem 1fr;
+      align-items: baseline;
+    }
+  }
+  .when {
+    font-variant-numeric: tabular-nums;
+  }
+  .book-link {
+    display: inline-flex;
+    gap: var(--s-4);
+    align-items: center;
+    text-decoration: none;
+  }
+  .book-link > span {
+    display: grid;
+    gap: var(--s-1);
+  }
+  .book-link:hover .what {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  .book-link :global(.cover) {
+    width: 64px;
+    height: auto;
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-sm);
+  }
+  .projects {
+    display: grid;
+    gap: var(--s-4);
+  }
+  .projects li {
+    display: grid;
+    gap: var(--s-1);
+    padding-block-end: var(--s-4);
+    border-block-end: var(--bw) solid var(--border);
+  }
+  .email {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: var(--fs-standfirst);
+    color: var(--text);
+    user-select: all;
+  }
+  .email button,
+  .email .copied {
+    user-select: none;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-5);
+    margin-block-start: var(--s-3);
+  }
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--size-touch);
+  }
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    margin-block-start: var(--s-6);
+  }
+  .pager a {
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    min-height: var(--size-touch);
+    display: inline-flex;
+    align-items: center;
+  }
+  .pager a[rel='next'] {
+    justify-self: end;
+  }
+</style>
