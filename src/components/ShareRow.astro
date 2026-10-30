@@ -1,0 +1,129 @@
+---
+// Share row (PRD §8): plain intent links, no SDKs or trackers. Text labels, not brand icons (DESIGN_SYSTEM §6).
+interface Props {
+  url: string;
+  title: string;
+  label?: string;
+  /** Render the shared "Link copied" toast. Only one share row per page should. */
+  toast?: boolean;
+}
+const { url, title, label = 'Share', toast = true } = Astro.props;
+const u = encodeURIComponent(url);
+const t = encodeURIComponent(title);
+const links = [
+  { name: 'LinkedIn', href: `https://www.linkedin.com/sharing/share-offsite/?url=${u}` },
+  { name: 'X', href: `https://x.com/intent/post?url=${u}&text=${t}` },
+  { name: 'WhatsApp', href: `https://wa.me/?text=${t}%20${u}` },
+  { name: 'Email', href: `mailto:?subject=${t}&body=${u}` },
+];
+---
+
+<nav class="share" aria-label={label}>
+  <span class="label meta">{label}</span>
+  <ul>
+    <li>
+      <button type="button" class="share-link" data-copy-url={url}>
+        Copy link
+      </button>
+    </li>
+    {links.map((l) => (
+      <li>
+        {l.href.startsWith('mailto:') ? (
+          <a class="share-link" href={l.href}>
+            {l.name}
+          </a>
+        ) : (
+          <a class="share-link" href={l.href} target="_blank" rel="noopener">
+            {l.name}
+            <span class="visually-hidden"> (opens in a new tab)</span>
+          </a>
+        )}
+      </li>
+    ))}
+  </ul>
+</nav>
+
+{toast && <div class="toast" role="status" aria-live="polite" data-toast hidden></div>}
+
+<script>
+  const toast = document.querySelector<HTMLElement>('[data-toast]');
+  let timer: number | undefined;
+  const show = (msg: string) => {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.hidden = false;
+    clearTimeout(timer);
+    timer = window.setTimeout(() => (toast.hidden = true), 1600);
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-url]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(b.dataset.copyUrl ?? location.href);
+        show('Link copied');
+      } catch {
+        show('Copy failed. Use the address bar instead.');
+      }
+    }),
+  );
+</script>
+
+<style>
+  .share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-2) var(--s-3);
+  }
+  .label {
+    margin-inline-end: var(--s-1);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+  .share-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--h-button-sm);
+    padding: 0 var(--s-3);
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-full);
+    background: transparent;
+    color: var(--text-soft);
+    font-family: var(--font-ui);
+    font-size: var(--fs-meta);
+    text-decoration: none;
+    transition:
+      border-color var(--d-fast) var(--ease),
+      color var(--d-fast) var(--ease);
+  }
+  .share-link:hover {
+    color: var(--text);
+    border-color: var(--border-control);
+  }
+  @media (pointer: coarse) {
+    .share-link {
+      min-height: var(--size-touch);
+    }
+  }
+  .toast {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: var(--s-6);
+    margin-inline: auto;
+    width: max-content;
+    max-width: calc(100vw - 2 * var(--s-4));
+    padding: var(--s-2) var(--s-4);
+    background: var(--text);
+    color: var(--bg);
+    border-radius: var(--r-full);
+    font-size: var(--fs-ui);
+    z-index: 70;
+  }
+  .toast[hidden] {
+    display: none;
+  }
+</style>
