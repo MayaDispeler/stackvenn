@@ -8,6 +8,7 @@ export const PAGES = [
   { name: 'explained-hub', path: '/explained' },
   { name: 'column', path: '/columns/2-am' },
   { name: 'author', path: '/author/srihari-venkatesan' },
+  { name: 'terms', path: '/terms' },
   { name: 'newsletter', path: '/newsletter' },
   { name: 'experiment', path: '/experiment' },
   { name: '404', path: '/404' },

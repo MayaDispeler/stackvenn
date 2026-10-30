@@ -1,8 +1,12 @@
 ---
-// Terms (the glossary) at /terms/<slug>, in the docs layout.
+// Terms (the glossary) at /terms/<slug> (DESIGN §4): the docs reading column without the
+// Explained sidebar. Definition (standfirst) first, then the body, "Related terms" and "Used in".
 import { render } from 'astro:content';
-import Explained from '../../layouts/Explained.astro';
-import { getPosts, slugOf, type Post } from '../../lib/posts';
+import Shell from '../../layouts/Shell.astro';
+import Corrections from '../../components/Corrections.astro';
+import { SITE } from '../../lib/site';
+import { FORMAT_LABEL, SECTION } from '../../lib/taxonomy';
+import { formatDate, getPosts, getStories, slugOf, urlOf, type Post } from '../../lib/posts';
 
 export async function getStaticPaths() {
   const terms = await getPosts((p) => p.data.format === 'term');
@@ -10,9 +14,206 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props as { post: Post };
-const { Content, headings } = await render(post);
+const { Content } = await render(post);
+const d = post.data;
+const slug = slugOf(post);
+const url = urlOf(post);
+const abs = new URL(url, SITE.url).href;
+const editUrl = `${SITE.repo}/edit/main/${(post.filePath ?? `src/content/${post.id}.md`).replace(/^\.\//, '')}`;
+
+// Related terms: only those that exist (and are visible in this build).
+const terms = await getPosts((p) => p.data.format === 'term');
+const bySlug = new Map(terms.map((t) => [slugOf(t), t]));
+const related = (d.related ?? [])
+  .map((s) => bySlug.get(s))
+  .filter((t): t is Post => !!t && t.id !== post.id);
+
+// Used in: stories whose body links to this term.
+const link = new RegExp(`/terms/${slug}(?![\\w-])`);
+const usedIn = await getStories((p) => link.test(p.body ?? ''));
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTerm',
+    '@id': `${abs}#term`,
+    name: d.headline,
+    description: d.standfirst,
+    url: abs,
+    termCode: slug,
+    inDefinedTermSet: {
+      '@type': 'DefinedTermSet',
+      '@id': `${SITE.url}/terms#set`,
+      name: `${SITE.name} terms`,
+      url: `${SITE.url}/terms`,
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: SITE.name, item: SITE.url },
+      { '@type': 'ListItem', position: 2, name: 'Terms', item: `${SITE.url}/terms` },
+      { '@type': 'ListItem', position: 3, name: d.headline, item: abs },
+    ],
+  },
+];
 ---
 
-<Explained post={post} headings={headings}>
-  <Content />
-</Explained>
+<Shell
+  title={d.headline}
+  description={d.standfirst}
+  path={url}
+  ogType="article"
+  publishedTime={d.published}
+  modifiedTime={d.updated}
+  noindex={d.status === 'draft'}
+  jsonLd={jsonLd}
+>
+  <div class="container term">
+    <article class="content" data-pagefind-body>
+      <span hidden data-pagefind-filter="section">
+        {SECTION[d.section].label}
+      </span>
+      <span hidden data-pagefind-filter="format">
+        {FORMAT_LABEL[d.format]}
+      </span>
+      <header>
+        <p class="eyebrow" data-pagefind-ignore>
+          <a href="/terms">Terms</a> <span aria-hidden="true">·</span>{' '}
+          <a href={`/${d.section}`}>{SECTION[d.section].label}</a>
+        </p>
+        <h1>{d.headline}</h1>
+        <p class="standfirst">{d.standfirst}</p>
+        <p class="meta" data-pagefind-ignore>
+          Updated{' '}
+          <time datetime={(d.updated ?? d.published).toISOString()}>
+            {formatDate(d.updated ?? d.published)}
+          </time>
+        </p>
+      </header>
+
+      <div class="prose term-body">
+        <Content />
+      </div>
+
+      {related.length > 0 && (
+        <section class="links" aria-labelledby="related-h" data-pagefind-ignore>
+          <h2 id="related-h">Related terms</h2>
+          <ul>
+            {related.map((t) => (
+              <li>
+                <a href={urlOf(t)}>{t.data.headline}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {usedIn.length > 0 && (
+        <section class="links" aria-labelledby="used-h" data-pagefind-ignore>
+          <h2 id="used-h">Used in</h2>
+          <ul>
+            {usedIn.map((s) => (
+              <li>
+                <a href={urlOf(s)}>{s.data.headline}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {d.sources.length > 0 && (
+        <section class="links" aria-labelledby="sources-h" data-pagefind-ignore>
+          <h2 id="sources-h">Sources</h2>
+          <ul>
+            {d.sources.map((s) => (
+              <li>
+                <a href={s.url}>{s.title}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <Corrections items={d.corrections} />
+
+      <footer class="foot meta">
+        <a href="/terms">All terms</a>
+        <a href={editUrl}>Edit on GitHub</a>
+      </footer>
+    </article>
+  </div>
+</Shell>
+
+<style>
+  .term {
+    padding-block-start: var(--s-6);
+  }
+  .content {
+    min-width: 0;
+    max-width: var(--w-explained);
+  }
+  h1 {
+    margin-block-start: var(--s-3);
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+    font-weight: 700;
+    letter-spacing: var(--ls-h1);
+  }
+  .standfirst {
+    margin-block-start: var(--s-3);
+    font-size: var(--fs-standfirst);
+    line-height: var(--lh-standfirst);
+    color: var(--text-muted);
+  }
+  header .meta {
+    margin-block: var(--s-4) var(--s-6);
+  }
+  .term-body {
+    font-family: var(--font-ui);
+    max-width: none;
+  }
+  .term-body :global(h2),
+  .term-body :global(h3) {
+    font-family: var(--font-ui);
+    font-weight: 700;
+  }
+  .eyebrow a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .eyebrow a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+  .links {
+    margin-block-start: var(--s-7);
+  }
+  .links h2 {
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding-block-end: var(--s-3);
+    margin-block-end: var(--s-3);
+    border-block-end: var(--bw) solid var(--border);
+  }
+  .links ul {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--s-2);
+  }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-4);
+    margin-block-start: var(--s-8);
+    padding-block-start: var(--s-5);
+    border-block-start: var(--bw) solid var(--border);
+  }
+</style>
