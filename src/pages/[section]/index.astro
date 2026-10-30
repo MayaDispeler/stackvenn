@@ -1,29 +1,10 @@
 ---
-// Interim section front: title, description, list. The full section front (lead + pagination) lands in Phase 2b.
-import List from '../../layouts/List.astro';
-import StoryList from '../../components/StoryList.astro';
-import { getStories } from '../../lib/posts';
-import { SECTION, SECTIONS, type Section } from '../../lib/taxonomy';
+import SectionFront from '../../components/SectionFront.astro';
+import { SECTIONS, type Section } from '../../lib/taxonomy';
 
 export function getStaticPaths() {
   return SECTIONS.map((section) => ({ params: { section } }));
 }
-
-const section = Astro.params.section as Section;
-const posts = await getStories((p) => p.data.section === section);
-const meta = SECTION[section];
 ---
 
-<List
-  title={meta.label}
-  heading={meta.label}
-  lede={meta.description}
-  description={`${meta.label} on Stackvenn: ${meta.description}`}
-  path={`/${section}`}
->
-  {posts.length ? (
-    <StoryList posts={posts} showSection={false} />
-  ) : (
-    <p class="meta">Nothing in {meta.label} yet.</p>
-  )}
-</List>
+<SectionFront section={Astro.params.section as Section} page={1} />

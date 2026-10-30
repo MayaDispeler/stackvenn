@@ -1,0 +1,18 @@
+---
+// /<section>/page/<n> for n ≥ 2. Page 1 is /<section> itself, so it never exists at /page/1.
+import SectionFront from '../../../components/SectionFront.astro';
+import { SECTION_PAGE_SIZE as PAGE_SIZE, getStories } from '../../../lib/posts';
+import { SECTIONS, type Section } from '../../../lib/taxonomy';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const section of SECTIONS) {
+    const n = (await getStories((p) => p.data.section === section)).length;
+    const pages = Math.max(1, Math.ceil(Math.max(0, n - 1) / PAGE_SIZE));
+    for (let page = 2; page <= pages; page++) paths.push({ params: { section, n: String(page) } });
+  }
+  return paths;
+}
+---
+
+<SectionFront section={Astro.params.section as Section} page={Number(Astro.params.n)} />

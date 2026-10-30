@@ -128,7 +128,7 @@ Job: within 5 seconds, a visitor knows what Stackvenn is, sees what's important 
 
 ## 5. Other pages
 
-- **Section front** (`/<section>`): the section name as a large title, its one-line description, a lead story (image, headline, standfirst), then a rule-separated list. Paginated at `/<section>/page/<n>` with "Newer" / "Older" links.
+- **Section front** (`/<section>`): the section name as a large title, its one-line description, a lead story (image, headline, standfirst), then a rule-separated list. Paginated at `/<section>/page/<n>` with "Newer" / "Older" links. 10 stories per page after the lead; page 2 onward is titled "<Section>, page <n>". **Empty sections** show "The first <Section> stories are being written.", links to the sections that do have stories (with counts) and RSS, never a blank page.
 - **Explained hub** (`/explained`): pieces grouped by section, with level and "Tested with".
 - **Column page** (`/columns/2-am`): column name, one line about it, all pieces newest first.
 - **Author page** (`/author/srihari-venkatesan`): portrait, a short bio, the expertise list with proof links (projects, talks, book), a "Hire / work with me" link to iamsrihari.com, all stories, and Person JSON-LD.
