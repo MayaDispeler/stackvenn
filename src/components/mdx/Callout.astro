@@ -1,0 +1,51 @@
+---
+// Callout (DESIGN_SYSTEM §7): Note, Tip, Warning or Danger. The 3px rule carries the semantic colour;
+// Danger uses the accent. The label is real text, so the meaning never rides on colour alone.
+interface Props {
+  type?: 'note' | 'tip' | 'warning' | 'danger';
+  title?: string;
+}
+const { type = 'note', title } = Astro.props;
+const LABEL = { note: 'Note', tip: 'Tip', warning: 'Warning', danger: 'Danger' };
+---
+
+<aside class:list={['callout', type]} aria-label={LABEL[type]}>
+  <p class="label">{title ?? LABEL[type]}</p>
+  <div class="content">
+    <slot />
+  </div>
+</aside>
+
+<style>
+  .callout {
+    margin-block: var(--s-6);
+    padding: var(--s-4) var(--s-5);
+    background: var(--surface);
+    border: var(--bw) solid var(--border);
+    border-inline-start: var(--bw-callout) solid var(--info);
+    border-radius: var(--r-md);
+  }
+  .tip {
+    border-inline-start-color: var(--success);
+  }
+  .warning {
+    border-inline-start-color: var(--warning);
+  }
+  .danger {
+    border-inline-start-color: var(--accent);
+  }
+  .label {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: var(--fs-ui);
+    color: var(--text);
+    margin-block-end: var(--s-1);
+  }
+  .content :global(> * + *) {
+    margin-block-start: var(--s-2);
+  }
+  .content :global(p) {
+    font-size: var(--fs-ui);
+    line-height: var(--lh-body);
+  }
+</style>

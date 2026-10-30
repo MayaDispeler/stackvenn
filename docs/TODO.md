@@ -42,7 +42,7 @@ Rewritten 2026-10-29 for the newspaper editorial model (PRD §5–§9). Old item
 - [ ] Front page: masthead (Venn, wordmark, IST date, promise), lead story + 3–4 top stories, section bands, Most read (editor picks), Explained strip, 2 AM column block, newsletter. `src/data/frontpage.json` for picks.
 - [x] Section fronts: large title, lead story, list, pagination at `/<section>/page/<n>`. Done 2026-10-30, with a designed empty state for sections that have no stories yet.
 - [x] Story page: kicker, headline, standfirst, byline with avatar, dateline + Updated, reading time, share row, pull quotes, sidenotes, sources, author box, "More in <Section>", Most read, Giscus on click. Done 2026-10-30; "Most read" is labelled Editor's picks until PostHog data exists, comments show "Comments open soon" until #6. Image lightbox still to do.
-- [ ] Explained page: sidebar (Paths / All Explained), meta row, "Explained in 60 seconds" box, Copy Markdown, Open in ▾, TOC scroll-spy, heading anchors, steps, callouts, prev/next, "Helpful?", Edit on GitHub, changelog.
+- [ ] Explained page: sidebar (Paths / All Explained), meta row, "Explained in 60 seconds" box, Copy Markdown, Open in ▾, TOC scroll-spy, heading anchors, steps, callouts, prev/next, "Helpful?", Edit on GitHub, changelog. **Partial (2026-10-30):** done: All Explained sidebar, meta row, 60-second box, Copy Markdown, Open in (ChatGPT, Claude, Perplexity, .md), scroll-spy TOC, Steps and Callout components, Edit on GitHub. Still to do: Paths view (needs a first series), heading anchors, prev/next, "Helpful?", changelog.
 - [ ] Column page, Explained hub, author page, About, Newsletter (+ issue archive), /experiment, Terms index and term page, tool page shell, book page, 404, search page.
 - [ ] Writing desk at `/admin`: evaluate Decap CMS vs Sveltia CMS (GitHub backend, draft → review workflow, OAuth proxy on a free Cloudflare Worker), collections matching the schema, mobile-friendly.
 - [ ] [H] GitHub OAuth app for the writing desk (issue with exact steps, added to #12).
@@ -56,7 +56,7 @@ Rewritten 2026-10-29 for the newspaper editorial model (PRD §5–§9). Old item
 ## Phase 3 — Reachability (REACHABILITY.md)
 - [x] Preview safety: every host except stackvenn.in is noindex (X-Robots-Tag + disallow-all robots.txt), with unit tests (Srihari, 2026-10-30).
 - [ ] Cloudflare bot and AI settings, Crawler Hints, HTTPS/HSTS, caching (§2).
-- [ ] robots.txt with Content Signals, sitemap index, RSS, JSON Feed, llms.txt, llms-full.txt, `.md` twins (§3).
+- [ ] robots.txt with Content Signals, sitemap index, RSS, JSON Feed, llms.txt, llms-full.txt, `.md` twins (§3). **Partial:** `.md` twins for every story done 2026-10-30; production robots.txt (without Content Signals) and basic RSS exist.
 - [ ] SEO build checks: titles, descriptions, canonicals, H1, alt text, internal-link minimums, duplicate detection (§4).
 - [ ] JSON-LD for all page types plus a validator in CI (§5).
 - [ ] OG image generator (Satori) using the design tokens.

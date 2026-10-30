@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-30: Explained page
+
+- Copy Markdown and Open in (ChatGPT, Claude, Perplexity, View as Markdown) on every Explained piece.
+- `/<section>/<slug>.md`: a clean Markdown twin of every story.
+- MDX components: `Steps` and `Callout` (Note, Tip, Warning, Danger).
+- Edit on GitHub links to the real file (.md or .mdx).
+
 ## 2026-10-30: Section fronts
 
 - All six sections: large title, description, lead story, paginated list (`/<section>/page/<n>`), CollectionPage JSON-LD, designed empty state.

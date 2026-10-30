@@ -1,0 +1,159 @@
+---
+// "Copy Markdown" and "Open in" (DESIGN §4). The menu is a native <details>, so it works without JS
+// and from the keyboard. Copy fetches the .md twin; if that fails it selects the article text.
+interface Props {
+  /** Absolute URL of the page. */
+  url: string;
+  /** Path of the .md twin, e.g. /ai/foo.md */
+  markdown: string;
+}
+const { url, markdown } = Astro.props;
+const prompt = encodeURIComponent(`Read ${url} and help me apply it to my project.`);
+const targets = [
+  { name: 'ChatGPT', href: `https://chatgpt.com/?q=${prompt}` },
+  { name: 'Claude', href: `https://claude.ai/new?q=${prompt}` },
+  { name: 'Perplexity', href: `https://www.perplexity.ai/search?q=${prompt}` },
+];
+---
+
+<div class="actions">
+  <button type="button" class="btn btn-secondary btn-sm" data-copy-md={markdown}>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+    </svg>
+    Copy Markdown
+  </button>
+  <details class="open-in">
+    <summary class="btn btn-secondary btn-sm">
+      Open in <span aria-hidden="true">▾</span>
+    </summary>
+    <ul class="menu">
+      {targets.map((t) => (
+        <li>
+          <a href={t.href} target="_blank" rel="noopener">
+            {t.name}
+            <span class="visually-hidden"> (opens in a new tab)</span>
+          </a>
+        </li>
+      ))}
+      <li>
+        <a href={markdown}>View as Markdown</a>
+      </li>
+    </ul>
+  </details>
+  <p class="toast" role="status" aria-live="polite" data-md-toast hidden></p>
+</div>
+
+<script>
+  const toast = document.querySelector<HTMLElement>('[data-md-toast]');
+  let timer: number | undefined;
+  const show = (msg: string) => {
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.hidden = false;
+    clearTimeout(timer);
+    timer = window.setTimeout(() => (toast.hidden = true), 1600);
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-md]').forEach((b) =>
+    b.addEventListener('click', async () => {
+      try {
+        const res = await fetch(b.dataset.copyMd ?? '');
+        if (!res.ok) throw new Error(String(res.status));
+        await navigator.clipboard.writeText(await res.text());
+        show('Copied as Markdown');
+      } catch {
+        const body = document.querySelector('.explained-body');
+        if (body) {
+          const range = document.createRange();
+          range.selectNodeContents(body);
+          const sel = getSelection();
+          sel?.removeAllRanges();
+          sel?.addRange(range);
+        }
+        show('Text selected. Press Ctrl+C to copy.');
+      }
+    }),
+  );
+  // Close the menu on Escape or an outside click.
+  document.querySelectorAll<HTMLDetailsElement>('.open-in').forEach((d) => {
+    document.addEventListener('click', (e) => {
+      if (d.open && !d.contains(e.target as Node)) d.open = false;
+    });
+    d.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        d.open = false;
+        d.querySelector('summary')?.focus();
+      }
+    });
+  });
+</script>
+
+<style>
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    align-items: center;
+  }
+  .open-in {
+    position: relative;
+  }
+  .open-in summary {
+    list-style: none;
+  }
+  .open-in summary::-webkit-details-marker {
+    display: none;
+  }
+  .menu {
+    position: absolute;
+    z-index: 20;
+    inset-inline-start: 0;
+    top: calc(100% + var(--s-1));
+    min-width: 200px;
+    list-style: none;
+    padding: var(--s-1);
+    background: var(--raised);
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-menu);
+  }
+  .menu a {
+    display: flex;
+    align-items: center;
+    min-height: var(--size-touch);
+    padding: 0 var(--s-3);
+    border-radius: var(--r-sm);
+    color: var(--text);
+    text-decoration: none;
+  }
+  .menu a:hover {
+    background: var(--surface);
+  }
+  .toast {
+    position: fixed;
+    inset-inline: 0;
+    inset-block-end: var(--s-6);
+    margin-inline: auto;
+    width: max-content;
+    max-width: calc(100vw - 2 * var(--s-4));
+    padding: var(--s-2) var(--s-4);
+    background: var(--text);
+    color: var(--bg);
+    border-radius: var(--r-full);
+    z-index: 70;
+  }
+  .toast[hidden] {
+    display: none;
+  }
+</style>
