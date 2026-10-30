@@ -12,7 +12,7 @@ Product first. Srihari is travelling and reviews the UI meanwhile. Marketing, re
 - Code and docs PRs: merge on green CI and a clean Impeccable audit. Content PRs (`content/*`) wait for Srihari. Never touch `cms/*` PRs.
 - Every PR: `npm run check` (includes `npm run slop`), docs and TODO.md updated in the same PR, then this file.
 - Lighthouse and screenshots only for pages touched; full suite at the end of each phase.
-- Preview: `bash <kit>/.tools/rebuild-preview.sh`, then `SHOW_DRAFTS=true npx astro dev --port 4321` from `<kit>/stackvenn-preview`. Tests use :4322.
+- Preview: `bash scripts/rebuild-preview.sh` (expects the `preview` worktree at `<kit>/stackvenn-preview`: `git worktree add ../stackvenn-preview preview`), then `SHOW_DRAFTS=true npx astro dev --port 4321` from `<kit>/stackvenn-preview`. Tests use :4322.
 - Deployed preview (main only, noindex): https://stackvenn.ksvhari007.workers.dev (`npm run deploy`).
 - After each merged PR, one short paragraph on issue #12: what changed, the localhost path, what waits on Srihari.
 
