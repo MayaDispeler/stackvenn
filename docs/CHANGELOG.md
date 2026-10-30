@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-30: Writing, not projects
+
+- Author page: the "Open-source work" section is gone; GitHub stays under contact. No Amazon author link in `sameAs`.
+- Docs: project seed pieces, repo-README links and repo-reading ideas removed (see DECISIONS).
+- `docs/NEXT.md`: where the build stands and the exact next step, updated after every merged PR.
+
 ## 2026-10-30: Writing desk
 
 - `/admin`: Decap CMS 3.16.3 (SRI-pinned), editorial workflow on GitHub, fields matching the schema, noindex on every host.
@@ -8,7 +14,7 @@
 
 ## 2026-10-30: Author page, corrections
 
-- Author page with portrait, line, dateline, sections, work and education timelines, book, open-source work, every story (paginated), copyable email, ProfilePage + Person JSON-LD.
+- Author page with portrait, line, dateline, sections, work and education timelines, book, every story (paginated), copyable email, ProfilePage + Person JSON-LD.
 - `/about/srihari` 301s to the author page.
 - Schema field `corrections`, rendered as "Correction, <date>: …".
 

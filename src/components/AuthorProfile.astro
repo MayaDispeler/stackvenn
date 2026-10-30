@@ -10,7 +10,7 @@ import bookCover from '../assets/book/the-mellivora-paradox.webp';
 import { AUTHOR } from '../data/author';
 import { SITE } from '../lib/site';
 import { SECTION, SECTIONS } from '../lib/taxonomy';
-import { AUTHOR_PAGE_SIZE, getStories, slugOf, urlOf } from '../lib/posts';
+import { AUTHOR_PAGE_SIZE, getStories } from '../lib/posts';
 
 interface Props {
   page: number;
@@ -27,24 +27,11 @@ const sections = SECTIONS.map((s) => ({
   n: stories.filter((p) => p.data.section === s).length,
 })).filter((x) => x.n > 0);
 
-// Open-source work links to its Explained piece once that piece is published, GitHub until then.
-const projects = AUTHOR.projects.map((p) => {
-  const piece = p.explained
-    ? stories.find((s) => slugOf(s) === p.explained && s.data.status !== 'draft')
-    : undefined;
-  return {
-    ...p,
-    href: piece ? urlOf(piece) : p.github,
-    label: piece ? 'Read the Explained piece' : 'On GitHub',
-  };
-});
-
 const sameAs = [
   SITE.author.url,
   AUTHOR.profiles.linkedin,
   AUTHOR.profiles.github,
   AUTHOR.profiles.medium,
-  AUTHOR.profiles.amazonAuthor,
 ].filter(Boolean);
 const personId = `${SITE.url}${base}#person`;
 const jsonLd = [
@@ -76,7 +63,7 @@ const title = page === 1 ? SITE.author.name : `${SITE.author.name}, stories page
 
 <Shell
   title={title}
-  description={`${SITE.author.name}: ${AUTHOR.jobTitle.toLowerCase()} in ${AUTHOR.location} who writes the 2 AM column on Stackvenn. Every story, work history, the book and open-source projects.`}
+  description={`${SITE.author.name}: ${AUTHOR.jobTitle.toLowerCase()} in ${AUTHOR.location} who writes the 2 AM column on Stackvenn. Every story, work history and the book.`}
   path={href(page)}
   jsonLd={jsonLd}
 >
@@ -172,21 +159,6 @@ const title = page === 1 ? SITE.author.name : `${SITE.author.name}, stories page
               <!-- /slop-ignore -->
             </span>
           </a>
-        </section>
-
-        <section aria-labelledby="oss-h">
-          <h2 id="oss-h" class="label">
-            Open-source work
-          </h2>
-          <ul class="projects">
-            {projects.map((p) => (
-              <li>
-                <p class="what">{p.name}</p>
-                <p class="meta">{p.what}</p>
-                <a href={p.href}>{p.label}</a>
-              </li>
-            ))}
-          </ul>
         </section>
       </>
     )}
@@ -388,16 +360,6 @@ const title = page === 1 ? SITE.author.name : `${SITE.author.name}, stories page
     height: auto;
     border: var(--bw) solid var(--border);
     border-radius: var(--r-sm);
-  }
-  .projects {
-    display: grid;
-    gap: var(--s-4);
-  }
-  .projects li {
-    display: grid;
-    gap: var(--s-1);
-    padding-block-end: var(--s-4);
-    border-block-end: var(--bw) solid var(--border);
   }
   .email {
     display: flex;

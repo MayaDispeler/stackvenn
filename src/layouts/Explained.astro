@@ -69,9 +69,24 @@ const jsonLd = [
   jsonLd={jsonLd}
 >
   <div class="container docs">
-    <details class="sidebar" open data-sidebar>
-      <summary class="btn btn-secondary btn-sm">All Explained</summary>
-      <nav aria-label="Explained">
+    <div class="sidebar" data-sidebar>
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm toggle"
+        aria-expanded="false"
+        aria-controls="explained-nav"
+        data-sidebar-toggle
+      >
+        All Explained
+      </button>
+      <noscript>
+        <style>
+          .sidebar nav {
+            display: grid;
+          }
+        </style>
+      </noscript>
+      <nav id="explained-nav" aria-label="Explained">
         {[...bySection].map(([section, items]) => (
           <details class="group" open={section === d.section}>
             <summary>{SECTION[section].label}</summary>
@@ -87,7 +102,7 @@ const jsonLd = [
           </details>
         ))}
       </nav>
-    </details>
+    </div>
 
     <article class="content" data-pagefind-body>
       <span hidden data-pagefind-filter="section">
@@ -189,11 +204,13 @@ const jsonLd = [
 
 <script>
   // Sidebar starts collapsed on small screens; open on desktop (no-JS default is open).
-  const sidebar = document.querySelector<HTMLDetailsElement>('[data-sidebar]');
-  const wide = matchMedia('(min-width: 960px)');
-  const syncSidebar = () => sidebar && (sidebar.open = wide.matches);
-  wide.addEventListener('change', syncSidebar);
-  syncSidebar();
+  const sidebar = document.querySelector<HTMLElement>('[data-sidebar]');
+  const toggle = sidebar?.querySelector<HTMLButtonElement>('[data-sidebar-toggle]');
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(open));
+    sidebar?.classList.toggle('open', open);
+  });
 
   // TOC scroll-spy.
   const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
@@ -226,16 +243,13 @@ const jsonLd = [
   }
 
   /* Sidebar */
-  .sidebar > summary {
-    list-style: none;
-  }
-  .sidebar > summary::-webkit-details-marker {
-    display: none;
-  }
   .sidebar nav {
     margin-block-start: var(--s-4);
-    display: grid;
+    display: none;
     gap: var(--s-2);
+  }
+  .sidebar.open nav {
+    display: grid;
   }
   .group > summary {
     cursor: pointer;
@@ -414,8 +428,12 @@ const jsonLd = [
       grid-template-columns: var(--w-sidebar) minmax(0, 1fr);
       gap: var(--s-7);
     }
-    .sidebar > summary {
+    .sidebar .toggle {
       display: none;
+    }
+    .sidebar nav {
+      display: grid;
+      margin-block-start: 0;
     }
     .sidebar,
     .toc {

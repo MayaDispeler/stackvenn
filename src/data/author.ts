@@ -44,24 +44,6 @@ export const AUTHOR = {
     linkedin: 'https://www.linkedin.com/in/sriharivvenkatesan',
     github: 'https://github.com/Mayadispeler',
     medium: 'https://medium.com/@ksvhari007',
-    /** No Amazon author page is linked anywhere on iamsrihari.com yet. */
-    amazonAuthor: '',
+    // No Amazon author page exists (Srihari, 2026-10-30), so sameAs leaves it out.
   },
-  projects: [
-    {
-      name: 'Orqestra',
-      // The Orqestra README's own tagline.
-      what: 'Your personal orqestra of specialists. Assembled on demand.',
-      // iamsrihari.com links MayaDispeler/TheOrqestra; the Orqestra README links sriharivvenkatesan/orqestra-ai.
-      github: 'https://github.com/MayaDispeler/TheOrqestra',
-      explained: 'how-orqestra-plans-a-build',
-    },
-    {
-      name: 'Savepoint',
-      // iamsrihari.com's tagline for Savepoint.
-      what: 'Undo for AI agents that work on old software.',
-      github: 'https://github.com/MayaDispeler/savepoint',
-      explained: '',
-    },
-  ],
 } as const;

@@ -2,6 +2,14 @@
 
 Newest first. Each entry: what was decided, why, and who decided.
 
+## 2026-10-30: Writing and ideas, not projects (Srihari)
+
+**Rule:** Stackvenn is a publication for Srihari's writing and ideas, not a showcase of his projects. No project pages, no project Explained pieces, no "Open-source work" on the author page, no links from his repos' READMEs, and the ideas pipeline never reads his code repos.
+
+**What stays:** the Explained format, for explaining topics and ideas. GitHub stays as a profile link under contact. No Amazon author page exists, so it is not in `sameAs`.
+
+**Done:** PR #25 (an Explained piece about one of his projects) closed unmerged and its branch deleted; project mentions removed from code, docs and tests.
+
 ## 2026-10-30: Writing desk is Decap CMS (Claude, per Srihari's brief)
 
 **Choice:** Decap CMS 3.16.3, loaded from unpkg with a Subresource Integrity hash, GitHub backend, `publish_mode: editorial_workflow`. Each save opens a draft pull request; the board moves it Draft → In review → Ready; Publish merges it. Srihari's Publish is his approval.
