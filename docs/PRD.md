@@ -182,7 +182,7 @@ faq: [{ q, a }]?
 
 1. **Migrate all 19 existing articles** in `data/blog-posts.json` (3 from the "2 AM" column, 11 LinkedIn, 4 Medium, 1 Kissflow), published **in full** at their new URLs (`MIGRATION.md`). The copies on LinkedIn and Medium stay up, but Stackvenn never links readers there.
 2. **Book page** for *The Mellivora Paradox* (Amazon link, synopsis, sample chapter if allowed).
-3. **5 Explained pieces** built from real work: Orqestra (97 agents, 101 skills), Savepoint, Stack Failure Drill, hybrid-retrieval RAG at Kissflow (only the numbers already public on iamsrihari.com).
+3. ~~5 Explained pieces built from real projects.~~ Struck (Srihari, 2026-10-30): Stackvenn publishes his writing and ideas, not a showcase of his projects. Explained pieces explain topics and ideas; the Terms pages prove the layout first.
 4. **20 Terms** (MCP, RAG, hybrid retrieval, LLM-as-judge, token budget, harness engineering…).
 5. **1 tool:** an LLM token-cost calculator.
 6. **"Start here" path** and the **/experiment** page with a month-0 baseline.

@@ -1,0 +1,91 @@
+---
+// "Helpful?" on Explained pieces (DESIGN §4). Sends `helpful_vote` through track(), which is a
+// no-op until PostHog exists. One vote per piece per browser; the count is never shown.
+interface Props {
+  slug: string;
+}
+const { slug } = Astro.props;
+---
+
+<div class="helpful" data-helpful={slug}>
+  <p class="q" id="helpful-q">
+    Was this helpful?
+  </p>
+  <div class="btns" role="group" aria-labelledby="helpful-q">
+    <button type="button" class="btn btn-secondary btn-sm" data-vote="yes">
+      Yes
+    </button>
+    <button type="button" class="btn btn-secondary btn-sm" data-vote="no">
+      No
+    </button>
+  </div>
+  <p class="meta thanks" role="status" aria-live="polite"></p>
+</div>
+
+<script>
+  import { track } from '../lib/analytics';
+
+  const box = document.querySelector<HTMLElement>('[data-helpful]');
+  const slug = box?.dataset.helpful ?? '';
+  const key = `helpful:${slug}`;
+  const thanks = box?.querySelector<HTMLElement>('.thanks');
+  const buttons = [...(box?.querySelectorAll<HTMLButtonElement>('[data-vote]') ?? [])];
+
+  const done = (vote: string) => {
+    buttons.forEach((b) => {
+      b.disabled = true;
+      b.setAttribute('aria-pressed', String(b.dataset.vote === vote));
+    });
+    if (thanks) thanks.textContent = 'Thanks. Your answer helps decide what gets updated.';
+  };
+
+  let previous: string | null = null;
+  try {
+    previous = localStorage.getItem(key);
+  } catch {
+    previous = null;
+  }
+  if (previous) done(previous);
+
+  buttons.forEach((b) =>
+    b.addEventListener('click', () => {
+      const vote = b.dataset.vote ?? '';
+      track('helpful_vote', { slug, vote });
+      try {
+        localStorage.setItem(key, vote);
+      } catch {
+        // Private mode: the vote still counts once.
+      }
+      done(vote);
+    }),
+  );
+</script>
+
+<style>
+  .helpful {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-4);
+    margin-block-start: var(--s-8);
+    padding: var(--s-4) var(--s-5);
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-md);
+    background: var(--surface);
+  }
+  .q {
+    font-weight: 600;
+    color: var(--text);
+  }
+  .btns {
+    display: flex;
+    gap: var(--s-2);
+  }
+  .btns button[aria-pressed='true'] {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .thanks:empty {
+    display: none;
+  }
+</style>

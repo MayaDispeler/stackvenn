@@ -12,7 +12,7 @@ Tick boxes in the PR that completes them.
 - [ ] [H] Accounts and tokens: dev.to API key; Hashnode token + publication; Bluesky app password; Mastodon account + token; LinkedIn developer app with "Share on LinkedIn" + OpenID; Threads app; Resend account (Claude adds the DNS records).
 - [ ] [H] Enable GitHub Discussions and install the Giscus app on the repo.
 - [ ] [H] Decide the Training-crawler setting (default: Allow) and the masthead line (default in DESIGN.md §2).
-- [ ] [H] Upload source material: the cream-blazer portrait, book cover, and any project numbers he approves for publishing.
+- [ ] [H] Upload source material: the cream-blazer portrait and book cover.
 - [x] [H] Grant Claude access to the iamsrihari.com repo (Local at Portfolio Pages/Portfolio; no action needed.) (for covers under `public/writing`, the Writing section and the Notion sync code).
 - [ ] [H] LinkedIn data export: Settings → Data privacy → Get a copy of your data → tick **Articles** → request. LinkedIn emails a download link; put the zip in `imports/linkedin/`. This is the only reliable way to get the 11 LinkedIn article bodies (LinkedIn blocks automated fetching).
 - [ ] [H] Medium export: Settings → Security and apps → Download your information. Put the zip in `imports/medium/`. (Claude first tries Medium's public RSS and page fetch; the export is the fallback.)
@@ -42,7 +42,7 @@ Rewritten 2026-10-29 for the newspaper editorial model (PRD §5–§9). Old item
 - [ ] Front page: masthead (Venn, wordmark, IST date, promise), lead story + 3–4 top stories, section bands, Most read (editor picks), Explained strip, 2 AM column block, newsletter. `src/data/frontpage.json` for picks.
 - [x] Section fronts: large title, lead story, list, pagination at `/<section>/page/<n>`. Done 2026-10-30, with a designed empty state for sections that have no stories yet.
 - [x] Story page: kicker, headline, standfirst, byline with avatar, dateline + Updated, reading time, share row, pull quotes, sidenotes, sources, author box, "More in <Section>", Most read, Giscus on click. Done 2026-10-30; "Most read" is labelled Editor's picks until PostHog data exists, comments show "Comments open soon" until #6. Image lightbox still to do.
-- [ ] Explained page: sidebar (Paths / All Explained), meta row, "Explained in 60 seconds" box, Copy Markdown, Open in ▾, TOC scroll-spy, heading anchors, steps, callouts, prev/next, "Helpful?", Edit on GitHub, changelog. **Partial (2026-10-30):** done: All Explained sidebar, meta row, 60-second box, Copy Markdown, Open in (ChatGPT, Claude, Perplexity, .md), scroll-spy TOC, Steps and Callout components, Edit on GitHub. Still to do: Paths view (needs a first series), heading anchors, prev/next, "Helpful?", changelog.
+- [ ] Explained page: sidebar (Paths / All Explained), meta row, "Explained in 60 seconds" box, Copy Markdown, Open in ▾, TOC scroll-spy, heading anchors, steps, callouts, prev/next, "Helpful?", Edit on GitHub, changelog. **Partial (2026-10-30):** done: All Explained sidebar, meta row, 60-second box, Copy Markdown, Open in (ChatGPT, Claude, Perplexity, .md), scroll-spy TOC, Steps and Callout components, Edit on GitHub. Heading anchors, prev/next within a path (series + order) and "Helpful?" (sends helpful_vote once PostHog exists) done 2026-10-30. Still to do: Paths view and changelog (need a first series).
 - [ ] Column page, Explained hub, author page, About, Newsletter (+ issue archive), /experiment, Terms index and term page, tool page shell, book page, 404, search page. **Partial (2026-10-30):** column page, 404 (search + stories), search page, book page and Explained hub done. Author page done (code); its bio, role lines and the /about page wait in a content PR. Still to do: Newsletter, /experiment, Terms, tool shell.
 - [x] Writing desk at `/admin` (2026-10-30: Decap CMS, see DECISIONS; login works once #30 is done): evaluate Decap CMS vs Sveltia CMS (GitHub backend, draft → review workflow, OAuth proxy on a free Cloudflare Worker), collections matching the schema, mobile-friendly.
 - [x] [H] GitHub OAuth app for the writing desk: issue #30, added to #12.
@@ -76,12 +76,12 @@ Rewritten 2026-10-29 for the newspaper editorial model (PRD §5–§9). Old item
 - [ ] `docs/VOICE.md` learned from Srihari's existing stories (tone, sentence length, recurring phrases, what he never says).
 - [ ] Run the full migration in `docs/MIGRATION.md`: all 19 articles from `data/blog-posts.json` published in full at their `/<section>/<slug>` URLs, the book page, and the Notion sync retired.
 - [ ] Book page.
-- [ ] 5 Explained pieces from real projects (draft PRs with `[[CONFIRM]]` items for Srihari).
+- ~~5 Explained pieces from real projects.~~ Struck (Srihari, 2026-10-30): Stackvenn is for his writing and ideas, not his projects.
 - [ ] 20 Terms.
 - [ ] Token-cost calculator tool.
 - [ ] "Start here" path and /experiment month-0 baseline.
 - [ ] iamsrihari.com: Writing section fed from stackvenn.in `/feed.json` (replacing the Notion feed), defensive 301s for `/writing/<slug>` and `/blog/<slug>` to stackvenn.in (MIGRATION §1 map), `rel="me"` links, and the about page linking to Stackvenn.
-- [ ] Repo READMEs (Orqestra, Savepoint, etc.) link to their Explained pieces.
+- ~~Repo READMEs link to their Explained pieces.~~ Struck (Srihari, 2026-10-30): no project content on Stackvenn.
 
 ## Phase 6 — Automation (MARKETING_AUTOMATION.md)
 - [ ] deploy.yml, distribute.yml (+ `data/distribution.json`), newsletter.yml, ideas.yml, editorial gate, report.yml, refresh.yml, links.yml, tokens.yml, keepalive.yml, costs.yml.

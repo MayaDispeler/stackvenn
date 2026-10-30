@@ -38,7 +38,7 @@ Any missing secret means that channel is skipped with a warning, never a failed 
 
 ### 3.1 `ideas.yml`: weekly idea pipeline (Mon 06:00 IST, cron `30 0 * * 1`)
 Claude:
-1. Reads GSC queries with impressions but no matching post, PostHog search terms with no results, open `idea` issues, and Srihari's repos' recent commits and READMEs (his real work is the best source).
+1. Reads only these sources: Srihari's existing articles (themes he has written about and could take further), Search Console queries with impressions but no matching story, site searches with no results (PostHog), and `idea:` issues Srihari opens. Never his code repos: Stackvenn is a publication for his writing and ideas, not a showcase of his projects (Srihari, 2026-10-30).
 2. Scores ideas: search demand × Srihari's first-hand experience × gap vs existing results.
 3. Opens up to **2 draft PRs** in `src/content/stories/` with `status: review`. Each PR includes:
    - the full draft in Srihari's voice (learn the voice from `src/content/stories/*` and keep `docs/VOICE.md` updated);
@@ -104,8 +104,8 @@ For posts at positions 8–20 with at least 100 impressions, or older than 9 mon
 
 1. **The experiment story:** publish monthly "This blog runs itself: month N" reports with real numbers (wins and failures). This is the most shareable asset; prepare a Show HN draft for month 3.
 2. **Linkable tools:** the token-cost calculator, an eval-checklist generator, an MCP tool-schema linter. Each gets its own launch notes.
-3. **Original data:** quarterly "State of my agent stack" with real cost and latency numbers from Srihari's projects (only what he approves).
-4. **Series over one-offs:** "Start here", "Building Orqestra", "Evals from zero". Series keep readers and earn links.
+3. **Original data:** a quarterly analysis built on public data and the site's own numbers (/experiment), with the method shown.
+4. **Series over one-offs:** "Start here", "Evals from zero". Series keep readers and earn links.
 5. **Terms flywheel:** each Explained piece links its Terms; each Term links back to the pieces that use it.
 6. **LinkedIn first:** Srihari's existing network is the fastest early channel. Optimise the LinkedIn copy hardest.
 7. **Newsletter referral:** a "Forward this to one engineer who'd use it" line plus a web version. No paid referral tools.
