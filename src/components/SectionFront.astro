@@ -1,0 +1,222 @@
+---
+// Section front (DESIGN §5): section name, one-line description, lead story, then a paginated list.
+// Page 1 is /<section>; later pages are /<section>/page/<n>. Empty sections get a designed empty state.
+import Shell from '../layouts/Shell.astro';
+import LeadStory from './LeadStory.astro';
+import StoryList from './StoryList.astro';
+import { SITE } from '../lib/site';
+import { SECTION, SECTIONS, type Section } from '../lib/taxonomy';
+import { SECTION_PAGE_SIZE as PAGE_SIZE, getStories, type Post } from '../lib/posts';
+
+interface Props {
+  section: Section;
+  page: number;
+}
+const { section, page } = Astro.props;
+const meta = SECTION[section];
+const all = await getStories((p) => p.data.section === section);
+
+// Page 1: the newest story is the lead and the next PAGE_SIZE fill the list. Later pages list the rest.
+const lead: Post | undefined = page === 1 ? all[0] : undefined;
+const rest = all.slice(1);
+const pages = Math.max(1, Math.ceil(rest.length / PAGE_SIZE));
+const list = rest.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+const base = `/${section}`;
+const href = (n: number) => (n === 1 ? base : `${base}/page/${n}`);
+
+// For the empty state: other sections that already have stories.
+const elsewhere = (
+  await Promise.all(
+    SECTIONS.filter((s) => s !== section).map(async (s) => ({
+      s,
+      n: (await getStories((p) => p.data.section === s)).length,
+    })),
+  )
+).filter((x) => x.n > 0);
+
+const title = page === 1 ? meta.label : `${meta.label}, page ${page}`;
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${meta.label} on ${SITE.name}`,
+    description: meta.description,
+    url: new URL(href(page), SITE.url).href,
+    isPartOf: { '@id': `${SITE.url}/#website` },
+  },
+];
+---
+
+<Shell
+  title={title}
+  description={
+    page === 1
+      ? `${meta.label} on Stackvenn: ${meta.description}`
+      : `${meta.label} on Stackvenn, page ${page}: ${meta.description}`
+  }
+  path={href(page)}
+  jsonLd={jsonLd}
+>
+  <div class="container front">
+    <header class="section-head">
+      <h1>{meta.label}</h1>
+      <p class="description">{meta.description}</p>
+      {page > 1 && (
+        <p class="meta">
+          Page {page} of {pages}
+        </p>
+      )}
+    </header>
+
+    {all.length === 0 ? (
+      <section class="empty" aria-labelledby="empty-h">
+        <h2 id="empty-h">The first {meta.label} stories are being written.</h2>
+        <p>
+          Until they're published, the rest of Stackvenn is open.
+          {elsewhere.length > 0 && ' Start with:'}
+        </p>
+        {elsewhere.length > 0 && (
+          <ul class="elsewhere">
+            {elsewhere.map(({ s, n }) => (
+              <li>
+                <a href={`/${s}`}>{SECTION[s].label}</a>
+                <span class="meta">
+                  {' '}
+                  · {n} {n === 1 ? 'story' : 'stories'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p class="meta">
+          New stories in every section reach you through <a href="/rss.xml">RSS</a>.
+        </p>
+      </section>
+    ) : (
+      <>
+        {lead && (
+          <div class:list={['lead-wrap', { ruled: list.length > 0 }]}>
+            <LeadStory post={lead} showSection={false} />
+          </div>
+        )}
+        {list.length > 0 && (
+          <section aria-labelledby="list-h">
+            <h2 id="list-h" class="visually-hidden">
+              {page === 1 ? `More from ${meta.label}` : `${meta.label}, page ${page}`}
+            </h2>
+            <StoryList posts={list} showSection={false} />
+          </section>
+        )}
+        {pages > 1 && (
+          <nav class="pager" aria-label={`${meta.label} pages`}>
+            {page > 1 ? (
+              <a href={href(page - 1)} rel="prev">
+                ← Newer
+              </a>
+            ) : (
+              <span />
+            )}
+            <span class="meta">
+              Page {page} of {pages}
+            </span>
+            {page < pages ? (
+              <a href={href(page + 1)} rel="next">
+                Older →
+              </a>
+            ) : (
+              <span />
+            )}
+          </nav>
+        )}
+      </>
+    )}
+  </div>
+</Shell>
+
+<style>
+  .front {
+    max-width: calc(var(--w-feed) + var(--gutter) + var(--gutter-r));
+    padding-block-start: var(--s-7);
+  }
+  .section-head {
+    padding-block-end: var(--s-5);
+    margin-block-end: var(--s-6);
+    border-block-end: var(--bw-active) solid var(--text);
+  }
+  h1 {
+    font-family: var(--font-ui);
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .description {
+    margin-block-start: var(--s-3);
+    font-family: var(--font-read);
+    font-style: italic;
+    font-size: var(--fs-standfirst);
+    line-height: var(--lh-standfirst);
+    color: var(--text-soft);
+    max-width: var(--measure);
+  }
+  .lead-wrap.ruled {
+    padding-block-end: var(--s-6);
+    margin-block-end: var(--s-6);
+    border-block-end: var(--bw) solid var(--border);
+  }
+  .empty {
+    display: grid;
+    gap: var(--s-4);
+    max-width: var(--measure);
+  }
+  .empty h2 {
+    font-family: var(--font-read);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+    font-weight: 500;
+  }
+  .empty p {
+    color: var(--text-soft);
+  }
+  .elsewhere {
+    list-style: none;
+    padding: 0;
+    border-block-start: var(--bw) solid var(--border);
+  }
+  .elsewhere li {
+    padding-block: var(--s-3);
+    border-block-end: var(--bw) solid var(--border);
+  }
+  .elsewhere a {
+    font-family: var(--font-read);
+    font-size: var(--fs-h3);
+    color: var(--text);
+    text-decoration: none;
+  }
+  .elsewhere a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--s-4);
+    margin-block-start: var(--s-7);
+  }
+  .pager a {
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    min-height: var(--size-touch);
+    display: inline-flex;
+    align-items: center;
+  }
+  .pager a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+  }
+  .pager a[rel='next'] {
+    justify-self: end;
+  }
+</style>

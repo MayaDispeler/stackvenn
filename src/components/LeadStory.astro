@@ -45,7 +45,7 @@ const alt = image ? '' : (d.cover_alt ?? '');
   <p class="standfirst">{d.standfirst}</p>
   <p class="meta">
     By {SITE.author.name} ·{' '}
-    <time datetime={d.published.toISOString()}>{formatDate(d.published)}</time>·{' '}
+    <time datetime={d.published.toISOString()}>{formatDate(d.published)}</time> ·{' '}
     {readingTime(post.body)} min read
   </p>
 </article>

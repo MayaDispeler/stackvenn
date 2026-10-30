@@ -4,6 +4,7 @@ export const PAGES = [
   { name: 'story', path: '/work/fixture-typography' },
   { name: 'explained', path: '/engineering/fixture-explained' },
   { name: 'section', path: '/work' },
+  { name: 'section-careers', path: '/careers' },
   { name: 'explained-hub', path: '/explained' },
   { name: 'author', path: '/author/srihari-venkatesan' },
   { name: '404', path: '/404' },

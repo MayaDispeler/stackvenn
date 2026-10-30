@@ -64,6 +64,9 @@ export async function getPosts(filter?: (p: Post) => boolean): Promise<Post[]> {
   return filter ? all.filter(filter) : all;
 }
 
+/** Stories per section-front page after the lead. */
+export const SECTION_PAGE_SIZE = 10;
+
 export const isStory = (p: Post) => FORMAT_DIR[p.data.format] === 'stories';
 
 export async function getStories(filter?: (p: Post) => boolean): Promise<Post[]> {

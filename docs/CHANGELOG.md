@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-30: Section fronts
+
+- All six sections: large title, description, lead story, paginated list (`/<section>/page/<n>`), CollectionPage JSON-LD, designed empty state.
+- Fixed a missing space in the lead story meta line (front page too).
+
 ## 2026-10-30: Story page
 
 - Byline with avatar, share row (top and end), figures with captions, sidenotes at ≥1200px, author box, comments placeholder, More in <Section>, Editor's picks.
