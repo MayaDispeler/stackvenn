@@ -4,6 +4,8 @@ You are building and running **Stackvenn** (stackvenn.in): a publication by Srih
 The project is an experiment: the site is built, published, distributed and measured end to end by Claude, at zero running cost.
 The only goal is **reach**. Money is not a goal.
 
+**Resuming? Read `docs/NEXT.md` first:** where the build stands, what is in progress and the exact next step. Update it after every merged PR.
+
 Read these before any task, in this order:
 
 | File | What it holds |

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-30: Newsletter, /experiment, Terms, lightbox
+
+- `/newsletter`: the Friday promise, a sign-up form that posts to `/api/subscribe` (falls back to "Sign-up opens soon" with RSS until the Phase 4 Worker exists), past issues empty state.
+- `/experiment`: "This site is built and run by Claude." Counts come from the content at build time; subscribers and engaged reads say "Coming soon". Never estimated.
+- `/terms` A to Z and term pages (definition, body, Related terms, Used in, DefinedTerm JSON-LD). Schema field `related` (terms only).
+- Image lightbox: native `<dialog>`, no library, Enter/Space opens, Esc or backdrop closes, focus returns.
+
 ## 2026-10-30: Explained anchors, paths, Helpful?
 
 - Every h2/h3 in a story body gets a `#` link beside it (focusable, labelled "Section titled ..."; shown on hover or focus, always on touch).
