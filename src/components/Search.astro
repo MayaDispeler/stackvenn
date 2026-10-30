@@ -1,0 +1,371 @@
+---
+// Search (DESIGN_SYSTEM §7): Pagefind's static index, our own UI. Two modes share one script:
+//  - modal: a native <dialog> opened by Ctrl/Cmd+K, "/" or any [data-search-open] link (focus is
+//    trapped and restored by the browser; Esc closes it)
+//  - page: the same box inline on /search, reading ?q= (and the fallback when JS is off)
+// The index exists only after `npm run build`, so dev mode says that instead of failing quietly.
+interface Props {
+  mode: 'modal' | 'page';
+}
+const { mode } = Astro.props;
+const id = mode === 'modal' ? 'search-dialog' : 'search-page';
+---
+
+{mode === 'modal' ? (
+  <dialog class="search-dialog" id={id} aria-label="Search Stackvenn" data-search-root>
+    <form method="get" action="/search" class="bar" role="search">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </svg>
+      <label class="visually-hidden" for={`${id}-q`}>
+        Search stories
+      </label>
+      <input
+        id={`${id}-q`}
+        name="q"
+        type="search"
+        autocomplete="off"
+        placeholder="Search stories"
+        data-search-input
+      />
+      <button type="button" class="esc" data-search-close aria-label="Close search">
+        Esc
+      </button>
+    </form>
+    <div class="results" data-search-results aria-live="polite" />
+  </dialog>
+) : (
+  <div class="search-inline" id={id} data-search-root>
+    <form method="get" action="/search" class="bar" role="search">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <circle cx="11" cy="11" r="7" />
+        <path d="m20 20-3.5-3.5" />
+      </svg>
+      <label class="visually-hidden" for={`${id}-q`}>
+        Search stories
+      </label>
+      <input
+        id={`${id}-q`}
+        name="q"
+        type="search"
+        autocomplete="off"
+        placeholder="Search stories"
+        data-search-input
+      />
+      <button type="submit" class="btn btn-primary btn-sm">
+        Search
+      </button>
+    </form>
+    <div class="results" data-search-results aria-live="polite" />
+  </div>
+)}
+
+<script>
+  type Hit = { url: string; title: string; excerpt: string; format: string; section: string };
+  /** The fields of a Pagefind result this UI reads. */
+  type PagefindData = {
+    url: string;
+    excerpt?: string;
+    meta?: { title?: string };
+    filters?: Record<string, string[]>;
+  };
+  type Pagefind = {
+    search: (q: string) => Promise<{ results: { data: () => Promise<PagefindData> }[] }>;
+  };
+
+  let engine: Promise<Pagefind | null> | undefined;
+  const load = () =>
+    (engine ??= import(/* @vite-ignore */ `${location.origin}/pagefind/pagefind.js`)
+      .then(async (m) => {
+        await m.init?.();
+        return m as Pagefind;
+      })
+      .catch(() => null));
+
+  const clean = (url: string) => url.replace(/\.html$/, '').replace(/\/index$/, '/') || '/';
+  const esc = (s: string) =>
+    s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+  const RECENT = 'stackvenn:recent-searches';
+  const recent = (): string[] => {
+    try {
+      return JSON.parse(localStorage.getItem(RECENT) ?? '[]');
+    } catch {
+      return [];
+    }
+  };
+  const remember = (q: string) => {
+    try {
+      const list = [q, ...recent().filter((x) => x !== q)].slice(0, 5);
+      localStorage.setItem(RECENT, JSON.stringify(list));
+    } catch {}
+  };
+
+  function render(box: HTMLElement, q: string, hits: Hit[] | null) {
+    if (hits === null) {
+      box.innerHTML =
+        '<p class="note">Search works on the built site. Run <code>npm run build</code> and preview it to try it locally.</p>';
+      return;
+    }
+    if (!q) {
+      const r = recent();
+      box.innerHTML = r.length
+        ? '<p class="group">Recent searches</p><ul class="recent">' +
+          r
+            .map((x) => `<li><button type="button" data-recent="${esc(x)}">${esc(x)}</button></li>`)
+            .join('') +
+          '</ul>'
+        : '';
+      return;
+    }
+    if (!hits.length) {
+      box.innerHTML = `<p class="note">No match for ‘${esc(q)}’. Try a broader term, or browse the sections.</p>`;
+      return;
+    }
+    const groups = new Map<string, Hit[]>();
+    for (const h of hits) groups.set(h.format, [...(groups.get(h.format) ?? []), h]);
+    box.innerHTML = [...groups]
+      .map(
+        ([format, list]) =>
+          `<p class="group">${esc(format)}</p><ul>` +
+          list
+            .map(
+              (h) =>
+                `<li><a href="${esc(h.url)}" data-hit><span class="t">${esc(h.title)}</span>` +
+                `<span class="s">${esc(h.section)}</span><span class="x">${h.excerpt}</span></a></li>`,
+            )
+            .join('') +
+          '</ul>',
+      )
+      .join('');
+  }
+
+  async function run(root: HTMLElement, q: string) {
+    const box = root.querySelector<HTMLElement>('[data-search-results]')!;
+    const pf = await load();
+    if (!pf) return render(box, q, null);
+    if (!q.trim()) return render(box, '', []);
+    const res = await pf.search(q);
+    const data = await Promise.all(res.results.slice(0, 12).map((r) => r.data()));
+    const hits: Hit[] = data.map((d) => ({
+      url: clean(d.url),
+      title: d.meta?.title ?? d.url,
+      excerpt: d.excerpt ?? '',
+      format: d.filters?.format?.[0] ?? 'Stories',
+      section: d.filters?.section?.[0] ?? '',
+    }));
+    render(box, q, hits);
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-search-root]')) {
+    const input = root.querySelector<HTMLInputElement>('[data-search-input]')!;
+    let t: number | undefined;
+    input.addEventListener('input', () => {
+      clearTimeout(t);
+      t = window.setTimeout(() => run(root, input.value), 120);
+    });
+    root.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-recent]');
+      if (b) {
+        input.value = b.dataset.recent ?? '';
+        run(root, input.value);
+        input.focus();
+      }
+      if ((e.target as HTMLElement).closest('[data-hit]') && input.value.trim())
+        remember(input.value.trim());
+    });
+    // Arrow keys move between the box and the results; Enter follows the link.
+    root.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      const links = [...root.querySelectorAll<HTMLElement>('[data-hit], [data-recent]')];
+      if (!links.length) return;
+      e.preventDefault();
+      const i = links.indexOf(document.activeElement as HTMLElement);
+      const next = e.key === 'ArrowDown' ? (i < 0 ? 0 : Math.min(i + 1, links.length - 1)) : i - 1;
+      (next < 0 ? input : links[next])!.focus();
+    });
+    if (root.matches('.search-inline')) {
+      const q = new URLSearchParams(location.search).get('q') ?? '';
+      input.value = q;
+      run(root, q);
+      if (q) remember(q);
+    }
+  }
+
+  const dialog = document.querySelector<HTMLDialogElement>('#search-dialog');
+  if (dialog) {
+    const input = dialog.querySelector<HTMLInputElement>('[data-search-input]')!;
+    const open = () => {
+      if (dialog.open) return;
+      dialog.showModal();
+      input.select();
+      run(dialog, input.value);
+    };
+    document.querySelectorAll<HTMLAnchorElement>('[data-search-open]').forEach((a) =>
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        open();
+      }),
+    );
+    dialog.querySelector('[data-search-close]')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    addEventListener('keydown', (e) => {
+      const typing = (e.target as HTMLElement).closest('input, textarea, [contenteditable]');
+      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        open();
+      } else if (e.key === '/' && !typing) {
+        e.preventDefault();
+        open();
+      }
+    });
+  }
+</script>
+
+<style>
+  .search-dialog {
+    width: min(var(--w-modal), calc(100vw - 2 * var(--s-4)));
+    max-height: min(80dvh, 640px);
+    margin: 10dvh auto auto;
+    padding: 0;
+    background: var(--raised);
+    color: var(--text);
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-menu);
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+  }
+  .search-dialog[open] {
+    display: flex;
+  }
+  .search-dialog::backdrop {
+    background: color-mix(in srgb, var(--bg) 70%, transparent);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    padding-inline: var(--s-4);
+    min-height: var(--h-input-search);
+    border-block-end: var(--bw) solid var(--border);
+    color: var(--text-muted);
+  }
+  .search-inline .bar {
+    border: var(--bw) solid var(--border-control);
+    border-radius: var(--r-md);
+    background: var(--surface);
+  }
+  input {
+    flex: 1;
+    min-width: 0;
+    min-height: var(--h-input-search);
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    font-size: var(--fs-standfirst);
+    outline: none;
+  }
+  input::-webkit-search-cancel-button {
+    appearance: none;
+  }
+  input::placeholder {
+    color: var(--text-muted);
+  }
+  .bar:focus-within {
+    outline: var(--focus-ring) solid var(--focus);
+    outline-offset: calc(-1 * var(--focus-ring));
+  }
+  .esc {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta);
+    color: var(--text-muted);
+    background: transparent;
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 2px var(--s-2);
+    min-height: var(--s-6);
+  }
+  .results {
+    overflow-y: auto;
+    padding: var(--s-2) var(--s-2) var(--s-4);
+  }
+  .search-inline .results {
+    padding-inline: 0;
+    margin-block-start: var(--s-5);
+  }
+  .results :global(ul) {
+    list-style: none;
+    padding: 0;
+  }
+  .results :global(.group) {
+    padding: var(--s-3) var(--s-3) var(--s-1);
+    font-size: var(--fs-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .results :global(a),
+  .results :global(.recent button) {
+    display: grid;
+    gap: 2px;
+    width: 100%;
+    text-align: start;
+    padding: var(--s-3);
+    border: 0;
+    border-radius: var(--r-sm);
+    background: transparent;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .results :global(a:hover),
+  .results :global(a:focus-visible),
+  .results :global(.recent button:hover),
+  .results :global(.recent button:focus-visible) {
+    background: var(--surface);
+  }
+  .results :global(.t) {
+    font-family: var(--font-read);
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
+  }
+  .results :global(.s) {
+    font-size: var(--fs-meta);
+    color: var(--text-muted);
+  }
+  .results :global(.x) {
+    font-size: var(--fs-ui);
+    color: var(--text-soft);
+  }
+  .results :global(mark) {
+    background: var(--selection);
+    color: var(--text);
+  }
+  .results :global(.note) {
+    padding: var(--s-4) var(--s-3);
+    color: var(--text-soft);
+  }
+</style>

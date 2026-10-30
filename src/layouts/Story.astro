@@ -9,7 +9,7 @@ import StoryList from '../components/StoryList.astro';
 import avatar from '../assets/author/avatar.webp';
 import picks from '../data/frontpage.json';
 import { SITE } from '../lib/site';
-import { COLUMNS, SECTION } from '../lib/taxonomy';
+import { COLUMNS, FORMAT_LABEL, SECTION } from '../lib/taxonomy';
 import {
   formatDate,
   getStories,
@@ -103,9 +103,15 @@ const jsonLd = [
     <span data-progress></span>
   </div>
 
-  <article class:list={['container', 'story', { brief: isBrief }]}>
+  <article class:list={['container', 'story', { brief: isBrief }]} data-pagefind-body>
+    <span hidden data-pagefind-filter="section">
+      {section.label}
+    </span>
+    <span hidden data-pagefind-filter="format">
+      {FORMAT_LABEL[d.format]}
+    </span>
     <header class="head">
-      <p class="kicker-row">
+      <p class="kicker-row" data-pagefind-ignore>
         <a class="section" href={`/${d.section}`}>
           {section.label}
         </a>
@@ -120,7 +126,7 @@ const jsonLd = [
       </p>
       <h1>{d.headline}</h1>
       <p class="standfirst">{d.standfirst}</p>
-      <div class="byline">
+      <div class="byline" data-pagefind-ignore>
         <OverlapChip overlap={d.overlap} />
         <p class="meta who">
           <a href="/author/srihari-venkatesan" tabindex="-1" aria-hidden="true">
@@ -141,7 +147,9 @@ const jsonLd = [
           <span aria-hidden="true">·</span>
           <span>{minutes} min read</span>
         </p>
-        <ShareRow url={abs} title={d.headline} />
+        <div data-pagefind-ignore>
+          <ShareRow url={abs} title={d.headline} />
+        </div>
       </div>
     </header>
 
@@ -166,7 +174,7 @@ const jsonLd = [
 
     <slot name="after" />
 
-    <footer class="end">
+    <footer class="end" data-pagefind-ignore>
       <ShareRow url={abs} title={d.headline} label="Share this story" toast={false} />
       <AuthorBox />
       <section class="comments" aria-labelledby="comments-h">

@@ -1,0 +1,15 @@
+---
+// /search: the same search box inline. Works as a plain form when JS is off; noindex (REACHABILITY §3).
+import Page from '../layouts/Page.astro';
+import Search from '../components/Search.astro';
+---
+
+<Page
+  title="Search"
+  heading="Search Stackvenn"
+  description="Search every story on Stackvenn by keyword, across all six sections and every format."
+  path="/search"
+  noindex
+>
+  <Search mode="page" />
+</Page>
