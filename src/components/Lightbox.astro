@@ -1,0 +1,150 @@
+---
+// Image lightbox (DESIGN_SYSTEM §7): a native <dialog>, so focus is trapped, Esc closes it and
+// focus goes back to the image that opened it. No library. Each `.prose` image that is not inside
+// a link becomes keyboard-activatable (role=button, Enter/Space) without changing the layout.
+---
+
+<dialog class="lightbox" id="lightbox" aria-label="Enlarged image">
+  <form method="dialog" class="bar">
+    <button type="submit" class="btn btn-secondary close" aria-label="Close image">
+      Close
+    </button>
+  </form>
+  <figure>
+    <img data-lightbox-img alt="" decoding="async" />
+    <figcaption data-lightbox-caption hidden></figcaption>
+  </figure>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#lightbox');
+  const big = dialog?.querySelector<HTMLImageElement>('[data-lightbox-img]');
+  const caption = dialog?.querySelector<HTMLElement>('[data-lightbox-caption]');
+  let trigger: HTMLElement | null = null;
+
+  // The largest candidate in srcset, else what the browser picked (currentSrc), else src.
+  const largestSrc = (img: HTMLImageElement) => {
+    let best = img.currentSrc || img.src;
+    let bestW = 0;
+    for (const part of (img.srcset || '').split(',')) {
+      const [url, d] = part.trim().split(/\s+/);
+      const w = d?.endsWith('w') ? parseInt(d, 10) : 0;
+      if (url && w > bestW) [best, bestW] = [url, w];
+    }
+    return best;
+  };
+
+  const open = (img: HTMLImageElement) => {
+    if (!dialog || !big || !caption) return;
+    trigger = img;
+    big.src = largestSrc(img);
+    big.alt = img.alt;
+    const text = img.closest('figure')?.querySelector('figcaption')?.textContent?.trim() ?? '';
+    caption.textContent = text;
+    caption.hidden = !text;
+    dialog.showModal();
+  };
+
+  if (dialog && big) {
+    document.querySelectorAll<HTMLImageElement>('.prose img').forEach((img) => {
+      if (img.closest('a, button, .lightbox')) return;
+      img.dataset.lightbox = '';
+      img.setAttribute('role', 'button');
+      img.tabIndex = 0;
+      img.setAttribute('aria-label', `Enlarge image: ${img.alt || 'untitled'}`);
+      img.addEventListener('click', () => open(img));
+      img.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          open(img);
+        }
+      });
+    });
+    // A click on the backdrop (the dialog itself, outside the figure and bar) closes it.
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('close', () => {
+      big.removeAttribute('src');
+      trigger?.focus();
+      trigger = null;
+    });
+  }
+</script>
+
+<style>
+  :global(.prose img[data-lightbox]) {
+    cursor: zoom-in;
+  }
+  :global(.prose img[data-lightbox]:focus-visible) {
+    outline: var(--focus-ring) solid var(--focus);
+    outline-offset: var(--focus-offset);
+  }
+  .lightbox {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: var(--s-4) var(--gutter-r) var(--s-5) var(--gutter);
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    display: none;
+    flex-direction: column;
+    gap: var(--s-3);
+  }
+  .lightbox[open] {
+    display: flex;
+  }
+  .lightbox::backdrop {
+    background: color-mix(in srgb, var(--bg) 92%, transparent);
+  }
+  .bar {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .close {
+    height: var(--h-button-sm);
+  }
+  figure {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-3);
+    pointer-events: none;
+  }
+  figure > * {
+    pointer-events: auto;
+  }
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    min-height: 0;
+    object-fit: contain;
+    border: var(--bw) solid var(--border);
+    background: var(--surface);
+  }
+  figcaption {
+    max-width: var(--w-story);
+    font-family: var(--font-ui);
+    font-size: var(--fs-meta);
+    line-height: var(--lh-meta);
+    color: var(--text-soft);
+    text-align: center;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .lightbox[open] {
+      animation: lightbox-in var(--d-mid) var(--ease);
+    }
+  }
+  @keyframes lightbox-in {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  }
+</style>

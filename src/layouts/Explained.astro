@@ -5,6 +5,7 @@
 import type { MarkdownHeading } from 'astro';
 import Shell from './Shell.astro';
 import Corrections from '../components/Corrections.astro';
+import Lightbox from '../components/Lightbox.astro';
 import ExplainedActions from '../components/ExplainedActions.astro';
 import { SITE } from '../lib/site';
 import { FORMAT_LABEL, SECTION, type Section } from '../lib/taxonomy';
@@ -200,6 +201,7 @@ const jsonLd = [
       </nav>
     )}
   </div>
+  <Lightbox />
 </Shell>
 
 <script>
