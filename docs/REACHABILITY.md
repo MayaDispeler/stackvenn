@@ -76,7 +76,7 @@ One-time human steps are marked **[H]**. Everything else is Claude's.
 AI answers cite pages that are crawlable, clear, specific and trustworthy.
 - [ ] Allow AI crawlers (§2–3). Keep pages server-rendered HTML (Astro static); no content behind client JS.
 - [ ] Open each post with a 2–3 sentence direct answer or summary. Use definitions in the form "X is …". Put steps in numbered lists and comparisons in real tables.
-- [ ] Original value AI can't make up: real numbers from Srihari's projects, code, architecture diagrams, failure post-mortems, benchmarks with method notes.
+- [ ] Original value AI can't make up: Srihari's own first-hand experience and argument, worked examples, diagrams, benchmarks with method notes.
 - [ ] Cite sources inline and in a "Sources" list. Show author credentials on every post.
 - [ ] Keep naming consistent ("Stackvenn", "Srihari Venkatesan") everywhere, including socials and GitHub, so assistants connect the entity.
 - [ ] "Copy Markdown" and "Open in ChatGPT/Claude/Perplexity" buttons on Explained pages spread the page into AI conversations.
@@ -85,7 +85,6 @@ AI answers cite pages that are crawlable, clear, specific and trustworthy.
 ## 8. Off-site reach (earned, not spammed)
 
 Claude prepares assets and drafts. Anything posted in communities is a human's decision.
-- [ ] **GitHub:** the READMEs of Orqestra, Savepoint and other repos link to the matching Explained piece. This is the strongest legitimate backlink source available. Claude opens PRs on Srihari's own repos.
 - [ ] **Syndication with canonical:** dev.to and Hashnode (see MARKETING_AUTOMATION.md).
 - [ ] **Old copies on LinkedIn and Medium stay up** (Srihari's choice). To help search engines treat stackvenn.in as the main version: migrated posts are revised and expanded (not word-for-word), carry their own canonical, and get internal links. [H, optional] On Medium, set each story's canonical link to the stackvenn.in URL (story settings → Advanced → "This story was originally published elsewhere"). LinkedIn has no canonical setting, so nothing is needed there.
 - [ ] **daily.dev:** submit stackvenn.in as a source (one-time, **[H]** if a form login is needed). Dev blogs get large reach there.
