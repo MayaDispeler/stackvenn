@@ -1,0 +1,154 @@
+---
+// Book landing page. Copy is the publisher description from the Amazon listing (checked 2026-10-29),
+// verbatim. The Amazon button is the only outbound commerce link allowed (CLAUDE.md golden rule 6).
+import { Image } from 'astro:assets';
+import Shell from '../../layouts/Shell.astro';
+import cover from '../../assets/book/the-mellivora-paradox.webp';
+import { SITE } from '../../lib/site';
+
+const BOOK = {
+  title: 'The Mellivora Paradox',
+  subtitle: 'A Field Guide for Those Who Refuse To Die',
+  amazon: 'https://www.amazon.in/Mellivora-Paradox-Field-Guide-Refuse/dp/B0GSQRT836',
+  asin: 'B0GSQRT836',
+};
+const url = '/book/the-mellivora-paradox';
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Book',
+    name: `${BOOK.title}: ${BOOK.subtitle}`,
+    author: { '@id': `${SITE.url}/author/${SITE.author.slug}#person` },
+    url: new URL(url, SITE.url).href,
+    inLanguage: 'en',
+    image: new URL(cover.src, SITE.url).href,
+    offers: { '@type': 'Offer', url: BOOK.amazon },
+  },
+];
+---
+
+<Shell
+  title={`${BOOK.title}: ${BOOK.subtitle}`}
+  description="The Mellivora Paradox by Srihari Venkatesan: a field guide for those who refuse to die. Not a guide to winning, but an examination of why winning stopped working."
+  path={url}
+  jsonLd={jsonLd}
+>
+  <article class="container book">
+    <div class="cover">
+      <Image
+        src={cover}
+        alt="Cover of The Mellivora Paradox by Srihari Venkatesan"
+        loading="eager"
+        fetchpriority="high"
+        widths={[320, 528]}
+        sizes="(min-width: 768px) 320px, 60vw"
+      />
+    </div>
+    <div class="text">
+      <p class="kicker">Book</p>
+      <h1>{BOOK.title}</h1>
+      <p class="subtitle">{BOOK.subtitle}</p>
+      <p class="byline meta">
+        By <a href={`/author/${SITE.author.slug}`}>{SITE.author.name}</a>
+      </p>
+
+      <!-- slop-ignore: publisher description, verbatim from the Amazon listing -->
+      <div class="blurb">
+        <p class="lead">
+          The lion expects you to run. The cobra expects you to fear. Be the animal that does
+          neither.
+        </p>
+        <p>You followed the rules. The rules didn’t follow you back.</p>
+        <p>
+          Knowledge expires. Indifference is armor. Chaos is raw material. Plans die at first
+          contact.
+        </p>
+        <p>
+          This is not a guide to winning. It is an examination of why winning stopped working. There
+          are no steps here. No secrets. No shortcuts. Only the question nobody asks.
+        </p>
+        <p class="question">When did surviving start requiring a manual?</p>
+      </div>
+      <!-- /slop-ignore -->
+
+      <a class="btn btn-primary buy" href={BOOK.amazon} rel="noopener">
+        Get the book on Amazon
+      </a>
+    </div>
+  </article>
+</Shell>
+
+<style>
+  .book {
+    display: grid;
+    gap: var(--s-7);
+    padding-block-start: var(--s-8);
+    max-width: calc(var(--w-explained) + var(--w-rail) + var(--s-7));
+  }
+  .cover :global(img) {
+    width: min(320px, 70vw);
+    height: auto;
+    border: var(--bw) solid var(--border);
+    border-radius: var(--r-sm);
+  }
+  .kicker {
+    font-size: var(--fs-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--accent-text);
+  }
+  h1 {
+    margin-block-start: var(--s-3);
+    font-family: var(--font-read);
+    font-size: var(--fs-display);
+    line-height: var(--lh-display);
+    font-weight: 500;
+    font-variation-settings: 'opsz' 72;
+  }
+  .subtitle {
+    margin-block-start: var(--s-3);
+    font-family: var(--font-read);
+    font-style: italic;
+    font-size: var(--fs-standfirst);
+    line-height: var(--lh-standfirst);
+    color: var(--text-muted);
+  }
+  .byline {
+    margin-block: var(--s-4) var(--s-6);
+  }
+  .byline a {
+    color: var(--text-soft);
+  }
+  .blurb {
+    font-family: var(--font-read);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--text-soft);
+    max-width: var(--measure);
+    display: grid;
+    gap: 1.1em;
+  }
+  .blurb .lead {
+    color: var(--text);
+    font-size: var(--fs-standfirst);
+    line-height: var(--lh-standfirst);
+  }
+  .buy {
+    margin-block-start: var(--s-6);
+  }
+  .question {
+    color: var(--text);
+    font-style: italic;
+  }
+  @media (min-width: 768px) {
+    .book {
+      grid-template-columns: 320px minmax(0, 1fr);
+      align-items: start;
+    }
+    .cover {
+      position: sticky;
+      top: calc(var(--h-header) + var(--s-5));
+    }
+  }
+</style>
