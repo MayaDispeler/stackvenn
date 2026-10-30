@@ -8,6 +8,8 @@
 // 3. Pages are cached for an hour with stale-while-revalidate (REACHABILITY §2). Hashed assets
 //    get their immutable header from public/_headers, so the two never stack.
 
+import { cmsAuth } from './cms-auth.js';
+
 /** Hosts that are allowed to be indexed. Everything else is a preview. */
 export const PRODUCTION_HOSTS = new Set(['stackvenn.in']);
 
@@ -22,11 +24,16 @@ export function isProduction(hostname) {
 export default {
   /**
    * @param {Request} request
-   * @param {{ ASSETS: { fetch: (r: Request) => Promise<Response> } }} env
+   * @param {{ ASSETS: { fetch: (r: Request) => Promise<Response> }, GITHUB_CLIENT_ID?: string, GITHUB_CLIENT_SECRET?: string }} env
    */
   async fetch(request, env) {
     const url = new URL(request.url);
     const production = isProduction(url.hostname);
+
+    // Writing desk login (Decap CMS, GitHub OAuth).
+    if (url.pathname === '/api/auth' || url.pathname === '/api/callback') {
+      return cmsAuth(request, env);
+    }
 
     if (!production && url.pathname === '/robots.txt') {
       return new Response(PREVIEW_ROBOTS, {
@@ -51,7 +58,9 @@ export default {
         out.headers.set('cache-control', PAGE_CACHE);
       }
     }
-    if (!production) out.headers.set('x-robots-tag', 'noindex, nofollow');
+    // Previews are never indexed, and neither is the writing desk on any host.
+    if (!production || url.pathname.startsWith('/admin'))
+      out.headers.set('x-robots-tag', 'noindex, nofollow');
     return out;
   },
 };

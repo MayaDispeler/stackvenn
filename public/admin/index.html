@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Writing desk · Stackvenn</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <!--
+      Stackvenn writing desk (TODO Phase 2e). Decap CMS, pinned and integrity-checked, GitHub backend with
+      the editorial workflow: every save is a draft pull request; "Publish" merges it (Srihari's approval).
+      Login goes through the site's own Worker (/api/auth, /api/callback), so base_url follows whichever
+      host serves this page: the workers.dev preview today, stackvenn.in once DNS moves (issue #2).
+    -->
+    <script>
+      window.CMS_MANUAL_INIT = true;
+    </script>
+    <script
+      src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"
+      integrity="sha384-A/Gdn928CNLufmnGWGs9RM4Q9o8bSNLeJERqBFrBjwzL7FRpoLT3MPF8Tl0+Wd2p"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      CMS.init({
+        config: {
+          backend: {
+            name: 'github',
+            repo: 'MayaDispeler/stackvenn',
+            branch: 'main',
+            base_url: window.location.origin,
+            auth_endpoint: 'api/auth',
+          },
+        },
+      });
+    </script>
+  </body>
+</html>

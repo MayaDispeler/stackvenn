@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-30: Writing desk
+
+- `/admin`: Decap CMS 3.16.3 (SRI-pinned), editorial workflow on GitHub, fields matching the schema, noindex on every host.
+- GitHub OAuth endpoints on the edge Worker, with 7 unit tests.
+- Schema accepts the empty values the desk writes; `written_by: srihari` stories are exempt from the slop check.
+
 ## 2026-10-30: Author page, corrections
 
 - Author page with portrait, line, dateline, sections, work and education timelines, book, open-source work, every story (paginated), copyable email, ProfilePage + Person JSON-LD.

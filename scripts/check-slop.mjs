@@ -143,6 +143,8 @@ function storyText(src) {
     .split(/\r?\n/)
     .filter((l) => /^(headline|standfirst|kicker|dateline):|^\s+- /.test(l))
     .join('\n');
+  // Srihari's own words, written in the /admin desk, keep his voice (CLAUDE.md, No AI slop).
+  if (/^written_by:\s*['"]?srihari/m.test(fm)) return '';
   if (/^migrated:\s*true/m.test(fm)) return fields;
   const body = src
     .replace(/^---[\s\S]*?\n---/, '')
