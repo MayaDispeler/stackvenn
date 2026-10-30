@@ -46,11 +46,6 @@ Here’s a table summarizing key findings from various studies:
 | Relationships | Deeper, more meaningful connections |
 | Life Satisfaction | Higher levels of happiness and fulfillment |
 
-The graph below illustrates the positive correlation between authentic living and various aspects of life satisfaction.
-
-![Bar chart titled “Detailed benefits of authentic living”, showing percentages for lower stress, improved overall health, deeper connections and higher happiness across mental health, physical health, relationships and life satisfaction.](../../assets/stories/how-to-live-a-kickass-life/benefits-chart.png)
-*DETAILED ANALYSIS ON BENEFITS OF AUTHENTIC LIVING*
-
 ### Real stats on living your best life
 
 Harvard’s longest-running study on happiness says it all: strong relationships make you happier and healthier. This 85-year-long study found that people with solid personal connections are not just happier, but they also live longer. They stress that “social fitness” is as important as hitting the gym for a long, healthy life.
