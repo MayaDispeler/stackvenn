@@ -25,3 +25,4 @@ tests/screenshots/__output__/
 Thumbs.db
 .vscode/*
 !.vscode/extensions.json
+lighthouse-results/
