@@ -115,13 +115,18 @@ function walk(dir, out = []) {
 
 /** Visible prose of an .astro file: drop frontmatter, scripts, styles, comments, tags and {expressions}. */
 function astroText(src) {
-  return src
-    .replace(/^---[\s\S]*?\n---/, '')
-    .replace(/<script[\s\S]*?<\/script>/g, '')
-    .replace(/<style[\s\S]*?<\/style>/g, '')
-    .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/\{[^{}]*\}/g, ' ')
-    .replace(/<[^>]+>/g, '\n');
+  return (
+    src
+      .replace(/^---[\s\S]*?\n---/, '')
+      // Verbatim third-party text (a publisher's blurb, a quotation) is not ours to rewrite.
+      // Wrap it in <!-- slop-ignore: reason --> … <!-- /slop-ignore --> and say why.
+      .replace(/<!-- slop-ignore: [^>]+ -->[\s\S]*?<!-- \/slop-ignore -->/g, '')
+      .replace(/<script[\s\S]*?<\/script>/g, '')
+      .replace(/<style[\s\S]*?<\/style>/g, '')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/\{[^{}]*\}/g, ' ')
+      .replace(/<[^>]+>/g, '\n')
+  );
 }
 
 /** String literals of 25+ characters in .ts files (site, taxonomy and other copy). */
