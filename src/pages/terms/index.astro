@@ -1,0 +1,104 @@
+---
+// Terms index (DESIGN §5): the glossary A to Z, grouped by first letter.
+import List from '../../layouts/List.astro';
+import { SITE } from '../../lib/site';
+import { getPosts, urlOf, type Post } from '../../lib/posts';
+
+const terms = (await getPosts((p) => p.data.format === 'term')).sort((a, b) =>
+  a.data.headline.localeCompare(b.data.headline, 'en', { sensitivity: 'base' }),
+);
+
+const letterOf = (p: Post) => {
+  const c = p.data.headline.trim()[0]?.toUpperCase() ?? '#';
+  return /[A-Z]/.test(c) ? c : '#';
+};
+const groups = new Map<string, Post[]>();
+for (const t of terms) groups.set(letterOf(t), [...(groups.get(letterOf(t)) ?? []), t]);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTermSet',
+    '@id': `${SITE.url}/terms#set`,
+    name: `${SITE.name} terms`,
+    url: `${SITE.url}/terms`,
+    hasDefinedTerm: terms.map((t) => ({
+      '@type': 'DefinedTerm',
+      '@id': `${new URL(urlOf(t), SITE.url).href}#term`,
+      name: t.data.headline,
+      description: t.data.standfirst,
+      url: new URL(urlOf(t), SITE.url).href,
+    })),
+  },
+];
+---
+
+<List
+  title="Terms"
+  heading="Terms"
+  lede="Short definitions of the words that come up in AI engineering, each with an example."
+  description="Terms on Stackvenn: plain definitions of AI engineering words, from MCP to RAG, each with an example and links to the stories that use it."
+  path="/terms"
+  jsonLd={jsonLd}
+>
+  {groups.size ? (
+    <>
+      <nav class="letters" aria-label="Jump to letter">
+        {[...groups.keys()].map((l) => (
+          <a href={`#letter-${l}`}>{l}</a>
+        ))}
+      </nav>
+      {[...groups].map(([letter, items]) => (
+        <section class="group" aria-labelledby={`letter-${letter}`}>
+          <h2 id={`letter-${letter}`}>{letter}</h2>
+          <dl>
+            {items.map((t) => (
+              <div>
+                <dt>
+                  <a href={urlOf(t)}>{t.data.headline}</a>
+                </dt>
+                <dd>{t.data.standfirst}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ))}
+    </>
+  ) : (
+    <p class="meta">The first terms are being written.</p>
+  )}
+</List>
+
+<style>
+  .letters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-block-end: var(--s-6);
+    font-weight: 600;
+  }
+  .group + .group {
+    margin-block-start: var(--s-7);
+  }
+  .group h2 {
+    font-size: var(--fs-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding-block-end: var(--s-3);
+    margin-block-end: var(--s-4);
+    border-block-end: var(--bw) solid var(--text);
+    scroll-margin-top: calc(var(--h-header) + var(--s-5));
+  }
+  dl {
+    display: grid;
+    gap: var(--s-5);
+  }
+  dt {
+    font-weight: 700;
+  }
+  dd {
+    margin-block-start: var(--s-1);
+    color: var(--text-muted);
+  }
+</style>

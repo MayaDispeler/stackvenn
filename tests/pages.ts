@@ -8,6 +8,7 @@ export const PAGES = [
   { name: 'explained-hub', path: '/explained' },
   { name: 'column', path: '/columns/2-am' },
   { name: 'author', path: '/author/srihari-venkatesan' },
+  { name: 'terms', path: '/terms' },
   { name: '404', path: '/404' },
 ];
 export const WIDTHS = [360, 390, 768, 1280, 1440];
