@@ -7,18 +7,23 @@ export const AUTHOR = {
   location: 'Chennai',
   worksFor: 'Kissflow',
   roles: [
-    { role: 'Lead Engineer', company: 'Kissflow', period: 'Jul 2021 – Present', line: '' },
+    {
+      role: 'Lead Engineer',
+      company: 'Kissflow',
+      period: 'Jul 2021 – Present',
+      line: 'Production agentic workflows in LangGraph and a hybrid-retrieval RAG pipeline used by 100+ people.',
+    },
     {
       role: 'Data Engineer',
       company: 'Neurealm (formerly GAVS Tech)',
       period: 'Sep 2020 – Jul 2021',
-      line: '',
+      line: 'PySpark pipelines processing 10M+ daily events for an AIOps platform.',
     },
     {
       role: 'System Engineer',
       company: 'Tata Consultancy Services',
       period: 'Jul 2017 – Aug 2020',
-      line: '',
+      line: 'L3 support across three data centres for core banking and insurance applications.',
     },
   ],
   education: [
@@ -30,7 +35,11 @@ export const AUTHOR = {
     },
   ],
   /** First-person bio paragraphs (120–180 words in total). Empty until Srihari approves them. */
-  bio: [] as string[],
+  bio: [
+    'I am an AI engineer in Chennai. In 2017 I kept core banking and insurance systems running across three data centres. When they went down, real customers felt it, and that is where I learned the lesson I still build by: technology is only as good as the trust it earns.',
+    'Today I am the primary AI engineer for a SaaS business team at Kissflow. My agentic workflows and retrieval systems serve 100+ colleagues every day, and I prove they work with numbers: research tasks that took 45 minutes now take under 3.',
+    'An aerospace engineer by training, I think in failure modes before features. I also write: a book, The Mellivora Paradox, and the 2 AM column, which I write late at night. Stackvenn is where it all lives, from what I learn shipping AI to what I notice about work along the way.',
+  ] as string[],
   profiles: {
     linkedin: 'https://www.linkedin.com/in/sriharivvenkatesan',
     github: 'https://github.com/Mayadispeler',

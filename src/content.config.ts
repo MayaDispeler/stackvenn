@@ -96,6 +96,12 @@ const posts = defineCollection({
             issue('format', '`level` and `summary` are for format: explained');
           }
           if (d.format === 'explained' && !d.level) issue('level', 'Explained pieces need a level');
+          if (d.format === 'explained' && !d.tested_with?.length) {
+            issue(
+              'tested_with',
+              'Explained pieces name the tools and versions they were written against',
+            );
+          }
           if (d.format === 'explained' && !d.summary) {
             issue('summary', 'Explained pieces need an "Explained in 60 seconds" summary');
           }
