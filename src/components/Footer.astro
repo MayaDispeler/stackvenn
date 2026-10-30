@@ -1,7 +1,19 @@
 ---
-import { SITE } from '../lib/site';
+// Footer (DESIGN §1): sections, columns and Explained, ways to follow, and the experiment line.
+import { NAV, SITE } from '../lib/site';
+import { COLUMNS, COLUMN_SLUGS } from '../lib/taxonomy';
 import Venn from './Venn.astro';
 const year = new Date().getFullYear();
+const more = [
+  { href: '/explained', label: 'Explained' },
+  ...COLUMN_SLUGS.map((c) => ({ href: `/columns/${c}`, label: `${COLUMNS[c].name} column` })),
+  { href: `/author/${SITE.author.slug}`, label: SITE.author.name },
+];
+const follow = [
+  { href: '/newsletter', label: 'Newsletter' },
+  { href: '/rss.xml', label: 'RSS' },
+  { href: SITE.author.url, label: 'iamsrihari.com', me: true },
+];
 ---
 
 <footer class="site-footer">
@@ -11,29 +23,47 @@ const year = new Date().getFullYear();
         <Venn size={24} />
         <span>{SITE.name}</span>
       </a>
-      <p>
-        {SITE.tagline} Written by <a href="/author/srihari-venkatesan">{SITE.author.name}</a>.
-      </p>
+      <p>{SITE.tagline}</p>
       <p>
         Built and run by Claude: <a href="/experiment">see the experiment</a>.
       </p>
     </div>
-    <nav aria-label="Footer">
+    <nav aria-labelledby="f-sections">
+      <p class="group" id="f-sections">
+        Sections
+      </p>
       <ul>
-        <li>
-          <a href="/explained">Explained</a>
-        </li>
-        <li>
-          <a href="/newsletter">Newsletter</a>
-        </li>
-        <li>
-          <a href="/rss.xml">RSS</a>
-        </li>
-        <li>
-          <a href={SITE.author.url} rel="me">
-            iamsrihari.com
-          </a>
-        </li>
+        {NAV.map((n) => (
+          <li>
+            <a href={n.href}>{n.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <nav aria-labelledby="f-more">
+      <p class="group" id="f-more">
+        More
+      </p>
+      <ul>
+        {more.map((n) => (
+          <li>
+            <a href={n.href}>{n.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <nav aria-labelledby="f-follow">
+      <p class="group" id="f-follow">
+        Follow
+      </p>
+      <ul>
+        {follow.map((n) => (
+          <li>
+            <a href={n.href} rel={n.me ? 'me' : undefined}>
+              {n.label}
+            </a>
+          </li>
+        ))}
       </ul>
     </nav>
   </div>
@@ -63,17 +93,23 @@ const year = new Date().getFullYear();
     margin-block-end: var(--s-3);
   }
   .about p {
-    max-width: 44ch;
+    max-width: 40ch;
   }
   .about p + p {
     margin-block-start: var(--s-2);
   }
+  .group {
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-block-end: var(--s-2);
+  }
   ul {
     list-style: none;
     padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 var(--s-5);
   }
   nav a {
     display: inline-flex;
@@ -90,10 +126,20 @@ const year = new Date().getFullYear();
   .legal {
     margin-block-start: var(--s-6);
   }
-  @media (min-width: 768px) {
+  @media (min-width: 640px) {
     .grid {
-      grid-template-columns: 1fr auto;
-      align-items: start;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .about {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (min-width: 960px) {
+    .grid {
+      grid-template-columns: 2fr repeat(3, minmax(0, 1fr));
+    }
+    .about {
+      grid-column: auto;
     }
   }
 </style>

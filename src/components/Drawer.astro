@@ -1,0 +1,175 @@
+---
+// Mobile menu drawer (DESIGN §1): a native <dialog>, so focus is trapped and restored and Esc closes it.
+// Below 1200px it also holds the theme control (the header only shows it from 1200px).
+import { NAV, SITE } from '../lib/site';
+import { COLUMNS, COLUMN_SLUGS } from '../lib/taxonomy';
+import ThemeToggle from './ThemeToggle.astro';
+
+const here = Astro.url.pathname;
+const isActive = (href: string) => here === href || here.startsWith(`${href}/`);
+const more = [
+  { href: '/explained', label: 'Explained' },
+  ...COLUMN_SLUGS.map((c) => ({ href: `/columns/${c}`, label: COLUMNS[c].name })),
+  { href: `/author/${SITE.author.slug}`, label: SITE.author.name },
+];
+---
+
+<dialog class="drawer" id="site-drawer" aria-label="Menu">
+  <div class="top">
+    <span class="title">Menu</span>
+    <button type="button" class="btn btn-icon" data-drawer-close aria-label="Close menu">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M6 6l12 12M18 6 6 18"></path>
+      </svg>
+    </button>
+  </div>
+  <nav aria-label="Sections">
+    <p class="group">Sections</p>
+    <ul>
+      {NAV.map((n) => (
+        <li>
+          <a href={n.href} aria-current={isActive(n.href) ? 'page' : undefined}>
+            {n.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <nav aria-label="More">
+    <p class="group">More</p>
+    <ul>
+      {more.map((n) => (
+        <li>
+          <a href={n.href} aria-current={isActive(n.href) ? 'page' : undefined}>
+            {n.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <div class="bottom">
+    <ThemeToggle />
+    <a class="btn btn-primary" href="/newsletter">
+      Subscribe
+    </a>
+  </div>
+</dialog>
+
+<script>
+  const drawer = document.querySelector<HTMLDialogElement>('#site-drawer');
+  if (drawer) {
+    document.querySelectorAll<HTMLButtonElement>('[data-drawer-open]').forEach((b) =>
+      b.addEventListener('click', () => {
+        drawer.showModal();
+        b.setAttribute('aria-expanded', 'true');
+        drawer.addEventListener('close', () => b.setAttribute('aria-expanded', 'false'), {
+          once: true,
+        });
+      }),
+    );
+    drawer.querySelector('[data-drawer-close]')?.addEventListener('click', () => drawer.close());
+    // A click on the backdrop (the dialog element itself, outside the panel content) closes it.
+    drawer.addEventListener('click', (e) => {
+      if (e.target === drawer) drawer.close();
+    });
+    // Close if the viewport grows past the breakpoint where the header shows everything.
+    matchMedia('(min-width: 1200px)').addEventListener('change', (m) => {
+      if (m.matches && drawer.open) drawer.close();
+    });
+  }
+</script>
+
+<style>
+  .drawer {
+    position: fixed;
+    inset: 0 0 0 auto;
+    width: min(360px, 100vw);
+    max-width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    padding: var(--s-4) var(--s-5) var(--s-6);
+    background: var(--bg);
+    color: var(--text);
+    border: 0;
+    border-inline-start: var(--bw) solid var(--border);
+    display: none;
+    flex-direction: column;
+    gap: var(--s-6);
+  }
+  .drawer[open] {
+    display: flex;
+  }
+  .drawer::backdrop {
+    background: color-mix(in srgb, var(--bg) 70%, transparent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .drawer[open] {
+      animation: drawer-in var(--d-slow) var(--ease);
+    }
+  }
+  @keyframes drawer-in {
+    from {
+      transform: translateX(var(--s-6));
+      opacity: 0;
+    }
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: var(--h-header);
+    margin-block: calc(-1 * var(--s-4)) 0;
+    border-block-end: var(--bw) solid var(--border);
+  }
+  .title {
+    font-weight: 600;
+  }
+  .group {
+    font-size: var(--fs-eyebrow);
+    line-height: var(--lh-eyebrow);
+    letter-spacing: var(--ls-eyebrow);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-block-end: var(--s-2);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  nav a {
+    display: flex;
+    align-items: center;
+    min-height: var(--size-touch);
+    font-family: var(--font-read);
+    font-size: var(--fs-h3);
+    color: var(--text-soft);
+    text-decoration: none;
+    border-block-end: var(--bw) solid var(--border);
+  }
+  nav a:hover,
+  nav a[aria-current='page'] {
+    color: var(--text);
+  }
+  nav a[aria-current='page'] {
+    box-shadow: inset var(--bw-active) 0 0 var(--accent);
+    padding-inline-start: var(--s-3);
+  }
+  .bottom {
+    margin-block-start: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+  }
+</style>

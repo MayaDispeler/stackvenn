@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-30: Drawer, footer, 404, column page
+
+- Mobile menu is a native dialog drawer: sections, Explained, 2 AM, author, theme, Subscribe; focus trapped, Esc closes.
+- Footer: sections, more (Explained, 2 AM column, author), follow (newsletter, RSS, iamsrihari.com).
+- 404 with inline search and five stories.
+- 2 AM column page with its own masthead and CreativeWorkSeries JSON-LD.
+
 ## 2026-10-30: Search
 
 - Ctrl/Cmd+K or `/` opens search (native dialog: focus trapped and restored, Esc closes).
