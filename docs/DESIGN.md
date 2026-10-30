@@ -122,6 +122,7 @@ Job: within 5 seconds, a visitor knows what Stackvenn is, sees what's important 
 - "Open in ▾" builds URLs such as `https://claude.ai/new?q=` and `https://chatgpt.com/?q=`, with the prompt "Read https://stackvenn.in/… and help me apply it to my project." Verify each tool's query parameter when building, and drop any that no longer prefill.
 - "Copy Markdown" fetches `<url>.md` and copies it, falling back to selecting the text.
 - Every heading gets a hover "#" anchor. Pressing `/` focuses search.
+- **Heading anchors:** a `#` link beside each h2/h3 (a sibling, so the heading name stays clean), visible on hover or focus and always on touch screens. **Path pager:** pieces sharing a `series` show Previous / Next cards ordered by `order`. **Helpful?:** Yes / No after the body; one vote per browser, never shown publicly.
 - **Terms** (`/terms/<slug>`) use this layout without the sidebar paths: definition in the first sentence, an example, "Related terms" and "Used in".
 
 ---
