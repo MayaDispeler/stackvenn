@@ -97,6 +97,7 @@ Nothing Stackvenn publishes may read as machine-made. Two vendored skills (`.cla
 - **While drafting** any prose (Explained pieces, Analysis, Briefs, Terms, standfirsts, summaries, UI copy, newsletter issues, distribution posts, PR and issue bodies): follow [[USE SKILL: stop-slop]]. Score the draft on its 5 dimensions; **below 35/50, revise** before showing anyone.
 - **Before any prose is committed:** run [[USE SKILL: humanizer]] over it (file mode for content files). It keeps every fact and adds none, which matches golden rule 2.
 - **CI:** `npm run slop` (inside `npm run check`) fails on strong tells: chatbot residue, staged run-ups, one-line closers, "not X but Y", stock AI words, the MARKETING_AUTOMATION banned phrases, em/en dashes in our copy, and the retired words "essay/guide/field note" in UI copy. It self-tests on every run.
+- **Quoted third-party text** (a publisher's blurb, a quotation) is wrapped in `<!-- slop-ignore: reason -->` … `<!-- /slop-ignore -->` in .astro files, with the reason stated. Never use it for our own copy.
 - **Srihari's own words are exempt.** Migrated story bodies (`migrated: true`) and anything he writes in `/admin` keep his voice, dashes included; MIGRATION.md §3 governs them. Never "humanize" his text. Headlines and standfirsts of migrated stories are still checked, because Claude edits those.
 - **Conflicts:** `docs/VOICE.md` (once written) beats both skills. Humanizer's "keep the writer's voice" beats stop-slop's absolutes (for example "no adverbs at all" is a check, not a rule for his voice).
 
